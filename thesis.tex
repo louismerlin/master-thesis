@@ -15,12 +15,12 @@
 \usepackage[MScThesis,lablogo]{EPFLreport}
 \usepackage{xspace}
 
-\title{A wonderful thesis\\about the merits of scientific writing}
-\author{The Student}
-\supervisor{The Doctoral Student}
+\title{Recovering type information from compiled binaries\\to aid in instrumentation}
+\author{Louis Merlin}
+\supervisor{Antony Vennard}
 \adviser{Prof. Dr. sc. ETH Mathias Payer}
 %\coadviser{Second Adviser}
-\expert{The External Reviewer}
+\expert{Damian Pfammatter}
 
 \newcommand{\sysname}{FooSystem\xspace}
 
@@ -30,9 +30,6 @@
 \makeacks
 
 \begin{abstract}
-The \sysname tool enables lateral decomposition of a multi-dimensional
-flux compensator along the timing and space axes.
-
 The abstract serves as an executive summary of your project.
 Your abstract should cover at least the following topics, 1-2 sentences for
 each: what area you are in, the problem you focus on, why existing work is
@@ -40,10 +37,10 @@ insufficient, what the high-level intuition of your work is, maybe a neat
 design or implementation decision, and key results of your evaluation.
 \end{abstract}
 
-\begin{frenchabstract}
-For a doctoral thesis, you have to provide a French translation of the
-English abstract. For other projects this is optional.
-\end{frenchabstract}
+% \begin{frenchabstract}
+% For a doctoral thesis, you have to provide a French translation of the
+% English abstract. For other projects this is optional.
+% \end{frenchabstract}
 
 \maketoc
 
@@ -62,6 +59,20 @@ The seventh paragraph will highlight some of your results
 The eights paragraph discusses your core contribution.
 
 This section is usually 3-5 pages.
+
+Setting: compiled binaries; RetroWrite; push for DWARF; closed-source C++ binaries in the wild (android?).
+
+Main challenge: C++-specific ELF sections are not as well documented as they could be (?).
+
+Related work: RetroWrite only does C; debugging tools don't have nice support for C++ features; DWARF will be explored more and more in the coming years.
+
+Our approach: Tool for static analysis of C++ binaries, to recover classes and display them in a helpful way. Fixing RetroWrite to support C++ binaries.
+
+Why it is needed: Nobody (?) has been able to rewrite C++ binaries before, this could lead to very interesting discoveries.
+
+Highlight results: 53\% of packages on debian that use C++ have extracteable classes, [whatever we are able to do with C++ and RetroWrite]
+
+Core contribution: dis-cover as an open-source tool; [whatever we are able to add to RetroWrite]
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
