@@ -62,6 +62,20 @@ This section is usually 3-5 pages.
 
 Setting: compiled binaries; RetroWrite; push for DWARF; closed-source C++ binaries in the wild (android?).
 
+Work on C++ began in 1979, as a "C with classes"~\cite{cwithclasses}.
+Since then, the language has grown in popularity, and even surpassed C itself~\cite{stackoverflowpopularity}.
+Nevertheless, reverse-engineering efforts have been focused towards C binaries, because analysis methods found this way will often work on C++ binaries too.
+
+The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a static rewriting tool for x86\_64 position-independent binaries.
+It enables the instrumentation of projects when we do not have access to the source code.
+This can include a legacy project, a closed-source product or even malware.
+
+[IF WE SUCCEEDED]
+In this thesis we would like to show how we brought C++ support to RetroWrite, and what research opportunities this will create.
+
+[IF WE FAILED :(]
+In this thesis we will detail how we tried to bring C++ support to RetroWrite, and what remains to be done for the implementation to work.
+
 Main challenge: C++-specific ELF sections are not as well documented as they could be (?).
 
 Related work: RetroWrite only does C; debugging tools don't have nice support for C++ features; DWARF will be explored more and more in the coming years.
