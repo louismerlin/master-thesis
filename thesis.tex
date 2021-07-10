@@ -67,12 +67,8 @@ design or implementation decision, and key results of your evaluation.
 
 Work on C++ began in 1979, as a "C with classes"~\cite{cwithclasses}.
 Since then, the language has grown in popularity, and even surpassed C itself~\cite{stackoverflowpopularity}.
+Examples of well-known C++ projects include the zoom~\cite{zoom} conferencing software, the gold linker~\cite{gold} or [TODO: find another "well-known" example].
 Nevertheless, reverse-engineering efforts have been focused towards C binaries, because analysis methods found this way will often work on C++ binaries too.
-
-The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a static rewriting tool for x86\_64 position-independent binaries.
-It enables the instrumentation of projects when we do not have access to the source code.
-This can include a legacy project, a closed-source product or even malware.
-% Give specific examples here
 
 
 % Main challenge:
@@ -80,6 +76,7 @@ This can include a legacy project, a closed-source product or even malware.
 % Debuggers do not work as well as they should on non-C binaries;
 
 This has meant reverse engineering tools like ghidra~\cite{ghidra}, IDA Pro~\cite{ida} or Binary Ninja~\cite{binja} have treated non-C binaries as second-class citizen.
+These tools will often show C++ specific features as passing comments, failing to show the real implications of a try/catch block or a polymorphic class.
 % Ghidra/IDA will show as pseudo-C code, but not C++
 %  see throw/catch or RTTI
 % C++ is quite a compilicated language.
@@ -91,6 +88,10 @@ This has meant reverse engineering tools like ghidra~\cite{ghidra}, IDA Pro~\cit
 % RetroWrite only does C;
 % debugging tools don't have nice support for C++ features;
 % DWARF will be explored more and more in the coming years;
+
+The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a static rewriting tool for x86\_64 position-independent binaries.
+It enables the instrumentation of projects when we do not have access to the source code.
+This can include a legacy project, a closed-source product or even malware.
 
 % Does anything else try to do retrowriting C++ ?
 % Does anything else try to extract classes ? (Marx / plugins)
@@ -115,6 +116,7 @@ This enables other debugging tools to see and display this information.
 % Highlight results:
 % 53\% of packages on debian that use C++ have extracteable classes;
 % [whatever we are able to do with C++ and RetroWrite];
+
 
 % It's a first symbolic representation of C++ code that can be recompiled
 
