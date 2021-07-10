@@ -63,15 +63,12 @@ design or implementation decision, and key results of your evaluation.
 % This section is usually 3-5 pages.
 
 
-% Setting: compiled binaries; RetroWrite; push for DWARF; closed-source C++ binaries in the wild (android?).
+% Setting: compiled binaries; RetroWrite; [need for a compatible exchange format => DWARF;] closed-source C++ binaries in the wild (android?).
 
 Work on C++ began in 1979, as a "C with classes"~\cite{cwithclasses}.
 Since then, the language has grown in popularity, and even surpassed C itself~\cite{stackoverflowpopularity}.
+Examples of well-known C++ projects include the zoom~\cite{zoom} conferencing software, the gold linker~\cite{gold} or [TODO: find another "well-known" example].
 Nevertheless, reverse-engineering efforts have been focused towards C binaries, because analysis methods found this way will often work on C++ binaries too.
-
-The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a static rewriting tool for x86\_64 position-independent binaries.
-It enables the instrumentation of projects when we do not have access to the source code.
-This can include a legacy project, a closed-source product or even malware.
 
 
 % Main challenge:
@@ -79,6 +76,13 @@ This can include a legacy project, a closed-source product or even malware.
 % Debuggers do not work as well as they should on non-C binaries;
 
 This has meant reverse engineering tools like ghidra~\cite{ghidra}, IDA Pro~\cite{ida} or Binary Ninja~\cite{binja} have treated non-C binaries as second-class citizen.
+These tools will often show C++ specific features as passing comments, failing to show the real implications of a try/catch block or a polymorphic class.
+
+% Ghidra/IDA will show as pseudo-C code, but not C++
+%  see throw/catch or RTTI
+% C++ is quite a compilicated language.
+% C's abstractions work very well in assembler, but C++ adds a whole layer of complexity.
+% When translated to assembly, a lot of information is lost.
 
 
 % Related work:
@@ -86,17 +90,25 @@ This has meant reverse engineering tools like ghidra~\cite{ghidra}, IDA Pro~\cit
 % debugging tools don't have nice support for C++ features;
 % DWARF will be explored more and more in the coming years;
 
+The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a static rewriting tool for x86\_64 position-independent binaries.
+It enables the instrumentation of projects when we do not have access to the source code.
+This can include a legacy project, a closed-source product or even malware.
+
+% Does anything else try to do retrowriting C++ ?
+% Does anything else try to extract classes ? (Marx / plugins)
+
 
 % Our approach:
 % Tool for static analysis of C++ binaries, to recover classes and display them in a helpful way;
 % Fixing RetroWrite to support C++ binaries;
 
-In this thesis we would like to present the \textbf{dis-cover}~\cite{discovergithub} static analysis tool, as well as improvements made to RetroWrite to support C++ binaries.
+In this thesis we would like to present the \textbf{dis-cover}~\cite{discovergithub} static analysis tool,
+as well as improvements made to RetroWrite to support C++ binaries.
 
 
 % Why it is needed:
 % Non-obtrusive way of adding C++ support in debugging tools;
-% Nobody (?) has been able to rewrite C++ binaries before, this could lead to very interesting discoveries;
+% Nobody (?) (as far as we know / to the best of our knowledge) has been able to rewrite C++ binaries before, this could lead to very interesting discoveries;
 
 The dis-cover tool is able to extract information from a C++ binary, and re-inject it as debug information using the DWARF format into the binary.
 This enables other debugging tools to see and display this information.
@@ -107,9 +119,13 @@ This enables other debugging tools to see and display this information.
 % [whatever we are able to do with C++ and RetroWrite];
 
 
+% It's a first symbolic representation of C++ code that can be recompiled
+
+
 % Core contribution:
 % dis-cover as an open-source tool;
 % [whatever we are able to add to RetroWrite];
+% Also the documentation of the process.
 
 [IF WE SUCCEEDED]
 In this thesis we would like to show how we brought C++ support to RetroWrite, and what research opportunities this will create.
@@ -128,7 +144,8 @@ that must be resolved to understand your design and implementation.
 
 This section is usually 3-5 pages.
 
-% C++ polymorphism (what, how, but also research like Marx)
+% C++ polymorphism (what, how, but also research like Marx) (+ exceptions) 
+% also talk about how compilers will optimize this out in certain situtations
 The C++ programming language implements polymorphism.
 This feature enables complex code logic that can comply with external business logic for example.
 Polymorphic classes are defined by having at least one virtual method, which is inheritable and overridable.
@@ -160,17 +177,31 @@ how the design fits together.
 
 This section is usually 5-10 pages.
 
-% Python script
-
-% ELF Sections
+% Design => Decisions
+% We decided not to reproduce Marx's work
+% First attempt : recover classes from RTTI
+% Future work : could take approaches like Marx and re-feed it like us
 
 % VTable => RTTI
+%   mention class data (debian analysis)
 
-% Creating DIEs
+% Also: exceptions (we felt this needed to be handled)
+
+% Why do we want DWARF data ?
+%   We want to make the info available to reversing tools
+%   => input from Dr. Sergey Bratus
+%        He would like to see DWARF used as a lingua franca for debugging
+% Also, exception's try/catch blocks & exception types
+% but dwarf is limited for this (=> future work)
 
 % Injecting debug section & symbols
 
 % RetroWrite structure
+%  x86_64 userspace and kernel, and arm_64
+%  We've decided to focus on the x86_64 userspace
+%    Most widely used target
+%    Kernel drivers are mostly written in C
+% We still want to keep the deterministic ability of retrowrite
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -183,13 +214,19 @@ you wrote but covers the implementation aspects of the projects.
 
 This section is usually 3-5 pages.
 
+% Python script (because RetroWrite; and good tools) (1 sentence)
+
 % RTTI and VTable
 
+% Creating DIEs
 % DIE Bytecode
+% unwind tables etc
+% what it does and does not do
 
 % eu-unstrip etc
 
 % RetroWrite implementation details
+% Refer to the other thesis
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
