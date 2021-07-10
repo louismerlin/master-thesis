@@ -142,11 +142,13 @@ In this thesis we will detail how we tried to bring C++ support to RetroWrite, a
 \chapter{Background}
 %%%%%%%%%%%%%%%%%%%%
 
-The background section introduces the necessary background to understand your
-work. This is not necessarily related work but technologies and dependencies
-that must be resolved to understand your design and implementation.
+% The background section introduces the necessary background to understand your
+% work. This is not necessarily related work but technologies and dependencies
+% that must be resolved to understand your design and implementation.
 
-This section is usually 3-5 pages.
+% This section is usually 3-5 pages.
+
+\section{C++ and polymorphism}
 
 % C++ polymorphism (what, how, but also research like Marx) (+ exceptions) 
 % also talk about how compilers will optimize this out in certain situtations
@@ -159,7 +161,9 @@ It only will successfuly cast if the value is of the referenced type or a base t
 In order to achieve that, the system must have some kind of information about the object's data type at runtime.
 This information is called Run-Time Type Information (\textbf{RTTI}), and is stored in the binary if it is needed.
 In certain situations, if there are polymorphic classes but certain features are not used (casting, inheritance logic), the classes are abstracted away at compile time and the RTTIs do not exist.
-We will go into more details about the implementation of C++ RTTIs in later chapters.
+We will go into more details about the implementation of C++ RTTI in later chapters.
+
+\section{DWARF debugging standard}
 
 % DWARF DIEs
 \textbf{DWARF} is the debugging standard used widly in conjunction with executable ELF files.
@@ -168,6 +172,8 @@ This debug information is made up of Debugging Information Entries (\textbf{DIEs
 These entries can contain information about variable names, method definitions, the compilation process, or more importantly for us, class names and class inheritance.
 
 % ELF sections
+
+\section{RetroWrite}
 
 % How RetroWrite works
 
