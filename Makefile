@@ -4,8 +4,7 @@ name=thesis
 all: *.tex *.bib
 	docker build -t master-thesis .
 	docker run -it --rm -v "${PWD}:/app" master-thesis rubber --pdf $(name).tex
-	chown ${USER} *
+	sudo chown ${USER} $(name).pdf
 
 clean:
-	rubber --clean --pdf $(name).tex
-
+	docker run -it --rm -v "${PWD}:/app" master-thesis rubber --clean --pdf $(name).tex
