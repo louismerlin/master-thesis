@@ -129,6 +129,15 @@ that must be resolved to understand your design and implementation.
 This section is usually 3-5 pages.
 
 % C++ polymorphism (what, how, but also research like Marx)
+The C++ programming language implements polymorphism.
+This feature enables complex code logic that can comply with external business logic for example.
+Polymorphic classes are defined by having at least one virtual method, which is inheritable and overridable.
+With this polymorphism comes type conversion, and more interestingly for us the \textbf{dynamic_cast} expression.
+Dynamic casting is a safe kind of type conversion.
+It only will successfuly cast if the value is of the referenced type or a base type of that type.
+In order to achieve that, the system must have some kind of information about the object's data type at runtime.
+This information is called Run-Time Type Information (\textbf{RTTI}), and is stored in the binary if it is needed.
+We will go into more details about the implementation of RTTIs in C++ in later chapters.
 
 % DWARF DIEs
 
