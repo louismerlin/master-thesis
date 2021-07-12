@@ -200,8 +200,15 @@ The MARX project can recover classes when no RTTI is present (in the Chrome proj
 
 % VTable => RTTI
 %   mention class data (debian analysis)
+For this project we decided to focus on RTTIs which, as mentioned in the Background chapter, are available for a class hierarchy tree when there is at least one virtual method implemented by one of the classes.
+We decided to test if RTTIs occured often in the wild : we proceed to download every Debian package that listed C++ as a dependency (get the list with \textbf{apt-cache rdepends libgcc1} on a debian machine).
+Out of around 80'000 packages, 5827 of them list C++ as a dependency.
+Out of those, we were able to extract classes from 3194 (54\%).
+We will share more details about this experiment in the Evaluation chapter.
 
 % Also: exceptions (we felt this needed to be handled)
+We also considered extracting information about exceptions, which is another big feature that differenciates C++ from C.
+We decided not to focus on this feature, as it did not seem to bring as much to the project considering the evaluated development time.
 
 % Why do we want DWARF data ?
 %   We want to make the info available to reversing tools
@@ -259,6 +266,8 @@ This section is usually 5-10 pages.
 % Big applications examples
 
 % Debian test
+As we have shown before, out of the 5827 debian packages that list C++ as a dependency, we were able to extract classes from 3194 (54\%).
+The total number of classes we found is 960'188, with 39\% of them unique across all packages (unique name in unique tree).
 
 % RetroWrite test
 
