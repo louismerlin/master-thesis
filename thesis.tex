@@ -192,6 +192,11 @@ This section is usually 5-10 pages.
 % We decided not to reproduce Marx's work
 % First attempt : recover classes from RTTI
 % Future work : could take approaches like Marx and re-feed it like us
+Class recovery from compiled C++ binaries has been done multiple ways before:
+there are plugins for popular debugging tools, like ida\_gcc\_rtti~\cite{idagccrtti} for IDA Pro,
+or Ghidra-Cpp-Class-Analyzer~\cite{ghidracppclassanalyzer} for Ghidra;
+there are academic projects such as MARX~\cite{marx} that rely on heuristics around VTables to find classes and inheritance information.
+The MARX project can recover classes when no RTTI is present (in the Chrome project for example, where the \textbf{fno-rrti} compilation flag is used), but not with 100\% accuracy.
 
 % VTable => RTTI
 %   mention class data (debian analysis)
