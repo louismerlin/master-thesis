@@ -209,6 +209,7 @@ We will share more details about this experiment in the Evaluation chapter.
 % Also: exceptions (we felt this needed to be handled)
 We also considered extracting information about exceptions, which is another big feature that differenciates C++ from C.
 We decided not to focus on this feature, as it did not seem to bring as much to the project considering the evaluated development time.
+We did have to study and work with exceptions and exception handling frames for the augmentation of RetroWrite (see the end of the Implementation chapter).
 
 % Why do we want DWARF data ?
 %   We want to make the info available to reversing tools
@@ -216,6 +217,12 @@ We decided not to focus on this feature, as it did not seem to bring as much to 
 %        He would like to see DWARF used as a lingua franca for debugging
 % Also, exception's try/catch blocks & exception types
 % but dwarf is limited for this (=> future work)
+Next comes the question : what should we do with all of this information ? What would be the most useful format to output the data in ?
+This is where DWARF~\cite{dwarf} comes in the picture. DWARF is the debugging standard for programs.
+It is mostly used by developers trying to understand where their implementation fails,
+and by reverse engineers to get a better understanding of how a program was conceived (although DWARF information is usually stripped from proprietary software).
+This kind of debug data is mostly found in C and C++ projects. % Should I add another language ?
+By having DWARF data as an output, the information would become readable by most modern reversing tools.
 
 % Injecting debug section & symbols
 
