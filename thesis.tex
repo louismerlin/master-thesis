@@ -92,7 +92,7 @@ These tools will often show C++ specific features as passing comments, failing t
 % When translated to assembly, a lot of information is lost.
 
 The blame can mostly be put on the complexity of C++ when compared to C.
-Whereas C translates quite naturaly to assembly, abstractions specific to C++ require more work and complexity to be translated to asm.
+Whereas C translates quite naturally to assembly, abstractions specific to C++ require more work and complexity to be translated to asm.
 This also leads to important information being lost from C++ source code to binary, but also certain information remaining.
 
 
@@ -126,7 +126,7 @@ This enables other debugging tools to see and display this information.
 
 
 % Highlight results:
-% 53\% of packages on debian that use C++ have extracteable classes;
+% 53\% of packages on Debian that use C++ have extracteable classes;
 % [whatever we are able to do with C++ and RetroWrite];
 
 
@@ -164,8 +164,8 @@ This feature enables complex code logic that can comply with external business l
 Polymorphic classes are defined by having at least one virtual method, which is inheritable and overridable.
 With this polymorphism comes type conversion, and more interestingly for us the \textbf{dynamic\_cast}~\cite{dynamiccast} expression.
 Dynamic casting is a safe kind of type conversion.
-It only will successfuly cast if the value is of the referenced type or a base type of that type.
-In order to achieve that, the system must have some kind of information about the object's data type at runtime.
+It only will successfully cast if the value is of the referenced type or a base type of that type.
+In order to achieve that, the system must have some kind of information about the object's data type at run time.
 
 This is where Run-Time Type Information (\textbf{RTTI}) comes into the picture.
 The system will use this RTTI to infer type inheritance for dynamic casting.
@@ -191,7 +191,7 @@ public:
 
 \end{figure}
 
-For RTTIs to appear in your C++ binary, you will also need to instanciate these classes, and have some runtime logic to make the binary non-deterministic [this not the right word I think, I mean to say that the binary depends on some input for its class-instanciation logic].
+For RTTIs to appear in your C++ binary, you will also need to instantiate these classes, and have some run time logic to make the binary non-deterministic [this not the right word I think, I mean to say that the binary depends on some input for its class-instantiating logic].
 For example, a conditional dynamic cast between the two classes we defined in \autoref{classes}.
 If you do not do these things, the class logic will be abstracted away by the compiler for optimization reasons.
 
@@ -210,13 +210,13 @@ This VTable will contain pointers to the virtual methods of the class, which are
 The first value preceding the VTable is a pointer to the RTTI of the class. The process finds out the class inheritance of a class instance by following this pointer.
 
 The RTTI itself is composed of an offset (used for complex class inheritance structures) as well as a pointer to the type name (this type name is not removed by simple stripping of the binary, like with \textbf{objdcopy --strip-all}).
-This name is mangled using C++ mangling, and can trivialy be demangled. This name is what we use to uniquely identify a class in a project (and make sure we have no duplicates).
+This name is mangled using C++ mangling, and can trivially be de-mangled. This name is what we use to uniquely identify a class in a project (and make sure we have no duplicates).
 The next values of the RTTI are pointers to the RTTIs of the parent classes. See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer to the Animal RTTI.
 
 \section{DWARF debugging standard}
 
 % DWARF DIEs
-\textbf{DWARF} is the debugging standard used widly in conjunction with executable ELF files.
+\textbf{DWARF} is the debugging standard used widely in conjunction with executable ELF files.
 It is often included in these ELF files in the \textbf{.debug\_info} section (and other related sections).
 This debug information is made up of Debugging Information Entries (\textbf{DIEs}).
 These entries can contain information about variable names, method definitions, the compilation process, or more importantly for us, class names and class inheritance.
@@ -249,15 +249,15 @@ there are academic projects such as MARX~\cite{marx} that rely on heuristics aro
 The MARX project can recover classes when no RTTI is present (in the Chrome project for example, where the \textbf{fno-rrti} compilation flag is used), but not with 100\% accuracy.
 
 % VTable => RTTI
-%   mention class data (debian analysis)
+%   mention class data (Debian analysis)
 For this project we decided to focus on RTTIs which, as mentioned in the Background chapter, are available for a class hierarchy tree when there is at least one virtual method implemented by one of the classes.
-We decided to test if RTTIs occured often in the wild : we proceed to download every Debian package that listed C++ as a dependency (get the list with \textbf{apt-cache rdepends libgcc1} on a debian machine).
+We decided to test if RTTIs occurred often in the wild : we proceed to download every Debian package that listed C++ as a dependency (get the list with \textbf{apt-cache rdepends libgcc1} on a Debian machine).
 Out of around 80'000 packages, 5827 of them list C++ as a dependency.
-Out of those, we were able to extract classes from 3194 (54\%).
+Out of those, we extracted classes from 3194 (54\%).
 We will share more details about this experiment in the Evaluation chapter.
 
 % Also: exceptions (we felt this needed to be handled)
-We also considered extracting information about exceptions, which is another big feature that differenciates C++ from C.
+We also considered extracting information about exceptions, which is another big feature that differentiates C++ from C.
 We decided not to focus on this feature, as it did not seem to bring as much to the project considering the evaluated development time.
 We did have to study and work with exceptions and exception handling frames for the augmentation of RetroWrite (see the end of the Implementation chapter).
 
@@ -275,7 +275,7 @@ This kind of debug data is mostly found in C and C++ projects. % Should I add an
 By having DWARF data as an output, the information would become readable by most modern reversing tools.
 
 There is a current push for DWARF to become the lingua franca for reverse engineering tools, lead by researchers like Dr. Sergey Bratus~\cite{bratus} from DARPA.
-He has publised a paper in 2011 where he was able to exploit certain features of DWARF to control program execution : Exploiting the hard-working DWARF~\cite{hardworkingdwarf}.
+He has published a paper in 2011 where he was able to exploit certain features of DWARF to control program execution : Exploiting the hard-working DWARF~\cite{hardworkingdwarf}.
 
 % Injecting debug section & symbols
 With dis-cover, we are able to inject information in the debug and symbol sections of the binary, creating a new ELF file with all of this useful info included.
