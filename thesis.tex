@@ -14,6 +14,13 @@
 % Options: MScThesis, BScThesis, MScProject, BScProject
 \usepackage[MScThesis,lablogo]{EPFLreport}
 \usepackage{xspace}
+\usepackage{listings}
+
+\lstset{ 
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  frame=single,	                   % adds a frame around the code
+  language=C++,                    % the language of the code
+}
 
 \title{Recovering type information from compiled binaries\\to aid in instrumentation}
 \author{Louis Merlin}
@@ -159,9 +166,48 @@ With this polymorphism comes type conversion, and more interestingly for us the 
 Dynamic casting is a safe kind of type conversion.
 It only will successfuly cast if the value is of the referenced type or a base type of that type.
 In order to achieve that, the system must have some kind of information about the object's data type at runtime.
-This information is called Run-Time Type Information (\textbf{RTTI}), and is stored in the binary if it is needed.
-In certain situations, if there are polymorphic classes but certain features are not used (casting, inheritance logic), the classes are abstracted away at compile time and the RTTIs do not exist.
-We will go into more details about the implementation of C++ RTTI in later chapters.
+
+This is where Run-Time Type Information (\textbf{RTTI}) comes into the picture.
+The system will use this RTTI to infer type inheritance for dynamic casting.
+We will now go into implementation details of RTTIs and VTables, which point to them.
+
+To make RTTIs appear in your C++ binary, you will to define classes that inherit from each other, as well as at least one virtual method in one of these classes.
+\autoref{classes} shows an example of such classes.
+
+\begin{figure}[h]
+\begin{lstlisting}
+class Animal {
+public:
+  virtual void speak() {}
+};
+
+class Dog {
+public:
+  virtual void speak() { cout << "Woof" << endl; }
+}
+\end{lstlisting}
+\caption{Polymorphic classes in C++}
+\label{classes}
+
+\end{figure}
+
+For RTTIs to appear in your C++ binary, you will also need to instanciate these classes, and have some runtime logic to make the binary non-deterministic [this not the right word I think, I mean to say that the binary depends on some input for its class-instanciation logic].
+For example, a conditional dynamic cast between the two classes we defined in \autoref{classes}.
+If you do not do these things, the class logic will be abstracted away by the compiler for optimization reasons.
+
+\begin{figure}[h]
+
+\includegraphics[width=16cm]{RTTI_graph.png}
+\caption{Overview of an example of VTables and RTTI in memory}
+\label{rttigraph}
+
+\end{figure}
+
+The structure of VTables and RTTIs is detailed in \autoref{rttigraph}.
+All of this is defined in the Itanium C++ ABI~\cite{cppabi}.
+An instance of a virtual class Animal will contain the \textbf{vtblptrAnimal}, a pointer to the virtual table (\textbf{VTable}) for the Animal class.
+This VTable will contain pointers to the virtual methods of the class, which are inherited and thus do not have to be duplicated for each class, simply pointed to.
+% I AM WRITING HERE
 
 \section{DWARF debugging standard}
 
