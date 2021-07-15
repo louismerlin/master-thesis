@@ -206,8 +206,12 @@ If you do not do these things, the class logic will be abstracted away by the co
 The structure of VTables and RTTIs is detailed in \autoref{rttigraph}.
 All of this is defined in the Itanium C++ ABI~\cite{cppabi}.
 An instance of a virtual class Animal will contain the \textbf{vtblptrAnimal}, a pointer to the virtual table (\textbf{VTable}) for the Animal class.
-This VTable will contain pointers to the virtual methods of the class, which are inherited and thus do not have to be duplicated for each class, simply pointed to.
-% I AM WRITING HERE
+This VTable will contain pointers to the virtual methods of the class, which are inherited and thus do not have to be duplicated for each class, they are simply pointed to.
+The first value preceding the VTable is a pointer to the RTTI of the class. The process finds out the class inheritance of a class instance by following this pointer.
+
+The RTTI itself is composed of an offset (used for complex class inheritance structures) as well as a pointer to the type name (this type name is not removed by simple stripping of the binary, like with \textbf{objdcopy --strip-all}).
+This name is mangled using C++ mangling, and can trivialy be demangled. This name is what we use to uniquely identify a class in a project (and make sure we have no duplicates).
+The next values of the RTTI are pointers to the RTTIs of the parent classes. See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer to the Animal RTTI.
 
 \section{DWARF debugging standard}
 
