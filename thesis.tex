@@ -295,6 +295,9 @@ We aimed to add C++ capabilities for x86\_64 binaries only, as it seems like the
 Another potential use of the class information is to implement defenses around type confusion, working with the findings from the HexType~\cite{hextype} paper.
 We decided not to focus on this for our project, as it would have been out of the scope of a 6-months master thesis.
 
+One of the defining properties of RetroWrite is that it does not use heuristics (and thus does not have probabilistic features and failures).
+Dis-cover has the same no-heuristics property, and thus could be used by the RetroWrite project without breaking the property.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementation}
