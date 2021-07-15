@@ -224,7 +224,12 @@ and by reverse engineers to get a better understanding of how a program was conc
 This kind of debug data is mostly found in C and C++ projects. % Should I add another language ?
 By having DWARF data as an output, the information would become readable by most modern reversing tools.
 
+There is a current push for DWARF to become the lingua franca for reverse engineering tools, lead by researchers like Dr. Sergey Bratus~\cite{bratus} from DARPA.
+He has publised a paper in 2011 where he was able to exploit certain features of DWARF to control program execution : Exploiting the hard-working DWARF~\cite{hardworkingdwarf}.
+
 % Injecting debug section & symbols
+With dis-cover, we are able to inject information in the debug and symbol sections of the binary, creating a new ELF file with all of this useful info included.
+We will go more into the implementation details in the next chapter.
 
 % RetroWrite structure
 %  x86_64 userspace and kernel, and arm_64
@@ -232,6 +237,13 @@ By having DWARF data as an output, the information would become readable by most
 %    Most widely used target
 %    Kernel drivers are mostly written in C
 % We still want to keep the deterministic ability of retrowrite
+Another focus of this project was the augmentation of RetroWrite for C++ capabilities.
+Today, RetroWrite supports the reversing of x86\_64 position-independent binaries.
+There was also work to augment RetroWrite to support kernel code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
+We aimed to add C++ capabilities for x86\_64 binaries only, as it seems like the biggest target.
+
+Another potential use of the class information is to implement defenses around type confusion, working with the findings from the HexType~\cite{hextype} paper.
+We decided not to focus on this for our project, as it would have been out of the scope of a 6-months master thesis.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
