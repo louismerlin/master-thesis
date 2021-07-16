@@ -303,25 +303,48 @@ Dis-cover has the same no-heuristics property, and thus could be used by the Ret
 \chapter{Implementation}
 %%%%%%%%%%%%%%%%%%%%%%%%
 
-The implementation covers some of the implementation details of your project.
-This is not intended to be a low level description of every line of code that
-you wrote but covers the implementation aspects of the projects.
+% The implementation covers some of the implementation details of your project.
+% This is not intended to be a low level description of every line of code that
+% you wrote but covers the implementation aspects of the projects.
 
-This section is usually 3-5 pages.
+% This section is usually 3-5 pages.
 
 % Python script (because RetroWrite; and good tools) (1 sentence)
 We decided to write a python module for this project, as the python ecosystem has great reverse engineering packages, and because the other projects from the HexHive lab are usually python modules.
 
+\section{Finding RTTIs}
+
 % RTTI and VTable
 The first thing dis-cover does is find ELF sections where the VTables and RTTIs could be hiding.
 This is usually \textbf{.rodata} (read-only data), but could sometimes also be related sections like \textbf{.data.rel.ro}, \textbf{.data.rel.ro.local}, or \textbf{.rdata}.
-As per the Itanium C++ ABI, the base VTable of a class will contain an "offset-to-top", which will be 0 in the base VTable's case, followed by a pointer to an RTTI.
+[TODO see if we can just look in .rodata]
+As per the Itanium C++ ABI, the base VTable of a class will contain an "offset-to-top", which will be 0 in the primary base virtual table's case, followed by a pointer to an RTTI.
 We simply have to pattern-match for zeroes directly followed by a pointer to another part of the read-only data sections, and we have a potential RTTI pointer.
-To check whether we have found an RTTI, we [TODO modifications in progress to simplify this] assert that the next value is a pointer to a string.
 
+To check whether we have found an RTTI, we assert that the next value is a pointer to a string located in a read-only data section.
+If it is, we can extract it, demangle it, and we have a class and a name.
+The next values in the RTTI are pointers to the RTTIs the class inherits from.
+We can go through them and parse them if we have not already, to add this inheritance information to the original class.
+
+This algorithm is $O(n)$, as adding a class only adds one more value to parse.
+
+\section{Creating DWARF data}
 
 % Creating DIEs
+Next, we want to add that information to the debug sections of a new ELF file.
+
 % DIE Bytecode
+In order to write DWARF data, the first step is defining the types we will be using, and their fields.
+This is done by writing bytes in the \textbf{.debug\_abbrev} section.
+For example, we create an abbrev of type \textbf{class\_type}, which has a \textbf{name}, and can have sub-field (children).
+Then, we create the abbrev of type \textbf{inheritance}, which has a \textbf{type} (a reference to the parent type).
+
+We can then populate the \textbf{.debug\_info} with classes and their inheritance data.
+DWARF data takes the form of a tree of values. We have to create a \textbf{compile\_unit} value at the root, and then the branches will be \textbf{class\_type}s.
+These \textbf{class\_type}s will themselves have as children \textbf{inheritance} values if the class inherits from another class.
+
+TODO Add a figure with the output from dwarfdump for a simple example.
+
 % unwind tables etc
 % what it does and does not do
 
