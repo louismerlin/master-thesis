@@ -317,7 +317,6 @@ We decided to write a python module for this project, as the python ecosystem ha
 % RTTI and VTable
 The first thing dis-cover does is find ELF sections where the VTables and RTTIs could be hiding.
 This is usually \textbf{.rodata} (read-only data), but could sometimes also be related sections like \textbf{.data.rel.ro}, \textbf{.data.rel.ro.local}, or \textbf{.rdata}.
-[TODO see if we can just look in .rodata]
 As per the Itanium C++ ABI, the base VTable of a class will contain an "offset-to-top", which will be 0 in the primary base virtual table's case, followed by a pointer to an RTTI.
 We simply have to pattern-match for zeroes directly followed by a pointer to another part of the read-only data sections, and we have a potential RTTI pointer.
 
