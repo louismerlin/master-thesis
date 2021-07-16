@@ -342,8 +342,26 @@ Then, we create the abbrev of type \textbf{inheritance}, which has a \textbf{typ
 We can then populate the \textbf{.debug\_info} with classes and their inheritance data.
 DWARF data takes the form of a tree of values. We have to create a \textbf{compile\_unit} value at the root, and then the branches will be \textbf{class\_type}s.
 These \textbf{class\_type}s will themselves have as children \textbf{inheritance} values if the class inherits from another class.
+\autoref{dwarfdump} shows a very simple example of this, with two class types and one inheriting from the other.
 
-TODO Add a figure with the output from dwarfdump for a simple example.
+\begin{figure}[h]
+\begin{lstlisting}
+< 1><0x0000001a>    DW_TAG_class_type
+                      DW_AT_containing_type       <0x0000001a>
+                      DW_AT_calling_convention    DW_CC_pass_by_reference
+                      DW_AT_name                  Shape
+                      DW_AT_byte_size             0x00000008
+< 1><0x00000026>    DW_TAG_class_type
+                      DW_AT_containing_type       <0x00000026>
+                      DW_AT_calling_convention    DW_CC_pass_by_reference
+                      DW_AT_name                  Rectangle
+                      DW_AT_byte_size             0x00000008
+< 2><0x00000031>      DW_TAG_inheritance
+                        DW_AT_type                  <0x0000001a>
+\end{lstlisting}
+\caption{Extract of a dwarfdump output showing simple inheritance}
+\label{dwarfdump}
+\end{figure}
 
 % unwind tables etc
 % what it does and does not do
