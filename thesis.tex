@@ -421,15 +421,70 @@ The newly created combined ELF file will contain all of the code and data from t
 \chapter{Evaluation}
 %%%%%%%%%%%%%%%%%%%%
 
-In the evaluation you convince the reader that your design works as intended.
-Describe the evaluation setup, the designed experiments, and how the
-experiments showcase the individual points you want to prove.
+% In the evaluation you convince the reader that your design works as intended.
+% Describe the evaluation setup, the designed experiments, and how the
+% experiments showcase the individual points you want to prove.
 
-This section is usually 5-10 pages.
+% This section is usually 5-10 pages.
+
+\section{Small case studies}
 
 % Small examples
+In addition to the first version of dis-cover, we created three small programs highlighting different features of C++.
+One was using simple inheritance,
+one had a namespace (which we can and should recover as part of the analysis),
+and the last one was a use case of multiple inheritance (using the diamond problem).
+
+We also created a script that would compile these 3 programs using different levels of compiler optimization.
+We could then use dis-cover to see if we could recover every class and the correct tree from the binaries.
+This served as a useful benchmark to check whether dis-cover was functioning correctly if we tried to apply changes to it.
+
+These examples alone were not capable of letting us evaluate the full capabilities of dis-cover.
+We found a few big applications that could serve that purpose.
+
+\section{Big case studies}
 
 % Big applications examples
+The first and smallest of these case studies was the \textbf{gold linker}~\cite{gold}.
+We were able to find 571 classes in version 1.16 of the program.
+This provides a good benchmark, but the classes themselves do not make use of multiple inheritance (only a "simple" inheritance tree).
+
+\textbf{LibreOffice}~\cite{libreoffice} on the other hand provided us with a great test case :
+the program is fragmented into many small libraries, containing some interesting uses of multiple inheritance.
+See \autoref{libloglo} for an example of multiple inheritance in the \textbf{libloglo.so} library from LibreOffice.
+This particular example was very important for verifying a big bug that was present in an early version of dis-cover.
+After fixing the bug, we were noticing around 10\% more inheritance links in some projects (but not more classes).
+Being able to go check with the open-source LibreOffice code that we had found the right inheritance links was extremely helpful.
+
+\begin{figure}[h]
+
+\includegraphics[width=16cm]{libloglo_partial.png}
+\caption{Partial class tree of libloglo.so from LibreOffice}
+\label{libloglo}
+
+\end{figure}
+
+Finally, we also were able to study the closed-source \textbf{zoom}~\cite{zoom} binary.
+This test case is very interesting in two ways.
+First, we are able to find \textbf{6039 classes} in the binary, with \textbf{5601 edges} in the class hierarchy graph.
+Second, as a large (80M) and complex ELF file, it served as a perfect benchmark for the performance of the algorithm.
+By adding a simple check earlier in the RTTI-spotting pipeline, we were able to speed up the analysis of the zoom binary 10 times.
+See \autoref{zoomspeed} for the details of this benchmark.
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{l | r | r | r}
+    ELF File and version & Old Algorithm & New Algorithm & Speedup Factor \\
+    \hline
+    zoom 5.5.7938.0228 & 52m42.123s & 5m22.321s & $10\times$ \\ % THESE NUMBERS ARE FAKE AND WILL BE UPDATED SOON
+    gold 1.16 & 0m5.123s & 0m1.321s & $5\times$ \\ % THESE NUMBERS ARE FAKE AND WILL BE UPDATED SOON
+    ceph-dencoder 15.2.13 & 1m30.123s & 0m9.123s & $10\times$ % THESE NUMBERS ARE FAKE AND WILL BE UPDATED SOON
+  \end{tabular}
+
+\caption{Difference of computation time between algorithms on a machine running Ubuntu 20.04 with a 2.6 Ghz dedicated vCPU}
+\label{zoomspeed}
+
+\end{table}
 
 % Debian test
 As we have shown before, out of the 5827 Debian packages that list C++ as a dependency, we were able to extract classes from 3194 (54\%).
