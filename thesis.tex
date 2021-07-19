@@ -210,7 +210,7 @@ This VTable will contain pointers to the virtual methods of the class, which are
 The first value preceding the VTable is a pointer to the RTTI of the class. The process finds out the class inheritance of a class instance by following this pointer.
 
 The RTTI itself is composed of an offset (used for complex class inheritance structures) as well as a pointer to the type name (this type name is not removed by simple stripping of the binary, like with \textbf{objdcopy --strip-all}).
-This name is mangled using C++ mangling, and can trivially be de-mangled. This name is what we use to uniquely identify a class in a project (and make sure we have no duplicates).
+This name is mangled using C++ mangling, and can trivially be demangled. This name is what we use to uniquely identify a class in a project (and make sure we have no duplicates).
 The next values of the RTTI are pointers to the RTTIs of the parent classes. See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer to the Animal RTTI.
 
 \section{DWARF debugging standard}
@@ -362,13 +362,60 @@ These \textbf{class\_type}s will themselves have as children \textbf{inheritance
 \label{dwarfdump}
 \end{figure}
 
-% unwind tables etc
-% what it does and does not do
+The strings themselves are stored in another section, \textbf{.debug\_str}, and are referred to with their offset in that section.
+
+\section{Creating symbols}
+
+% symbols
+Symbols are used to have access to variable names, class names, function names or any other kind of text information when debugging a binary.
+We want to create two symbols for every class we have found during the analysis : one pointing to the VTable and one pointing to the RTTI, labeling them as such.
+
+In order to create new symbol sections, we take the symbol table from the original binary (if there was one) and append the aforementioned symbols.
+
+The two symbol sections are \textbf{.symtab}, which contains the information (offset, size, type, ...) for each symbol, and \textbf{.strtab}, which contains the strings related to these symbols.
+
+\section{Wrapping things together}
+
+\subsection{Creating a fake ELF file}
 
 % eu-unstrip etc
+Once we have the three debug sections ready
+(\textbf{.debug\_abbrev} with the debug types, \textbf{.debug\_info} with the debug information, and \textbf{debug\_str} with the strings)
+as well as the two symbol sections, we have to make them available to the user.
+The first step is building an empty ELF file with only these five sections in them.
+
+We start by constructing a \textbf{program header table}.
+This table contains information about the offset and size of each segment of the binary (which segment is used for what, and their read/write permissions).
+The ELF file we're creating will not be run, but only used temporarily.
+Thus, we noticed that we did not have to create a valid program header table for the process to work.
+We simply copy this program header table almost as-is from the original binary.
+
+Next, we use the individual sections we built earlier and construct the \textbf{section header table}.
+For every section present in the original binary, we create an entry in the section header table, reusing most values from the original section header table.
+The only values we modify is the offset.
+For every section that we have created, we add the appropriate row in the section header table.
+Every section name gets added to the \textbf{.shstrtab} section, as per the convention.
+
+Finally, we construct the \textbf{elf header}, taking some of the values from the original binaries, and calculating some others from the size of the tables and sections we have built.
+We can now create a fake ELF file by appending the elf header, the program header table, the sections we built and the section header table.
+
+\subsection{Stripping the original ELF file}
+
+Next, we will create a stripped version of the original ELF file.
+We use the \textbf{objcopy --strip-all} command.
+This is to avoid section conflicts in the next step.
+
+\subsection{Combining the two ELF files}
+
+Now, we can use the ELF utility program \textbf{eu-unstrip} to combine the two ELF files we have created into one.
+The newly created combined ELF file will contain all of the code and data from the original file, as well as the debug and symbol sections we have created.
+
+% what it does and does not do
 
 % RetroWrite implementation details
 % Refer to the other thesis
+
+% unwind tables etc
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
@@ -385,7 +432,7 @@ This section is usually 5-10 pages.
 % Big applications examples
 
 % Debian test
-As we have shown before, out of the 5827 debian packages that list C++ as a dependency, we were able to extract classes from 3194 (54\%).
+As we have shown before, out of the 5827 Debian packages that list C++ as a dependency, we were able to extract classes from 3194 (54\%).
 The total number of classes we found is 960'188, with 39\% of them unique across all packages (unique name in unique tree).
 
 % RetroWrite test
