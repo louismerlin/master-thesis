@@ -15,6 +15,16 @@
 \usepackage[MScThesis,lablogo]{EPFLreport}
 \usepackage{xspace}
 \usepackage{listings}
+% Enable all todo comments.
+\usepackage[]{todonotes}
+% Uncomment this to disable the comment blocks
+% \usepackage[disable]{todonotes} 
+% This is how we do comments for papers in the lab. This way you can see it 
+% both in TeX and when you compile the PDF. Make sure they're all removed for 
+% the final version by switching the lines above. I also don't mind if you 
+% delete them once resolved because I can see them changed in git :)
+\newcommand{\ant}[1]{\todo[inline,color=blue!40]{Antony: #1}}
+\newcommand{\dam}[1]{\todo[inline,color=red!40]{Damian: #1}}
 
 \lstset{ 
   basicstyle=\footnotesize,        % the size of the fonts that are used for the code
@@ -74,7 +84,7 @@ design or implementation decision, and key results of your evaluation.
 
 Work on C++ began in 1979, as a "C with classes"~\cite{cwithclasses}.
 Since then, the language has grown in popularity, and even surpassed C itself~\cite{stackoverflowpopularity}.
-Examples of well-known C++ projects include the zoom~\cite{zoom} conferencing software, the gold linker~\cite{gold} or [TODO: find another "well-known" example].
+Examples of well-known C++ projects include the zoom~\cite{zoom} conferencing software, the gold linker~\cite{gold} or \ant{Windows Explorer, Qt Framework, Chrome, Firefox, Some Embedded Projects. Very widely used :)} [TODO: find another "well-known" example].
 Nevertheless, reverse-engineering efforts have been focused towards C binaries, because analysis methods found this way will often work on C++ binaries too.
 
 
@@ -161,11 +171,39 @@ In this thesis we will detail how we tried to bring C++ support to RetroWrite, a
 % also talk about how compilers will optimize this out in certain situtations
 The C++ programming language implements polymorphism.
 This feature enables complex code logic that can comply with external business logic for example.
+\ant{Yes - I would expand on this a bit. 
+The key part is that C++ allows the programmer to create abstract concepts in the 
+language itself. One example is an interface, which C++ calls an abstract base 
+class - this lets different programmers in different teams only need to know 
+what interface to implement for their objects and not need to care so much 
+about the underlying detail. The key is that this is also enforced and checked 
+by the compiler, as opposed to C where you can do this but you need to 
+document it, so it should be more efficient for programmers.
+
+You can also re-use functionality by inheriting parent classes, meaning that if 
+you want to implement a Dog and your Animal class already has an implementation 
+for Eat, you don't need a dog-specific implementation if appropriate. 
+
+Sometimes we can make all of these decisions at compile time, but polymorphsm 
+requires that we use dynamic dispatch, as we can't always know what instance 
+of a class will be supplied.
+
+I know we haven't actually covered this as much as we could have but... C++ is 
+nice but also horrible :)
+}
 Polymorphic classes are defined by having at least one virtual method, which is inheritable and overridable.
 With this polymorphism comes type conversion, and more interestingly for us the \textbf{dynamic\_cast}~\cite{dynamiccast} expression.
 Dynamic casting is a safe kind of type conversion.
 It only will successfully cast if the value is of the referenced type or a base type of that type.
 In order to achieve that, the system must have some kind of information about the object's data type at run time.
+\ant{So let's tidy this up a little bit. I probably don't explain it very well 
+except when I write. dynamic\_cast allows you to downcast: you can convert a 
+base or more abstract type to a more concrete type. So if you have:
+A : B : C
+where A is the base, then you can dynamic cast an A to a B or C, if it really 
+is a C in the first place.
+Upcasting is what happens when we become more abstract, so go from C to A. 
+This should work with just a plain old static\_cast.}
 
 This is where Run-Time Type Information (\textbf{RTTI}) comes into the picture.
 The system will use this RTTI to infer type inheritance for dynamic casting.
@@ -215,6 +253,13 @@ The next values of the RTTI are pointers to the RTTIs of the parent classes. See
 
 \section{DWARF debugging standard}
 
+\ant{MOAR!! :) There is quite a bit you can say here. DWARF powers debuggers, 
+and lets you do things like map source to binary code, recover variable 
+names, function names that might not be external symbols, as well as class 
+information.
+Another key point to mention for later will be the structure of how it is used 
+in EH\_Frame. DWARF uses an abstract representation of the processor, so its 
+register 1 for example must be mapped to the processor.}
 % DWARF DIEs
 \textbf{DWARF} is the debugging standard used widely in conjunction with executable ELF files.
 It is often included in these ELF files in the \textbf{.debug\_info} section (and other related sections).
@@ -223,10 +268,18 @@ These entries can contain information about variable names, method definitions, 
 
 % ELF sections
 
+\ant{Exceptions and how they work :)}
+
 \section{RetroWrite}
 
 % How RetroWrite works
-
+\ant{So here you can cite the Retrowrite paper and reword some of what they 
+say in your own words. Especially: about what we mean by symbolization in assembly, 
+why we avoid heuristics for the moment (to be sure it works, also because shared 
+libraries are usually always PIE so we have something to target).
+You can also talk about the compilation process here, as GCC will emit 
+its intermediate assembly. Then the assembler and linker resolve the symbols 
+that are required.}
 
 %%%%%%%%%%%%%%%%
 \chapter{Design}
