@@ -467,22 +467,25 @@ Being able to go check with the open-source LibreOffice code that we had found t
 Finally, we also were able to study the closed-source \textbf{zoom}~\cite{zoom} binary.
 This test case is very interesting in two ways.
 First, we are able to find \textbf{6039 classes} in the binary, with \textbf{5601 edges} in the class hierarchy graph.
-Second, as a large (80M) and complex ELF file, it served as a perfect benchmark for the performance of the algorithm.
-By adding a simple check earlier in the RTTI-spotting pipeline, we were able to speed up the analysis of the zoom binary 10 times.
-See \autoref{zoomspeed} for the details of this benchmark.
+Second, as a large (76M) and complex ELF file, it served as a perfect benchmark for the performance of the algorithm.
+By adding a simple check earlier in the RTTI-spotting pipeline, we were able to speed up the analysis of the zoom binary 13.37 times, from over an hour to five minutes.
+
+\autoref{discoverbenchmarks} details the benchmarks we conducted on many well-known projects.
 
 \begin{table}[h]
   \centering
-  \begin{tabular}{l | r | r | r}
-    ELF File and version & Old Algorithm & New Algorithm & Speedup Factor \\
+  {\small
+  \begin{tabular}{l | r | r | r | r }
+    ELF File and version & Size & Size of .rodata & Computation time & Amount of classes recovered  \\
     \hline
-    zoom 5.5.7938.0228 & 52m42.123s & 5m22.321s & $10\times$ \\ % THESE NUMBERS ARE FAKE AND WILL BE UPDATED SOON
-    gold 1.16 & 0m5.123s & 0m1.321s & $5\times$ \\ % THESE NUMBERS ARE FAKE AND WILL BE UPDATED SOON
-    ceph-dencoder 15.2.13 & 1m30.123s & 0m9.123s & $10\times$ % THESE NUMBERS ARE FAKE AND WILL BE UPDATED SOON
+    gold 1.16 & 2.3M & 0.1M & 0m0.605s & 571 \\
+    ceph-dencoder 15.2.13 & 29M & 0.9M & 0m12.493s & 2959 \\
+    zoom 5.5.7938.0228 & 76M & 16M & 5m50.626s & 6039 
   \end{tabular}
+  }
 
-\caption{Difference of computation time between algorithms on a machine running Ubuntu 20.04 with a 2.6 Ghz dedicated vCPU}
-\label{zoomspeed}
+\caption{Benchmarks of dis-cover on a machine running Ubuntu 20.04 with a 2.6 Ghz dedicated vCPU}
+\label{discoverbenchmarks}
 
 \end{table}
 
