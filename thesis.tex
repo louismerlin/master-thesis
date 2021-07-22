@@ -25,6 +25,7 @@
 % delete them once resolved because I can see them changed in git :)
 \newcommand{\ant}[1]{\todo[inline,color=blue!40]{Antony: #1}}
 \newcommand{\dam}[1]{\todo[inline,color=red!40]{Damian: #1}}
+\newcommand{\lou}[1]{\todo[inline,color=green!40]{Louis: #1}}
 
 \lstset{ 
   basicstyle=\footnotesize,        % the size of the fonts that are used for the code
@@ -84,7 +85,7 @@ design or implementation decision, and key results of your evaluation.
 
 Work on C++ began in 1979, as a "C with classes"~\cite{cwithclasses}.
 Since then, the language has grown in popularity, and even surpassed C itself~\cite{stackoverflowpopularity}.
-Examples of well-known C++ projects include the zoom~\cite{zoom} conferencing software, the gold linker~\cite{gold} or \ant{Windows Explorer, Qt Framework, Chrome, Firefox, Some Embedded Projects. Very widely used :)} [TODO: find another "well-known" example].
+Examples of well-known C++ projects include the zoom~\cite{zoom} conferencing software, the gold linker~\cite{gold} or \ant{Windows Explorer, Qt Framework, Chrome, Firefox, Some Embedded Projects. Very widely used :)} \lou{Also IDA, sleigh library (ghidra)} [TODO: find another "well-known" example].
 Nevertheless, reverse-engineering efforts have been focused towards C binaries, because analysis methods found this way will often work on C++ binaries too.
 
 
@@ -249,7 +250,16 @@ The first value preceding the VTable is a pointer to the RTTI of the class. The 
 
 The RTTI itself is composed of an offset (used for complex class inheritance structures) as well as a pointer to the type name (this type name is not removed by simple stripping of the binary, like with \textbf{objdcopy --strip-all}).
 This name is mangled using C++ mangling, and can trivially be demangled. This name is what we use to uniquely identify a class in a project (and make sure we have no duplicates).
+\lou{Talk about why there is mangling (ELF documentation should have the answer) and a basic example of how it works and why it can be useful (overloading for example).}
 The next values of the RTTI are pointers to the RTTIs of the parent classes. See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer to the Animal RTTI.
+
+\section{ELF format}
+
+\lou{ELF sections}
+\ant{Exceptions and how they work :)}
+\lou{Relocation tables}
+\lou{PIE}
+
 
 \section{DWARF debugging standard}
 
@@ -260,15 +270,15 @@ information.
 Another key point to mention for later will be the structure of how it is used 
 in EH\_Frame. DWARF uses an abstract representation of the processor, so its 
 register 1 for example must be mapped to the processor.}
+\lou{Regarding Antony's comment => more info about the justification for using DWARF.
+Also, the EH\_FRAME is also used for going back on the stack for debugging purposes.}
+\lou{Talk about the Compile Unit}
 % DWARF DIEs
 \textbf{DWARF} is the debugging standard used widely in conjunction with executable ELF files.
 It is often included in these ELF files in the \textbf{.debug\_info} section (and other related sections).
 This debug information is made up of Debugging Information Entries (\textbf{DIEs}).
 These entries can contain information about variable names, method definitions, the compilation process, or more importantly for us, class names and class inheritance.
 
-% ELF sections
-
-\ant{Exceptions and how they work :)}
 
 \section{RetroWrite}
 
@@ -280,6 +290,8 @@ libraries are usually always PIE so we have something to target).
 You can also talk about the compilation process here, as GCC will emit 
 its intermediate assembly. Then the assembler and linker resolve the symbols 
 that are required.}
+\lou{Also, what are we trying to achieve ? Why are we integrating into RetroWrite ?
+Also, mention Cffix (one of HexHive's publications), and how RetroWrite could implement this}
 
 %%%%%%%%%%%%%%%%
 \chapter{Design}
@@ -295,22 +307,28 @@ that are required.}
 % We decided not to reproduce Marx's work
 % First attempt : recover classes from RTTI
 % Future work : could take approaches like Marx and re-feed it like us
-Class recovery from compiled C++ binaries has been done multiple ways before:
+Class recovery from compiled C++ binaries has been tried multiple ways before:
 there are plugins for popular debugging tools, like ida\_gcc\_rtti~\cite{idagccrtti} for IDA Pro,
 or Ghidra-Cpp-Class-Analyzer~\cite{ghidracppclassanalyzer} for Ghidra;
 there are academic projects such as MARX~\cite{marx} that rely on heuristics around VTables to find classes and inheritance information.
 The MARX project can recover classes when no RTTI is present (in the Chrome project for example, where the \textbf{fno-rrti} compilation flag is used), but not with 100\% accuracy.
+\lou{IDA : you need the license; Ghidra : not usable outside of ghidra; MARX : different (and cite accuracy statistics)}
 
 % VTable => RTTI
 %   mention class data (Debian analysis)
 For this project we decided to focus on RTTIs which, as mentioned in the Background chapter, are available for a class hierarchy tree when there is at least one virtual method implemented by one of the classes.
+\lou{Why did we decide to focus on RTTIs ? We wanted to be able to get information from C++ binaries, make it available through DWARF and use that information in RetroWrite for a proof of concept.
+More complex analysis projects could use the same process in the future.}
 We decided to test if RTTIs occurred often in the wild : we proceed to download every Debian package that listed C++ as a dependency (get the list with \textbf{apt-cache rdepends libgcc1} on a Debian machine).
 Out of around 80'000 packages, 5827 of them list C++ as a dependency.
 Out of those, we extracted classes from 3194 (54\%).
+\lou{Maybe talk about the fact that the other 46\% might have classes, but they are optimized aways in many cases.}
 We will share more details about this experiment in the Evaluation chapter.
 
 % Also: exceptions (we felt this needed to be handled)
-We also considered extracting information about exceptions, which is another big feature that differentiates C++ from C.
+Exceptions are often implemented as classes, and our tool will naturally recover information about programmer-defined exceptions.
+Future extension of this work might consider reconvering more information about exceptions.
+We also considered extracting information about exceptions, which is another big feature that differentiates C++ from C. \lou{Remove / Rephrase this sentence}
 We decided not to focus on this feature, as it did not seem to bring as much to the project considering the evaluated development time.
 We did have to study and work with exceptions and exception handling frames for the augmentation of RetroWrite (see the end of the Implementation chapter).
 
@@ -329,6 +347,8 @@ By having DWARF data as an output, the information would become readable by most
 
 There is a current push for DWARF to become the lingua franca for reverse engineering tools, lead by researchers like Dr. Sergey Bratus~\cite{bratus} from DARPA.
 He has published a paper in 2011 where he was able to exploit certain features of DWARF to control program execution : Exploiting the hard-working DWARF~\cite{hardworkingdwarf}.
+\lou{Talk more about the hard-working DWARF : talk about what DWARF allows and what it gives you (turing complete ?)
+Also: why is it becoming the lingua franca ? Why does it matter ?}
 
 % Injecting debug section & symbols
 With dis-cover, we are able to inject information in the debug and symbol sections of the binary, creating a new ELF file with all of this useful info included.
@@ -343,13 +363,16 @@ We will go more into the implementation details in the next chapter.
 Another focus of this project was the augmentation of RetroWrite for C++ capabilities.
 Today, RetroWrite supports the reversing of x86\_64 position-independent binaries.
 There was also work to augment RetroWrite to support kernel code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
-We aimed to add C++ capabilities for x86\_64 binaries only, as it seems like the biggest target.
+We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most widly used platform (though the same logic will most probably apply with a little tweaking to ARM and other achitectures).
+\lou{Mention the fact that we're trying to enable the usage of the dis-cover data in RetroWrite and other RE tools.}
 
 Another potential use of the class information is to implement defenses around type confusion, working with the findings from the HexType~\cite{hextype} paper.
 We decided not to focus on this for our project, as it would have been out of the scope of a 6-months master thesis.
+\lou{Not "out of the scope" but "we hope that future people will be able to do it".}
 
 One of the defining properties of RetroWrite is that it does not use heuristics (and thus does not have probabilistic features and failures).
 Dis-cover has the same no-heuristics property, and thus could be used by the RetroWrite project without breaking the property.
+\lou{(to make retrowrite more generic, we will need heuristics, but that is for future people => we might accept analysis like MARX in the future)}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -363,7 +386,7 @@ Dis-cover has the same no-heuristics property, and thus could be used by the Ret
 % This section is usually 3-5 pages.
 
 % Python script (because RetroWrite; and good tools) (1 sentence)
-We decided to write a python module for this project, as the python ecosystem has great reverse engineering packages, and because the other projects from the HexHive lab are usually python modules.
+We decided to write a python module for this project, as the python ecosystem has great reverse engineering packages, and for easy integration in RetroWrite, which is also written in python.
 
 \section{Finding RTTIs}
 
@@ -372,6 +395,9 @@ The first thing dis-cover does is find ELF sections where the VTables and RTTIs 
 This is usually \textbf{.rodata} (read-only data), but could sometimes also be related sections like \textbf{.data.rel.ro}, \textbf{.data.rel.ro.local}, or \textbf{.rdata}.
 As per the Itanium C++ ABI, the base VTable of a class will contain an "offset-to-top", which will be 0 in the primary base virtual table's case, followed by a pointer to an RTTI.
 We simply have to pattern-match for zeroes directly followed by a pointer to another part of the read-only data sections, and we have a potential RTTI pointer.
+
+\lou{Explain the "primary base virtual table" and why it's the one we're interested in.}
+\lou{This could be diagramed (RTTIs) => multiple inheritance, diamond problem...}
 
 To check whether we have found an RTTI, we assert that the next value is a pointer to a string located in a read-only data section.
 If it is, we can extract it, demangle it, and we have a class and a name.
@@ -417,10 +443,13 @@ These \textbf{class\_type}s will themselves have as children \textbf{inheritance
 
 The strings themselves are stored in another section, \textbf{.debug\_str}, and are referred to with their offset in that section.
 
+\lou{The three dwarf sections should be explained in more detail in the Background or Design sections.}
+
 \section{Creating symbols}
 
 % symbols
 Symbols are used to have access to variable names, class names, function names or any other kind of text information when debugging a binary.
+\lou{Symbols are also used for shared object loading}
 We want to create two symbols for every class we have found during the analysis : one pointing to the VTable and one pointing to the RTTI, labeling them as such.
 
 In order to create new symbol sections, we take the symbol table from the original binary (if there was one) and append the aforementioned symbols.
@@ -435,7 +464,8 @@ The two symbol sections are \textbf{.symtab}, which contains the information (of
 Once we have the three debug sections ready
 (\textbf{.debug\_abbrev} with the debug types, \textbf{.debug\_info} with the debug information, and \textbf{debug\_str} with the strings)
 as well as the two symbol sections, we have to make them available to the user.
-The first step is building an empty ELF file with only these five sections in them.
+The first step is building an empty ELF file with only these five sections in them.\lou{"we'll discuss why in 4.4.3"}
+\lou{say about the three dwarf sections => this is the dwarf information we have recovered, and we are trying to incorporate it into the binary.}
 
 We start by constructing a \textbf{program header table}.
 This table contains information about the offset and size of each segment of the binary (which segment is used for what, and their read/write permissions).
@@ -462,6 +492,8 @@ This is to avoid section conflicts in the next step.
 
 Now, we can use the ELF utility program \textbf{eu-unstrip} to combine the two ELF files we have created into one.
 The newly created combined ELF file will contain all of the code and data from the original file, as well as the debug and symbol sections we have created.
+\lou{Talk about why we had to do all of that, and the fact that DWARF info rarely comes alone.
+eu-unstrip lets us merge the 2 different elf files, but they have to closely match, which is why we're going though these steps.}
 
 % what it does and does not do
 
