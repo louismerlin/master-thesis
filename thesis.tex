@@ -171,47 +171,14 @@ In this thesis we will detail how we tried to bring C++ support to RetroWrite, a
 % C++ polymorphism (what, how, but also research like Marx) (+ exceptions) 
 % also talk about how compilers will optimize this out in certain situtations
 The C++ programming language implements polymorphism.
-This feature enables complex code logic that can comply with external business logic for example.
-\ant{Yes - I would expand on this a bit. 
-The key part is that C++ allows the programmer to create abstract concepts in the 
-language itself. One example is an interface, which C++ calls an abstract base 
-class - this lets different programmers in different teams only need to know 
-what interface to implement for their objects and not need to care so much 
-about the underlying detail. The key is that this is also enforced and checked 
-by the compiler, as opposed to C where you can do this but you need to 
-document it, so it should be more efficient for programmers.
-
-You can also re-use functionality by inheriting parent classes, meaning that if 
-you want to implement a Dog and your Animal class already has an implementation 
-for Eat, you don't need a dog-specific implementation if appropriate. 
-
-Sometimes we can make all of these decisions at compile time, but polymorphsm 
-requires that we use dynamic dispatch, as we can't always know what instance 
-of a class will be supplied.
-
-I know we haven't actually covered this as much as we could have but... C++ is 
-nice but also horrible :)
-}
-Polymorphic classes are defined by having at least one virtual method, which is inheritable and overridable.
-With this polymorphism comes type conversion, and more interestingly for us the \textbf{dynamic\_cast}~\cite{dynamiccast} expression.
-Dynamic casting is a safe kind of type conversion.
-It only will successfully cast if the value is of the referenced type or a base type of that type.
-In order to achieve that, the system must have some kind of information about the object's data type at run time.
-\ant{So let's tidy this up a little bit. I probably don't explain it very well 
-except when I write. dynamic\_cast allows you to downcast: you can convert a 
-base or more abstract type to a more concrete type. So if you have:
-A : B : C
-where A is the base, then you can dynamic cast an A to a B or C, if it really 
-is a C in the first place.
-Upcasting is what happens when we become more abstract, so go from C to A. 
-This should work with just a plain old static\_cast.}
-
-This is where Run-Time Type Information (\textbf{RTTI}) comes into the picture.
-The system will use this RTTI to infer type inheritance for dynamic casting.
-We will now go into implementation details of RTTIs and VTables, which point to them.
-
-To make RTTIs appear in your C++ binary, you will to define classes that inherit from each other, as well as at least one virtual method in one of these classes.
-\autoref{classes} shows an example of such classes.
+This feature enables complex code logic that can comply with external business logic.
+Here we will introduce the example that will follow us througout this thesis :
+in \autoref{classes} we define two abstract base classes \textbf{Animal} and \textbf{Feline},
+and the two classes \textbf{Cat} (that inherits from Animal and Feline) and \textbf{Dog} (that inherits from Animal).
+In a large codebase, with multiple teams of programmers working on different features,
+an Animal could be passed around without caring about whether it was a Cat, a Dog or any other species.
+This Animal is sure to have the \textbf{speak} method and whatever other properties and methods Animal could define.
+This logic is verified by the compiler.
 
 \begin{figure}[h]
 \begin{lstlisting}
@@ -220,18 +187,47 @@ public:
   virtual void speak() {}
 };
 
-class Dog {
+class Feline {
+  virtual void retract_claws() {}
+};
+
+class Cat : public Animal, public Feline {
+public:
+  virtual void speak() { cout << "Purr" << endl; }
+};
+
+class Dog : public Animal {
 public:
   virtual void speak() { cout << "Woof" << endl; }
-}
+};
 \end{lstlisting}
 \caption{Polymorphic classes in C++}
 \label{classes}
 
 \end{figure}
 
-For RTTIs to appear in your C++ binary, you will also need to instantiate these classes, and have some run time logic to make the binary non-deterministic [this not the right word I think, I mean to say that the binary depends on some input for its class-instantiating logic].
-For example, a conditional dynamic cast between the two classes we defined in \autoref{classes}.
+This polymorphism feature also enables re-use of functionality by inheriting parent classes.
+If you want to implement a Lemur and your Animal class already has an implementation of the eat method,
+you don't need a lemur-specific implementation if appropriate. 
+
+Polymorphic classes are defined by having at least one virtual method, which is inheritable and overridable.
+With this polymorphism comes type conversion, of which there are two kinds.
+The first, \textbf{static\_cast}~\cite{staticcast}, will check that the casting is upcasting at compile time,
+but does not do any run-time checks to verify the validity of the conversion.
+The fact that a class is polymorphic will have no impact on this type of casting.
+The second is the more interesting one for us. It is the \textbf{dynamic\_cast}~\cite{dynamiccast} expression.
+Dynamic casting is a safe kind of type conversion that can handle downcasting and sidecasting.
+In order to achieve that, the system must have some kind of information about the object's data type at run time.
+
+This is where Run-Time Type Information (\textbf{RTTI}) comes into the picture.
+The system will use this RTTI to infer type inheritance for dynamic casting.
+We will now go into implementation details of RTTIs and VTables, which point to them.
+
+To make RTTIs appear in your C++ binary, you will to define classes that inherit from each other, as well as at least one virtual method in one of these classes.
+\autoref{classes} shows an example of such classes.
+
+You will also need to instantiate these classes, and have some run time logic to make the binary non-deterministic. \lou{deterministic is not the right word, I mean to say that the binary depends on some input for its class-instantiating logic}
+For example, a conditional dynamic cast between the two children classes we defined in \autoref{classes}.
 If you do not do these things, the class logic will be abstracted away by the compiler for optimization reasons.
 
 \begin{figure}[h]
