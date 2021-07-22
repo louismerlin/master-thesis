@@ -247,6 +247,7 @@ The first value preceding the VTable is a pointer to the RTTI of the class. The 
 The RTTI itself is composed of an offset (used for complex class inheritance structures) as well as a pointer to the type name (this type name is not removed by simple stripping of the binary, like with \textbf{objdcopy --strip-all}).
 This name is mangled using C++ mangling, and can trivially be demangled. This name is what we use to uniquely identify a class in a project (and make sure we have no duplicates).
 \lou{Talk about why there is mangling (ELF documentation should have the answer) and a basic example of how it works and why it can be useful (overloading for example).}
+\lou{TODO NOW : \_ZTV6Feline => vtable for Feline; \_ZTI6Feline => typeinfo for Feline; https://en.wikipedia.org/wiki/Name\_mangling; http://www.kegel.com/mangle.html}
 The next values of the RTTI are pointers to the RTTIs of the parent classes. See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer to the Animal RTTI.
 
 \section{ELF format}
