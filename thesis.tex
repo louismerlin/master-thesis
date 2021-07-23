@@ -28,12 +28,13 @@
 \newcommand{\lou}[1]{\todo[inline,color=green!40]{Louis: #1}}
 
 \lstset{ 
-  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
-  frame=single,	                   % adds a frame around the code
-  language=C++,                    % the language of the code
+  basicstyle=\footnotesize,
+  frame=single,
+  language=C++,
 }
 
-\title{Recovering type information from compiled binaries\\to aid in instrumentation}
+\title{Recovering type information from compiled binaries\\to aid in 
+instrumentation}
 \author{Louis Merlin}
 \supervisor{Antony Vennard}
 \adviser{Prof. Dr. sc. ETH Mathias Payer}
@@ -81,30 +82,41 @@ design or implementation decision, and key results of your evaluation.
 % This section is usually 3-5 pages.
 
 
-% Setting: compiled binaries; RetroWrite; [need for a compatible exchange format => DWARF;] closed-source C++ binaries in the wild (android?).
+% Setting: compiled binaries; RetroWrite; [need for a compatible exchange 
+% format => DWARF;] closed-source C++ binaries in the wild (android?).
 
 Work on C++ began in 1979, as a "C with classes"~\cite{cwithclasses}.
-Since then, the language has grown in popularity, and even surpassed C itself~\cite{stackoverflowpopularity}.
-Examples of well-known C++ projects include modern browsers like Chrome~\cite{chrome} and Firefox~\cite{firefox}, the Qt Framework~\cite{qt}, or the zoom~\cite{zoom} conferencing software.
-Nevertheless, reverse-engineering efforts have been focused towards C binaries, because analysis methods found this way will often work on C++ binaries too.
+Since then, the language has grown in popularity, and even surpassed C 
+itself~\cite{stackoverflowpopularity}.
+Examples of well-known C++ projects include modern browsers like 
+Chrome~\cite{chrome} and Firefox~\cite{firefox}, the Qt Framework~\cite{qt}, or 
+the zoom~\cite{zoom} conferencing software.
+Nevertheless, reverse-engineering efforts have been focused towards C binaries, 
+because analysis methods found this way will often work on C++ binaries too.
 
 
 % Main challenge:
 % C++-specific ELF sections are not as well documented as they could be (?);
 % Debuggers do not work as well as they should on non-C binaries;
 
-This has meant reverse engineering tools like ghidra~\cite{ghidra}, IDA Pro~\cite{ida} or Binary Ninja~\cite{binja} have treated non-C binaries as second-class citizen.
-These tools will often show C++ specific features as passing comments, failing to show the real implications of a try/catch block or a polymorphic class.
+This has meant reverse engineering tools like ghidra~\cite{ghidra}, IDA 
+Pro~\cite{ida} or Binary Ninja~\cite{binja} have treated non-C binaries as 
+second-class citizen.
+These tools will often show C++ specific features as passing comments, failing 
+to show the real implications of a try/catch block or a polymorphic class.
 
 % Ghidra/IDA will show as pseudo-C code, but not C++
 %  see throw/catch or RTTI
 % C++ is quite a compilicated language.
-% C's abstractions work very well in assembler, but C++ adds a whole layer of complexity.
+% C's abstractions work very well in assembler, but C++ adds a whole layer of 
+% complexity.
 % When translated to assembly, a lot of information is lost.
 
 The blame can mostly be put on the complexity of C++ when compared to C.
-Whereas C translates quite naturally to assembly, abstractions specific to C++ require more work and complexity to be translated to asm.
-This also leads to important information being lost from C++ source code to binary, but also certain information remaining.
+Whereas C translates quite naturally to assembly, abstractions specific to C++ 
+require more work and complexity to be translated to asm.
+This also leads to important information being lost from C++ source code to 
+binary, but also certain information remaining.
 
 
 % Related work:
@@ -112,8 +124,10 @@ This also leads to important information being lost from C++ source code to bina
 % debugging tools don't have nice support for C++ features;
 % DWARF will be explored more and more in the coming years;
 
-The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a static rewriting tool for x86\_64 position-independent binaries.
-It enables the instrumentation of projects when we do not have access to the source code.
+The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a 
+static rewriting tool for x86\_64 position-independent binaries.
+It enables the instrumentation of projects when we do not have access to the 
+source code.
 This can include a legacy project, a closed-source product or even malware.
 
 % Does anything else try to do retrowriting C++ ?
@@ -121,18 +135,22 @@ This can include a legacy project, a closed-source product or even malware.
 
 
 % Our approach:
-% Tool for static analysis of C++ binaries, to recover classes and display them in a helpful way;
+% Tool for static analysis of C++ binaries, to recover classes and display them 
+% in a helpful way;
 % Fixing RetroWrite to support C++ binaries;
 
-In this thesis we would like to present the \textbf{dis-cover}~\cite{discovergithub} static analysis tool,
+In this thesis we would like to present the 
+\textbf{dis-cover}~\cite{discovergithub} static analysis tool,
 as well as improvements made to RetroWrite to support C++ binaries.
 
 
 % Why it is needed:
 % Non-obtrusive way of adding C++ support in debugging tools;
-% Nobody (?) (as far as we know / to the best of our knowledge) has been able to rewrite C++ binaries before, this could lead to very interesting discoveries;
+% Nobody (?) (as far as we know / to the best of our knowledge) has been able 
+% to rewrite C++ binaries before, this could lead to very interesting discoveries;
 
-The dis-cover tool is able to extract information from a C++ binary, and re-inject it as debug information using the DWARF format into the binary.
+The dis-cover tool is able to extract information from a C++ binary, and 
+re-inject it as debug information using the DWARF format into the binary.
 This enables other debugging tools to see and display this information.
 
 
@@ -150,10 +168,12 @@ This enables other debugging tools to see and display this information.
 % Also the documentation of the process.
 
 [IF WE SUCCEEDED]
-In this thesis we would like to show how we brought C++ support to RetroWrite, and what research opportunities this will create.
+In this thesis we would like to show how we brought C++ support to RetroWrite, 
+and what research opportunities this will create.
 
 [IF WE FAILED]
-In this thesis we will detail how we tried to bring C++ support to RetroWrite, and what remains to be done for the implementation to work.
+In this thesis we will detail how we tried to bring C++ support to RetroWrite, 
+and what remains to be done for the implementation to work.
 
 
 %%%%%%%%%%%%%%%%%%%%
@@ -171,13 +191,19 @@ In this thesis we will detail how we tried to bring C++ support to RetroWrite, a
 % C++ polymorphism (what, how, but also research like Marx) (+ exceptions) 
 % also talk about how compilers will optimize this out in certain situtations
 The C++ programming language implements polymorphism.
-This feature enables complex code logic that can comply with external business logic.
+This feature enables complex code logic that can comply with external business 
+logic.
 Here we will introduce the example that will follow us throughout this thesis :
-in \autoref{classes} we define two abstract base classes \textbf{Animal} and \textbf{Feline},
-and the two classes \textbf{Cat} (that inherits from Animal and Feline) and \textbf{Dog} (that inherits from Animal).
-In a large code base, with multiple teams of programmers working on different features,
-an Animal could be passed around without caring about whether it was a Cat, a Dog or any other species.
-This Animal is sure to have the \textbf{speak} method and whatever other properties and methods Animal could define.
+in \autoref{classes} we define two abstract base classes \textbf{Animal} and 
+\textbf{Feline},
+and the two classes \textbf{Cat} (that inherits from Animal and Feline) and 
+\textbf{Dog} (that inherits from Animal).
+In a large code base, with multiple teams of programmers working on different 
+features,
+an Animal could be passed around without caring about whether it was a Cat, a 
+Dog or any other species.
+This Animal is sure to have the \textbf{speak} method and whatever other 
+properties and methods Animal could define.
 This logic is verified by the compiler.
 
 \begin{figure}[h]
@@ -206,29 +232,45 @@ public:
 
 \end{figure}
 
-This polymorphism feature also enables re-use of functionality by inheriting parent classes.
-If you want to implement a Lemur and your Animal class already has an implementation of the eat method,
+This polymorphism feature also enables re-use of functionality by inheriting 
+parent classes.
+If you want to implement a Lemur and your Animal class already has an 
+implementation of the eat method,
 you don't need a lemur-specific implementation if appropriate. 
 
-Polymorphic classes are defined by having at least one virtual method, which is inheritable and overridable.
+Polymorphic classes are defined by having at least one virtual method, which is 
+inheritable and overridable.
 With this polymorphism comes type conversion, of which there are two kinds.
-The first, \textbf{static\_cast}~\cite{staticcast}, will check that the casting is upcasting at compile time,
+The first, \textbf{static\_cast}~\cite{staticcast}, will check that the casting 
+is upcasting at compile time,
 but does not do any run-time checks to verify the validity of the conversion.
-The fact that a class is polymorphic will have no impact on this type of casting.
-The second is the more interesting one for us. It is the \textbf{dynamic\_cast}~\cite{dynamiccast} expression.
-Dynamic casting is a safe kind of type conversion that can handle downcasting and sidecasting.
-In order to achieve that, the system must have some kind of information about the object's data type at run time.
+The fact that a class is polymorphic will have no impact on this type of 
+casting.
+The second is the more interesting one for us. It is the 
+\textbf{dynamic\_cast}~\cite{dynamiccast} expression.
+Dynamic casting is a safe kind of type conversion that can handle downcasting 
+and sidecasting.
+In order to achieve that, the system must have some kind of information about 
+the object's data type at run time.
 
 This is where Run-Time Type Information (\textbf{RTTI}) comes into the picture.
 The system will use this RTTI to infer type inheritance for dynamic casting.
-We will now go into implementation details of RTTIs and VTables, which point to them.
+We will now go into implementation details of RTTIs and VTables, which point to 
+them.
 
-To make RTTIs appear in your C++ binary, you will to define classes that inherit from each other, as well as at least one virtual method in one of these classes.
+To make RTTIs appear in your C++ binary, you will to define classes that 
+inherit from each other, as well as at least one virtual method in one of these 
+classes.
 \autoref{classes} shows an example of such classes.
 
-You will also need to instantiate these classes, and have some run time logic to make the binary non-deterministic. \lou{deterministic is not the right word, I mean to say that the binary depends on some input for its class-instantiating logic}
-For example, a conditional dynamic cast between the two children classes we defined in \autoref{classes}.
-If you do not do these things, the class logic will be abstracted away by the compiler for optimization reasons.
+You will also need to instantiate these classes, and have some run time logic 
+to make the binary non-deterministic. \lou{deterministic is not the right word, 
+I mean to say that the binary depends on some input for its class-instantiating 
+logic}
+For example, a conditional dynamic cast between the two children classes we 
+defined in \autoref{classes}.
+If you do not do these things, the class logic will be abstracted away by the 
+compiler for optimization reasons.
 
 \begin{figure}[h]
 
@@ -240,41 +282,62 @@ If you do not do these things, the class logic will be abstracted away by the co
 
 The structure of VTables and RTTIs is detailed in \autoref{rttigraph}.
 All of this is defined in the Itanium C++ ABI~\cite{cppabi}.
-An instance of a virtual class Animal will contain the \textbf{vtblptrAnimal}, a pointer to the virtual table (\textbf{VTable}) for the Animal class.
-This VTable will contain pointers to the virtual methods of the class, which are inherited and thus do not have to be duplicated for each class, they are simply pointed to.
-The first value preceding the VTable is a pointer to the RTTI of the class. The process finds out the class inheritance of a class instance by following this pointer.
+An instance of a virtual class Animal will contain the \textbf{vtblptrAnimal}, 
+a pointer to the virtual table (\textbf{VTable}) for the Animal class.
+This VTable will contain pointers to the virtual methods of the class, which 
+are inherited and thus do not have to be duplicated for each class, they are 
+simply pointed to.
+The first value preceding the VTable is a pointer to the RTTI of the class. The 
+process finds out the class inheritance of a class instance by following this 
+pointer.
 
-The RTTI itself is composed of a pointer to a VTable for the typeinfo class (defined by the compiler) and well as a pointer to the type name (this type name is not removed by simple stripping of the binary, like with \textbf{objdcopy --strip-all}).
+The RTTI itself is composed of a pointer to a VTable for the typeinfo class 
+(defined by the compiler) and well as a pointer to the type name (this type 
+name is not removed by simple stripping of the binary, like with 
+\textbf{objdcopy --strip-all}).
 This name is mangled using C++ mangling, and can trivially be demangled.
 Here are some examples of C++ name mangling :
 \textbf{\_ZTI6Feline} demangles to \textbf{typeinfo for Feline};
 \textbf{\_ZTV6Feline} demangles to \textbf{vtable for Feline}.
-Mangling is especially useful when defining several methods in the same scope with different arguments (this is called overloading),
+Mangling is especially useful when defining several methods in the same scope 
+with different arguments (this is called overloading),
 in order to differentiate the different methods.
 The next values of the RTTI are pointers to the RTTIs of the parent classes.
 These are used at runtime to check the relationship between classes.
-See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer to the Animal RTTI.
+See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer 
+to the Animal RTTI.
 
 \section{Executable and Linkable Format (ELF)}
 
-Now we will study how all of the previously mentioned data is stored and organized.
-The common standard \textbf{Executable and Linkable Format} (ELF) format is mostly used as executable files, object code and shared libraries.
-It usually contains a program header table, which describes memory segments (e.g. "this is read-only data", "this is executable instructions").
-It also usually contains a section header table, describing sections (their name, size, offset and some flags). 
+Now we will study how all of the previously mentioned data is stored and 
+organized.
+The common standard \textbf{Executable and Linkable Format} (ELF) format is 
+mostly used as executable files, object code and shared libraries.
+It usually contains a program header table, which describes memory segments 
+(e.g. "this is read-only data", "this is executable instructions").
+It also usually contains a section header table, describing sections (their 
+name, size, offset and some flags). 
 The rest of an ELF file is taken up by sections.
 Famous sections include
 \textbf{.text} (where the instructions are),
 \textbf{.data} (where you will see global tables and other variables),
 \textbf{.rodata} (you will find strings in here)
-and \textbf{.eh\_frame} (where exception unwinding information is stored for C++ binaries).
+and \textbf{.eh\_frame} (where exception unwinding information is stored for 
+C++ binaries).
 
 \section{Position-Independent Code (PIC) and Executable (PIE)}
 
-Position-independence for code is a property that guarantees that code will execute correctly no matter the absolute address of the body of code.
-This is mostly possible by computing relative positions instead of using absolute addresses.
+Position-independence for code is a property that guarantees that code will 
+execute correctly no matter the absolute address of the body of code.
+This is mostly possible by computing relative positions instead of using 
+absolute addresses.
 
-PIC is most often found for shared libraries, so that they can be inserted into an ELF file without worry.
-PIE binaries are seen as more secure because they allow for easy inserting of security measures like address space layout randomization~\cite{aslr}.\lou{@antony, what would be a more appropriate citation for ASLR ?}
+PIC is most often found for shared libraries, so that they can be inserted into 
+an ELF file without worry.
+PIE binaries are seen as more secure because they allow for easy inserting of 
+security measures like address space layout 
+randomization~\cite{aslr}.\lou{@antony, what would be a more appropriate 
+citation for ASLR ?}
 We will talk more about PIE in \autoref{retrowritesection}.
 
 \section{Exceptions in C++}
@@ -291,28 +354,39 @@ information.
 Another key point to mention for later will be the structure of how it is used 
 in EH\_Frame. DWARF uses an abstract representation of the processor, so its 
 register 1 for example must be mapped to the processor.}
-\lou{Regarding Antony's comment => more info about the justification for using DWARF.
-Also, the EH\_FRAME is also used for going back on the stack for debugging purposes.}
+\lou{Regarding Antony's comment => more info about the justification for using 
+DWARF.
+Also, the EH\_FRAME is also used for going back on the stack for debugging 
+purposes.}
 \lou{Talk about the Compile Unit}
 % DWARF DIEs
-\textbf{DWARF} is the debugging standard used widely in conjunction with executable ELF files.
-It is often included in these ELF files in the \textbf{.debug\_info} section (and other related sections).
-This debug information is made up of Debugging Information Entries (\textbf{DIEs}).
-These entries can contain information about variable names, method definitions, the compilation process, or more importantly for us, class names and class inheritance.
+\textbf{DWARF} is the debugging standard used widely in conjunction with 
+executable ELF files.
+It is often included in these ELF files in the \textbf{.debug\_info} section 
+(and other related sections).
+This debug information is made up of Debugging Information Entries 
+(\textbf{DIEs}).
+These entries can contain information about variable names, method definitions, 
+the compilation process, or more importantly for us, class names and class 
+inheritance.
 
 
 \section{RetroWrite} \label{retrowritesection}
 
 % How RetroWrite works
 \ant{So here you can cite the RetroWrite paper and reword some of what they 
-say in your own words. Especially: about what we mean by symbolization in assembly, 
-why we avoid heuristics for the moment (to be sure it works, also because shared 
+say in your own words. Especially: about what we mean by symbolization in 
+assembly, 
+why we avoid heuristics for the moment (to be sure it works, also because 
+shared 
 libraries are usually always PIE so we have something to target).
 You can also talk about the compilation process here, as GCC will emit 
 its intermediate assembly. Then the assembler and linker resolve the symbols 
 that are required.}
-\lou{Also, what are we trying to achieve ? Why are we integrating into RetroWrite ?
-Also, mention Cffix (one of HexHive's publications), and how RetroWrite could implement this}
+\lou{Also, what are we trying to achieve ? Why are we integrating into 
+RetroWrite ?
+Also, mention Cffix (one of HexHive's publications), and how RetroWrite could 
+implement this}
 
 %%%%%%%%%%%%%%%%
 \chapter{Design}
@@ -329,29 +403,47 @@ Also, mention Cffix (one of HexHive's publications), and how RetroWrite could im
 % First attempt : recover classes from RTTI
 % Future work : could take approaches like Marx and re-feed it like us
 Class recovery from compiled C++ binaries has been tried multiple ways before:
-there are plugins for popular debugging tools, like ida\_gcc\_rtti~\cite{idagccrtti} for IDA Pro,
+there are plugins for popular debugging tools, like 
+ida\_gcc\_rtti~\cite{idagccrtti} for IDA Pro,
 or Ghidra-Cpp-Class-Analyzer~\cite{ghidracppclassanalyzer} for Ghidra;
-there are academic projects such as MARX~\cite{marx} that rely on heuristics around VTables to find classes and inheritance information.
-The MARX project can recover classes when no RTTI is present (in the Chrome project for example, where the \textbf{fno-rrti} compilation flag is used), but not with 100\% accuracy.
-\lou{IDA : you need the license; Ghidra : not usable outside of ghidra; MARX : different (and cite accuracy statistics)}
+there are academic projects such as MARX~\cite{marx} that rely on heuristics 
+around VTables to find classes and inheritance information.
+The MARX project can recover classes when no RTTI is present (in the Chrome 
+project for example, where the \textbf{fno-rrti} compilation flag is used), but 
+not with 100\% accuracy.
+\lou{IDA : you need the license; Ghidra : not usable outside of ghidra; MARX : 
+different (and cite accuracy statistics)}
 
 % VTable => RTTI
 %   mention class data (Debian analysis)
-For this project we decided to focus on RTTIs which, as mentioned in the Background chapter, are available for a class hierarchy tree when there is at least one virtual method implemented by one of the classes.
-\lou{Why did we decide to focus on RTTIs ? We wanted to be able to get information from C++ binaries, make it available through DWARF and use that information in RetroWrite for a proof of concept.
+For this project we decided to focus on RTTIs which, as mentioned in the 
+Background chapter, are available for a class hierarchy tree when there is at 
+least one virtual method implemented by one of the classes.
+\lou{Why did we decide to focus on RTTIs ? We wanted to be able to get 
+information from C++ binaries, make it available through DWARF and use that 
+information in RetroWrite for a proof of concept.
 More complex analysis projects could use the same process in the future.}
-We decided to test if RTTIs occurred often in the wild : we proceed to download every Debian package that listed C++ as a dependency (get the list with \textbf{apt-cache rdepends libgcc1} on a Debian machine).
+We decided to test if RTTIs occurred often in the wild : we proceed to download 
+every Debian package that listed C++ as a dependency (get the list with 
+\textbf{apt-cache rdepends libgcc1} on a Debian machine).
 Out of around 80'000 packages, 5827 of them list C++ as a dependency.
 Out of those, we extracted classes from 3194 (54\%).
-\lou{Maybe talk about the fact that the other 46\% might have classes, but they are optimized aways in many cases.}
+\lou{Maybe talk about the fact that the other 46\% might have classes, but they 
+are optimized aways in many cases.}
 We will share more details about this experiment in the Evaluation chapter.
 
 % Also: exceptions (we felt this needed to be handled)
-Exceptions are often implemented as classes, and our tool will naturally recover information about programmer-defined exceptions.
-Future extension of this work might consider recovering more information about exceptions.
-We also considered extracting information about exceptions, which is another big feature that differentiates C++ from C. \lou{Remove / Rephrase this sentence}
-We decided not to focus on this feature, as it did not seem to bring as much to the project considering the evaluated development time.
-We did have to study and work with exceptions and exception handling frames for the augmentation of RetroWrite (see the end of the Implementation chapter).
+Exceptions are often implemented as classes, and our tool will naturally 
+recover information about programmer-defined exceptions.
+Future extension of this work might consider recovering more information about 
+exceptions.
+We also considered extracting information about exceptions, which is another 
+big feature that differentiates C++ from C. \lou{Remove / Rephrase this 
+sentence}
+We decided not to focus on this feature, as it did not seem to bring as much to 
+the project considering the evaluated development time.
+We did have to study and work with exceptions and exception handling frames for 
+the augmentation of RetroWrite (see the end of the Implementation chapter).
 
 % Why do we want DWARF data ?
 %   We want to make the info available to reversing tools
@@ -359,20 +451,34 @@ We did have to study and work with exceptions and exception handling frames for 
 %        He would like to see DWARF used as a lingua franca for debugging
 % Also, exception's try/catch blocks & exception types
 % but dwarf is limited for this (=> future work)
-Next comes the question : what should we do with all of this information ? What would be the most useful format to output the data in ?
-This is where DWARF~\cite{dwarf} comes in the picture. DWARF is the debugging standard for programs.
-It is mostly used by developers trying to understand where their implementation fails,
-and by reverse engineers to get a better understanding of how a program was conceived (although DWARF information is usually stripped from proprietary software).
-This kind of debug data is mostly found in C and C++ projects. % Should I add another language ?
-By having DWARF data as an output, the information would become readable by most modern reversing tools.
+Next comes the question : what should we do with all of this information ? What 
+would be the most useful format to output the data in ?
+This is where DWARF~\cite{dwarf} comes in the picture. DWARF is the debugging 
+standard for programs.
+It is mostly used by developers trying to understand where their implementation 
+fails,
+and by reverse engineers to get a better understanding of how a program was 
+conceived (although DWARF information is usually stripped from proprietary 
+software).
+This kind of debug data is mostly found in C and C++ projects. % Should I add 
+another language ?
+By having DWARF data as an output, the information would become readable by 
+most modern reversing tools.
 
-There is a current push for DWARF to become the lingua franca for reverse engineering tools, lead by researchers like Dr. Sergey Bratus~\cite{bratus} from DARPA.
-He has published a paper in 2011 where he was able to exploit certain features of DWARF to control program execution : Exploiting the hard-working DWARF~\cite{hardworkingdwarf}.
-\lou{Talk more about the hard-working DWARF : talk about what DWARF allows and what it gives you (turing complete ?)
+There is a current push for DWARF to become the lingua franca for reverse 
+engineering tools, lead by researchers like Dr. Sergey Bratus~\cite{bratus} 
+from DARPA.
+He has published a paper in 2011 where he was able to exploit certain features 
+of DWARF to control program execution : Exploiting the hard-working 
+DWARF~\cite{hardworkingdwarf}.
+\lou{Talk more about the hard-working DWARF : talk about what DWARF allows and 
+what it gives you (turing complete ?)
 Also: why is it becoming the lingua franca ? Why does it matter ?}
 
 % Injecting debug section & symbols
-With dis-cover, we are able to inject information in the debug and symbol sections of the binary, creating a new ELF file with all of this useful info included.
+With dis-cover, we are able to inject information in the debug and symbol 
+sections of the binary, creating a new ELF file with all of this useful info 
+included.
 We will go more into the implementation details in the next chapter.
 
 % RetroWrite structure
@@ -381,19 +487,31 @@ We will go more into the implementation details in the next chapter.
 %    Most widely used target
 %    Kernel drivers are mostly written in C
 % We still want to keep the deterministic ability of retrowrite
-Another focus of this project was the augmentation of RetroWrite for C++ capabilities.
-Today, RetroWrite supports the reversing of x86\_64 position-independent binaries.
-There was also work to augment RetroWrite to support kernel code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
-We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most widely used platform (though the same logic will most probably apply with a little tweaking to ARM and other architectures).
-\lou{Mention the fact that we're trying to enable the usage of the dis-cover data in RetroWrite and other RE tools.}
+Another focus of this project was the augmentation of RetroWrite for C++ 
+capabilities.
+Today, RetroWrite supports the reversing of x86\_64 position-independent 
+binaries.
+There was also work to augment RetroWrite to support kernel 
+code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
+We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most 
+widely used platform (though the same logic will most probably apply with a 
+little tweaking to ARM and other architectures).
+\lou{Mention the fact that we're trying to enable the usage of the dis-cover 
+data in RetroWrite and other RE tools.}
 
-Another potential use of the class information is to implement defenses around type confusion, working with the findings from the HexType~\cite{hextype} paper.
-We decided not to focus on this for our project, as it would have been out of the scope of a 6-months master thesis.
-\lou{Not "out of the scope" but "we hope that future people will be able to do it".}
+Another potential use of the class information is to implement defenses around 
+type confusion, working with the findings from the HexType~\cite{hextype} paper.
+We decided not to focus on this for our project, as it would have been out of 
+the scope of a 6-months master thesis.
+\lou{Not "out of the scope" but "we hope that future people will be able to do 
+it".}
 
-One of the defining properties of RetroWrite is that it does not use heuristics (and thus does not have probabilistic features and failures).
-Dis-cover has the same no-heuristics property, and thus could be used by the RetroWrite project without breaking the property.
-\lou{(to make retrowrite more generic, we will need heuristics, but that is for future people => we might accept analysis like MARX in the future)}
+One of the defining properties of RetroWrite is that it does not use heuristics 
+(and thus does not have probabilistic features and failures).
+Dis-cover has the same no-heuristics property, and thus could be used by the 
+RetroWrite project without breaking the property.
+\lou{(to make retrowrite more generic, we will need heuristics, but that is for 
+future people => we might accept analysis like MARX in the future)}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -407,23 +525,36 @@ Dis-cover has the same no-heuristics property, and thus could be used by the Ret
 % This section is usually 3-5 pages.
 
 % Python script (because RetroWrite; and good tools) (1 sentence)
-We decided to write a python module for this project, as the python ecosystem has great reverse engineering packages, and for easy integration in RetroWrite, which is also written in python.
+We decided to write a python module for this project, as the python ecosystem 
+has great reverse engineering packages, and for easy integration in RetroWrite, 
+which is also written in python.
 
 \section{Finding RTTIs}
 
 % RTTI and VTable
-The first thing dis-cover does is find ELF sections where the VTables and RTTIs could be hiding.
-This is usually \textbf{.rodata} (read-only data) and \textbf{.data.rel.ro}, but could sometimes also be related sections like \textbf{.data.rel.ro.local}, or \textbf{.rdata}.
-As per the Itanium C++ ABI, the base VTable of a class will contain an "offset-to-top", which will be 0 in the primary base virtual table's case, followed by a pointer to an RTTI.
-We simply have to pattern-match for zeroes directly followed by a pointer to another part of the read-only data sections, and we have a potential RTTI pointer.
+The first thing dis-cover does is find ELF sections where the VTables and RTTIs 
+could be hiding.
+This is usually \textbf{.rodata} (read-only data) and \textbf{.data.rel.ro}, 
+but could sometimes also be related sections like \textbf{.data.rel.ro.local}, 
+or \textbf{.rdata}.
+As per the Itanium C++ ABI, the base VTable of a class will contain an 
+"offset-to-top", which will be 0 in the primary base virtual table's case, 
+followed by a pointer to an RTTI.
+We simply have to pattern-match for zeroes directly followed by a pointer to 
+another part of the read-only data sections, and we have a potential RTTI 
+pointer.
 
-\lou{Explain the "primary base virtual table" and why it's the one we're interested in.}
-\lou{This could be diagramed (RTTIs) => multiple inheritance, diamond problem...}
+\lou{Explain the "primary base virtual table" and why it's the one we're 
+interested in.}
+\lou{This could be diagramed (RTTIs) => multiple inheritance, diamond 
+problem...}
 
-To check whether we have found an RTTI, we assert that the next value is a pointer to a string located in a read-only data section.
+To check whether we have found an RTTI, we assert that the next value is a 
+pointer to a string located in a read-only data section.
 If it is, we can extract it, demangle it, and we have a class and a name.
 The next values in the RTTI are pointers to the RTTIs the class inherits from.
-We can go through them and parse them if we have not already, to add this inheritance information to the original class.
+We can go through them and parse them if we have not already, to add this 
+inheritance information to the original class.
 
 This algorithm is $O(n)$, as adding a class only adds one more value to parse.
 
@@ -433,15 +564,23 @@ This algorithm is $O(n)$, as adding a class only adds one more value to parse.
 Next, we want to add that information to the debug sections of a new ELF file.
 
 % DIE Bytecode
-In order to write DWARF data, the first step is defining the types we will be using, and their fields.
+In order to write DWARF data, the first step is defining the types we will be 
+using, and their fields.
 This is done by writing bytes in the \textbf{.debug\_abbrev} section.
-For example, we create an abbrev of type \textbf{class\_type}, which has a \textbf{name}, and can have sub-field (children).
-Then, we create the abbrev of type \textbf{inheritance}, which has a \textbf{type} (a reference to the parent type).
+For example, we create an abbrev of type \textbf{class\_type}, which has a 
+\textbf{name}, and can have sub-field (children).
+Then, we create the abbrev of type \textbf{inheritance}, which has a 
+\textbf{type} (a reference to the parent type).
 
-We can then populate the \textbf{.debug\_info} with classes and their inheritance data.
-DWARF data takes the form of a tree of values. We have to create a \textbf{compile\_unit} value at the root, and then the branches will be \textbf{class\_type}s.
-These \textbf{class\_type}s will themselves have as children \textbf{inheritance} values if the class inherits from another class.
-\autoref{dwarfdump} shows a very simple example of this, with two class types and one inheriting from the other.
+We can then populate the \textbf{.debug\_info} with classes and their 
+inheritance data.
+DWARF data takes the form of a tree of values. We have to create a 
+\textbf{compile\_unit} value at the root, and then the branches will be 
+\textbf{class\_type}s.
+These \textbf{class\_type}s will themselves have as children 
+\textbf{inheritance} values if the class inherits from another class.
+\autoref{dwarfdump} shows a very simple example of this, with two class types 
+and one inheriting from the other.
 
 \begin{figure}[h]
 \begin{lstlisting}
@@ -462,20 +601,28 @@ These \textbf{class\_type}s will themselves have as children \textbf{inheritance
 \label{dwarfdump}
 \end{figure}
 
-The strings themselves are stored in another section, \textbf{.debug\_str}, and are referred to with their offset in that section.
+The strings themselves are stored in another section, \textbf{.debug\_str}, and 
+are referred to with their offset in that section.
 
-\lou{The three dwarf sections should be explained in more detail in the Background or Design sections.}
+\lou{The three dwarf sections should be explained in more detail in the 
+Background or Design sections.}
 
 \section{Creating symbols}
 
 % symbols
-Symbols are used to have access to variable names, class names, function names or any other kind of text information when debugging a binary.
+Symbols are used to have access to variable names, class names, function names 
+or any other kind of text information when debugging a binary.
 \lou{Symbols are also used for shared object loading}
-We want to create two symbols for every class we have found during the analysis : one pointing to the VTable and one pointing to the RTTI, labeling them as such.
+We want to create two symbols for every class we have found during the analysis 
+: one pointing to the VTable and one pointing to the RTTI, labeling them as 
+such.
 
-In order to create new symbol sections, we take the symbol table from the original binary (if there was one) and append the aforementioned symbols.
+In order to create new symbol sections, we take the symbol table from the 
+original binary (if there was one) and append the aforementioned symbols.
 
-The two symbol sections are \textbf{.symtab}, which contains the information (offset, size, type, ...) for each symbol, and \textbf{.strtab}, which contains the strings related to these symbols.
+The two symbol sections are \textbf{.symtab}, which contains the information 
+(offset, size, type, ...) for each symbol, and \textbf{.strtab}, which contains 
+the strings related to these symbols.
 
 \section{Wrapping things together}
 
@@ -483,25 +630,38 @@ The two symbol sections are \textbf{.symtab}, which contains the information (of
 
 % eu-unstrip etc
 Once we have the three debug sections ready
-(\textbf{.debug\_abbrev} with the debug types, \textbf{.debug\_info} with the debug information, and \textbf{debug\_str} with the strings)
+(\textbf{.debug\_abbrev} with the debug types, \textbf{.debug\_info} with the 
+debug information, and \textbf{debug\_str} with the strings)
 as well as the two symbol sections, we have to make them available to the user.
-The first step is building an empty ELF file with only these five sections in them.\lou{"we'll discuss why in 4.4.3"}
-\lou{say about the three dwarf sections => this is the dwarf information we have recovered, and we are trying to incorporate it into the binary.}
+The first step is building an empty ELF file with only these five sections in 
+them.\lou{"we'll discuss why in 4.4.3"}
+\lou{say about the three dwarf sections => this is the dwarf information we 
+have recovered, and we are trying to incorporate it into the binary.}
 
 We start by constructing a \textbf{program header table}.
-This table contains information about the offset and size of each segment of the binary (which segment is used for what, and their read/write permissions).
+This table contains information about the offset and size of each segment of 
+the binary (which segment is used for what, and their read/write permissions).
 The ELF file we're creating will not be run, but only used temporarily.
-Thus, we noticed that we did not have to create a valid program header table for the process to work.
+Thus, we noticed that we did not have to create a valid program header table 
+for the process to work.
 We simply copy this program header table almost as-is from the original binary.
 
-Next, we use the individual sections we built earlier and construct the \textbf{section header table}.
-For every section present in the original binary, we create an entry in the section header table, reusing most values from the original section header table.
+Next, we use the individual sections we built earlier and construct the 
+\textbf{section header table}.
+For every section present in the original binary, we create an entry in the 
+section header table, reusing most values from the original section header 
+table.
 The only values we modify is the offset.
-For every section that we have created, we add the appropriate row in the section header table.
-Every section name gets added to the \textbf{.shstrtab} section, as per the convention.
+For every section that we have created, we add the appropriate row in the 
+section header table.
+Every section name gets added to the \textbf{.shstrtab} section, as per the 
+convention.
 
-Finally, we construct the \textbf{elf header}, taking some of the values from the original binaries, and calculating some others from the size of the tables and sections we have built.
-We can now create a fake ELF file by appending the elf header, the program header table, the sections we built and the section header table.
+Finally, we construct the \textbf{elf header}, taking some of the values from 
+the original binaries, and calculating some others from the size of the tables 
+and sections we have built.
+We can now create a fake ELF file by appending the elf header, the program 
+header table, the sections we built and the section header table.
 
 \subsection{Stripping the original ELF file}
 
@@ -511,10 +671,14 @@ This is to avoid section conflicts in the next step.
 
 \subsection{Combining the two ELF files}
 
-Now, we can use the ELF utility program \textbf{eu-unstrip} to combine the two ELF files we have created into one.
-The newly created combined ELF file will contain all of the code and data from the original file, as well as the debug and symbol sections we have created.
-\lou{Talk about why we had to do all of that, and the fact that DWARF info rarely comes alone.
-eu-unstrip lets us merge the 2 different elf files, but they have to closely match, which is why we're going though these steps.}
+Now, we can use the ELF utility program \textbf{eu-unstrip} to combine the two 
+ELF files we have created into one.
+The newly created combined ELF file will contain all of the code and data from 
+the original file, as well as the debug and symbol sections we have created.
+\lou{Talk about why we had to do all of that, and the fact that DWARF info 
+rarely comes alone.
+eu-unstrip lets us merge the 2 different elf files, but they have to closely 
+match, which is why we're going though these steps.}
 
 % what it does and does not do
 
@@ -536,31 +700,45 @@ eu-unstrip lets us merge the 2 different elf files, but they have to closely mat
 \section{Small case studies}
 
 % Small examples
-In addition to the first version of dis-cover, we created three small programs highlighting different features of C++.
+In addition to the first version of dis-cover, we created three small programs 
+highlighting different features of C++.
 One was using simple inheritance,
 one had a namespace (which we can and should recover as part of the analysis),
-and the last one was a use case of multiple inheritance (using the diamond problem).
+and the last one was a use case of multiple inheritance (using the diamond 
+problem).
 
-We also created a script that would compile these 3 programs using different levels of compiler optimization.
-We could then use dis-cover to see if we could recover every class and the correct tree from the binaries.
-This served as a useful benchmark to check whether dis-cover was functioning correctly if we tried to apply changes to it.
+We also created a script that would compile these 3 programs using different 
+levels of compiler optimization.
+We could then use dis-cover to see if we could recover every class and the 
+correct tree from the binaries.
+This served as a useful benchmark to check whether dis-cover was functioning 
+correctly if we tried to apply changes to it.
 
-These examples alone were not capable of letting us evaluate the full capabilities of dis-cover.
+These examples alone were not capable of letting us evaluate the full 
+capabilities of dis-cover.
 We found a few big applications that could serve that purpose.
 
 \section{Big case studies}
 
 % Big applications examples
-The first and smallest of these case studies was the \textbf{gold linker}~\cite{gold}.
+The first and smallest of these case studies was the \textbf{gold 
+linker}~\cite{gold}.
 We were able to find 571 classes in version 1.16 of the program.
-This provides a good benchmark, but the classes themselves do not make use of multiple inheritance (only a "simple" inheritance tree).
+This provides a good benchmark, but the classes themselves do not make use of 
+multiple inheritance (only a "simple" inheritance tree).
 
-\textbf{LibreOffice}~\cite{libreoffice} on the other hand provided us with a great test case :
-the program is fragmented into many small libraries, containing some interesting uses of multiple inheritance.
-See \autoref{libloglo} for an example of multiple inheritance in the \textbf{libloglo.so} library from LibreOffice.
-This particular example was very important for verifying a big bug that was present in an early version of dis-cover.
-After fixing the bug, we were noticing around 10\% more inheritance links in some projects (but not more classes).
-Being able to go check with the open-source LibreOffice code that we had found the right inheritance links was extremely helpful.
+\textbf{LibreOffice}~\cite{libreoffice} on the other hand provided us with a 
+great test case :
+the program is fragmented into many small libraries, containing some 
+interesting uses of multiple inheritance.
+See \autoref{libloglo} for an example of multiple inheritance in the 
+\textbf{libloglo.so} library from LibreOffice.
+This particular example was very important for verifying a big bug that was 
+present in an early version of dis-cover.
+After fixing the bug, we were noticing around 10\% more inheritance links in 
+some projects (but not more classes).
+Being able to go check with the open-source LibreOffice code that we had found 
+the right inheritance links was extremely helpful.
 
 \begin{figure}[h]
 
@@ -570,19 +748,26 @@ Being able to go check with the open-source LibreOffice code that we had found t
 
 \end{figure}
 
-Finally, we also were able to study the closed-source \textbf{zoom}~\cite{zoom} binary.
+Finally, we also were able to study the closed-source \textbf{zoom}~\cite{zoom} 
+binary.
 This test case is very interesting in two ways.
-First, we are able to find \textbf{6039 classes} in the binary, with \textbf{5601 edges} in the class hierarchy graph.
-Second, as a large (76M) and complex ELF file, it served as a perfect benchmark for the performance of the algorithm.
-By adding a simple check earlier in the RTTI-spotting pipeline, we were able to speed up the analysis of the zoom binary 13.37 times, from over an hour to five minutes.
+First, we are able to find \textbf{6039 classes} in the binary, with 
+\textbf{5601 edges} in the class hierarchy graph.
+Second, as a large (76M) and complex ELF file, it served as a perfect benchmark 
+for the performance of the algorithm.
+By adding a simple check earlier in the RTTI-spotting pipeline, we were able to 
+speed up the analysis of the zoom binary 13.37 times, from over an hour to five 
+minutes.
 
-\autoref{discoverbenchmarks} details the benchmarks we conducted on many well-known projects.
+\autoref{discoverbenchmarks} details the benchmarks we conducted on many 
+well-known projects.
 
 \begin{table}[h]
   \centering
   {\small
   \begin{tabular}{l | r | r | r | r }
-    ELF File and version & Size & Size of .rodata & Computation time & Amount of classes recovered  \\
+    ELF File and version & Size & Size of .rodata & Computation time & Amount 
+of classes recovered  \\
     \hline
     gold 1.16 & 2.3M & 0.1M & 0m0.605s & 571 \\
     ceph-dencoder 15.2.13 & 29M & 0.9M & 0m12.493s & 2959 \\
@@ -590,14 +775,17 @@ By adding a simple check earlier in the RTTI-spotting pipeline, we were able to 
   \end{tabular}
   }
 
-\caption{Benchmarks of dis-cover on a machine running Ubuntu 20.04 with a 2.6 Ghz dedicated vCPU}
+\caption{Benchmarks of dis-cover on a machine running Ubuntu 20.04 with a 2.6 
+Ghz dedicated vCPU}
 \label{discoverbenchmarks}
 
 \end{table}
 
 % Debian test
-As we have shown before, out of the 5827 Debian packages that list C++ as a dependency, we were able to extract classes from 3194 (54\%).
-The total number of classes we found is 960'188, with 39\% of them unique across all packages (unique name in unique tree).
+As we have shown before, out of the 5827 Debian packages that list C++ as a 
+dependency, we were able to extract classes from 3194 (54\%).
+The total number of classes we found is 960'188, with 39\% of them unique 
+across all packages (unique name in unique tree).
 
 % RetroWrite test
 

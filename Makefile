@@ -6,6 +6,13 @@ all: *.tex *.bib
 	docker run -it --rm -v "${PWD}:/app" master-thesis rubber --pdf $(name).tex
 	sudo chown ${USER} $(name).pdf
 
+nodocker:
+	rubber --pdf $(name).tex
+
+fold:
+	fold -s thesis.tex > thesis.fold.tex
+	mv thesis.fold.tex thesis.tex
+
 spellcheck:
 	aspell -t check thesis.tex
 
