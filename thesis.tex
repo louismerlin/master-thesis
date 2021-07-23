@@ -257,10 +257,22 @@ See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer t
 
 \section{ELF format}
 
-\lou{ELF sections}
+Now we will study how all of the previously mentioned data is stored and organized.
+The common standard \textbf{Executable and Linkable Format} (ELF) format is mostly used as executable files, object code and shared libraries.
+It usually contains a program header table, which describes memory segments (e.g. "this is read-only data", "this is executable instructions").
+It also usually contains a section header table, describing sections (their name, size, offset and some flags). 
+The rest of an ELF file is taken up by sections.
+Famous sections include
+\textbf{.text} (where the instructions are),
+\textbf{.data} (where you will see global tables and other variables),
+\textbf{.rodata} (you will find strings in here)
+and \textbf{.eh\_frame} (where exception unwinding information is stored for C++ binaries).
+
+\section{Position-independent code}
+
+\section{Exceptions in C++}
 \ant{Exceptions and how they work :)}
 \lou{Relocation tables}
-\lou{PIE}
 
 
 \section{DWARF debugging standard}
