@@ -255,7 +255,7 @@ The next values of the RTTI are pointers to the RTTIs of the parent classes.
 These are used at runtime to check the relationship between classes.
 See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer to the Animal RTTI.
 
-\section{ELF format}
+\section{Executable and Linkable Format (ELF)}
 
 Now we will study how all of the previously mentioned data is stored and organized.
 The common standard \textbf{Executable and Linkable Format} (ELF) format is mostly used as executable files, object code and shared libraries.
@@ -268,7 +268,14 @@ Famous sections include
 \textbf{.rodata} (you will find strings in here)
 and \textbf{.eh\_frame} (where exception unwinding information is stored for C++ binaries).
 
-\section{Position-independent code}
+\section{Position-Independent Code (PIC) and Executable (PIE)}
+
+Position-independence for code is a property that guarantees that code will execute correctly no matter the absolute address of the body of code.
+This is mostly possible by computing relative positions instead of using absolute addresses.
+
+PIC is most often found for shared libraries, so that they can be inserted into an ELF file without worry.
+PIE binaries are seen as more secure because they allow for easy inserting of security measures like address space layout randomization~\cite{aslr}.\lou{@antony, what would be a more appropriate citation for ASLR ?}
+We will talk more about PIE in \autoref{retrowritesection}.
 
 \section{Exceptions in C++}
 \ant{Exceptions and how they work :)}
@@ -294,7 +301,7 @@ This debug information is made up of Debugging Information Entries (\textbf{DIEs
 These entries can contain information about variable names, method definitions, the compilation process, or more importantly for us, class names and class inheritance.
 
 
-\section{RetroWrite}
+\section{RetroWrite} \label{retrowritesection}
 
 % How RetroWrite works
 \ant{So here you can cite the RetroWrite paper and reword some of what they 
