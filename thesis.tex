@@ -637,12 +637,14 @@ Background or Design sections.}
 \section{Creating symbols}
 
 % symbols
-Symbols are used to have access to variable names, class names, function names 
-or any other kind of text information when debugging a binary.
-\lou{Symbols are also used for shared object loading}
-We want to create two symbols for every class we have found during the analysis 
-: one pointing to the VTable and one pointing to the RTTI, labeling them as 
-such.
+Symbols are mainly used for shared object loading, to import the \textbf{cout}
+object from \textbf{iostream} for example, the binary must be aware of an
+object named \textbf{cout}.
+Symbols are also used to have access to variable names, class names, function
+names or any other kind of text information when debugging a binary.
+In dis-cover, we want to create two symbols for every class we have found
+during the analysis : one pointing to the VTable and one pointing to the RTTI,
+and labeling them as such.
 
 In order to create new symbol sections, we take the symbol table from the 
 original binary (if there was one) and append the aforementioned symbols.
