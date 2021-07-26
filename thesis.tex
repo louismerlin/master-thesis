@@ -350,7 +350,7 @@ Exceptions are one of the defining features that make C++ stand out from C.
 In contrast to C errors, which terminate the whole program, C++ exceptions
 can be caught and handled.
 
-In order for the program to be able to continue excution after an exception
+In order for the program to be able to continue execution after an exception
 is caught, binaries need some way of safely doing \textbf{stack unwinding}.
 The information on how to safely unwind the stack is stored in the
 \textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
@@ -383,7 +383,7 @@ inheritance. You can also map source code to binary code.
 All of this information is usually used in debuggers.
 
 The \textbf{.eh\_frame} section mentioned in \autoref{exceptions} is also used
-by debuggers to undwind the stack for debugging purposes.
+by debuggers to unwind the stack for debugging purposes.
 
 DWARF data takes the form of a tree of values.
 The root of the tree is called the \textbf{Compile Unit} (CU).
@@ -524,7 +524,7 @@ little tweaking to ARM and other architectures).
 
 Dis-cover could be used in RetroWrite in order to add instrumentation around
 \textbf{Object Type Integrity}, as defined in the CFIXX paper~\cite{cfixx},
-or reenforcing typechecks as defined in the HexType paper~\cite{hextype} to
+or reinforcing type checks as defined in the HexType paper~\cite{hextype} to
 avoid type confusion errors and vulnerabilities.
 
 One of the goals of the project was to augment RetroWrite's
@@ -565,7 +565,7 @@ pointer.
 
 \lou{Explain the "primary base virtual table" and why it's the one we're 
 interested in.}
-\lou{This could be diagramed (RTTIs) => multiple inheritance, diamond 
+\lou{This could be diagrammed (RTTIs) => multiple inheritance, diamond 
 problem...}
 
 To check whether we have found an RTTI, we assert that the next value is a 
@@ -795,7 +795,7 @@ of classes recovered  \\
   }
 
 \caption{Benchmarks of dis-cover on a machine running Ubuntu 20.04 with a 2.6 
-Ghz dedicated vCPU}
+GHz dedicated vCPU}
 \label{discoverbenchmarks}
 
 \end{table}
