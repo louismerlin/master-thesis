@@ -662,10 +662,9 @@ Once we have the three debug sections ready
 (\textbf{.debug\_abbrev} with the debug types, \textbf{.debug\_info} with the 
 debug information, and \textbf{debug\_str} with the strings)
 as well as the two symbol sections, we have to make them available to the user.
+They contain all of the information we were able to extract from the binary.
 The first step is building an empty ELF file with only these five sections in 
-them.\lou{"we'll discuss why in 4.4.3"}
-\lou{say about the three dwarf sections => this is the dwarf information we 
-have recovered, and we are trying to incorporate it into the binary.}
+them. We will discuss why in \autoref{combiningelf}.
 
 We start by constructing a \textbf{program header table}.
 This table contains information about the offset and size of each segment of 
@@ -699,15 +698,21 @@ We use the \textbf{objcopy --strip-all} command.
 This is to avoid section conflicts in the next step.
 
 \subsection{Combining the two ELF files}
+\label{combiningelf}
 
 Now, we can use the ELF utility program \textbf{eu-unstrip} to combine the two 
 ELF files we have created into one.
 The newly created combined ELF file will contain all of the code and data from 
 the original file, as well as the debug and symbol sections we have created.
-\lou{Talk about why we had to do all of that, and the fact that DWARF info 
-rarely comes alone.
-eu-unstrip lets us merge the 2 different elf files, but they have to closely 
-match, which is why we're going though these steps.}
+
+The reason why we had to go through these hoops to make the debug and symbol
+information available to the user is because these sections do not come alone
+: they have to be accompanied by machine code and data.
+We did not want to recreate a whole compiler to assemble all of this data.
+Luckily, the \textbf{eu-unstrip} tool was created as an utility application
+to "combine stripped files with separate symbols and debug information".
+In order to use this tool, we had to make the fake binary match the original
+binary as closely as possible regarding headers and segments.
 
 % what it does and does not do
 
