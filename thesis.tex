@@ -341,6 +341,7 @@ citation for ASLR ?}
 We will talk more about PIE in \autoref{retrowritesection}.
 
 \section{Exceptions in C++}
+\label{exceptions}
 
 Exceptions are one of the defining features that make C++ stand out from C.
 In contrast to C errors, which terminate the whole program, C++ exceptions
@@ -350,11 +351,12 @@ In order for the program to be able to continue excution after an exception
 is caught, binaries need some way of safely doing \textbf{stack unwinding}.
 The information on how to safely unwind the stack is stored in the
 \textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
-(see the next section).
+(see \autoref{dwarf}).
 
 \lou{Should I talk about relocation tables ? If yes how ?}
 
 \section{DWARF debugging standard}
+\label{dwarf}
 
 \ant{MOAR!! :) There is quite a bit you can say here. DWARF powers debuggers, 
 and lets you do things like map source to binary code, recover variable 
@@ -364,10 +366,7 @@ Another key point to mention for later will be the structure of how it is used
 in EH\_Frame. DWARF uses an abstract representation of the processor, so its 
 register 1 for example must be mapped to the processor.}
 \lou{Regarding Antony's comment => more info about the justification for using 
-DWARF.
-Also, the EH\_FRAME is also used for going back on the stack for debugging 
-purposes.}
-\lou{Talk about the Compile Unit}
+DWARF.}
 % DWARF DIEs
 \textbf{DWARF} is the debugging standard used widely in conjunction with 
 executable ELF files.
@@ -377,8 +376,16 @@ This debug information is made up of Debugging Information Entries
 (\textbf{DIEs}).
 These entries can contain information about variable names, method definitions, 
 the compilation process, or more importantly for us, class names and class 
-inheritance.
+inheritance. You can also map source code to binary code.
+All of this information is usually used in debuggers.
 
+The \textbf{.eh\_frame} section mentioned in \autoref{exceptions} is also used
+by debuggers to undwind the stack for debugging purposes.
+
+DWARF data takes the form of a tree of values.
+The root of the tree is called the \textbf{Compile Unit} (CU).
+It contains information about the source code file, the programming language
+used as well as the compiler.
 
 \section{RetroWrite} \label{retrowritesection}
 
