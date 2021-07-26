@@ -327,6 +327,7 @@ and \textbf{.eh\_frame} (where exception unwinding information is stored for
 C++ binaries).
 
 \section{Position-Independent Code (PIC) and Executable (PIE)}
+\label{picpie}
 
 Position-independence for code is a property that guarantees that code will 
 execute correctly no matter the absolute address of the body of code.
@@ -391,19 +392,31 @@ used as well as the compiler.
 \section{RetroWrite} \label{retrowritesection}
 
 % How RetroWrite works
-\ant{So here you can cite the RetroWrite paper and reword some of what they 
-say in your own words. Especially: about what we mean by symbolization in 
-assembly, 
-why we avoid heuristics for the moment (to be sure it works, also because 
-shared 
-libraries are usually always PIE so we have something to target).
-You can also talk about the compilation process here, as GCC will emit 
-its intermediate assembly. Then the assembler and linker resolve the symbols 
-that are required.}
 \lou{Also, what are we trying to achieve ? Why are we integrating into 
 RetroWrite ?
 Also, mention Cffix (one of HexHive's publications), and how RetroWrite could 
 implement this}
+
+The \textbf{RetroWrite}\cite{dinesh20oakland} project is a project from the
+HexHive lab that aims to statically rewrite binaries (transform from binary
+to assembly) to instrument them later to improve fuzzing capabilities.
+
+RetroWrite's core idea is to symbolize all of the addresses in the machine
+code. This means transforming an an address offset (+8) into a symbol
+(.LD1234) and adding the appropriate label at that location.
+This way, we can add any instruction after and before existing instructions
+without breaking relative offsets.
+
+RetroWrite only works on \textbf{x86\_64} position-independent executables
+(see \autoref{picpie}), compiled from C. This enables the program to stay
+heuristics-free (meaning that it is designed to work for every example without
+exceptions). One of the goals of the project was to augment RetroWrite's
+process using \textbf{dis-cover}'s output. This is why we have decided to
+design dis-cover in a heuristics-free way.
+
+Dis-cover could be used in RetroWrite in order to add instrumentation around
+\textbf{Object Type Integrity}, as defined in the CFIXX paper~\cite{cfixx},
+or reenforcing typechecks as defined in the HexType paper~\cite{hextype}.
 
 %%%%%%%%%%%%%%%%
 \chapter{Design}
