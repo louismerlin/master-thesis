@@ -188,6 +188,7 @@ and what remains to be done for the implementation to work.
 % This section is usually 3-5 pages.
 
 \section{C++ and polymorphism}
+\label{polymorphism}
 
 % C++ polymorphism (what, how, but also research like Marx) (+ exceptions) 
 % also talk about how compilers will optimize this out in certain situtations
@@ -410,13 +411,8 @@ without breaking relative offsets.
 RetroWrite only works on \textbf{x86\_64} position-independent executables
 (see \autoref{picpie}), compiled from C. This enables the program to stay
 heuristics-free (meaning that it is designed to work for every example without
-exceptions). One of the goals of the project was to augment RetroWrite's
-process using \textbf{dis-cover}'s output. This is why we have decided to
-design dis-cover in a heuristics-free way.
+exceptions).
 
-Dis-cover could be used in RetroWrite in order to add instrumentation around
-\textbf{Object Type Integrity}, as defined in the CFIXX paper~\cite{cfixx},
-or reenforcing typechecks as defined in the HexType paper~\cite{hextype}.
 
 %%%%%%%%%%%%%%%%
 \chapter{Design}
@@ -428,52 +424,52 @@ or reenforcing typechecks as defined in the HexType paper~\cite{hextype}.
 
 % This section is usually 5-10 pages.
 
+\section{Goals}
+
+The primary goal of this project was to extract some debug information from a
+stripped C++ binary, make it available through DWARF in order to be able to
+use that information in other projects, as a proof of concept.
+The hope is that this process will be re-used in other projects in the future.
+For this project, we decided to focus on recovering class information from
+Run-Time Type Information (RTTI, see \autoref{polymorphism}).
+
 % Design => Decisions
 % We decided not to reproduce Marx's work
 % First attempt : recover classes from RTTI
 % Future work : could take approaches like Marx and re-feed it like us
 Class recovery from compiled C++ binaries has been tried multiple ways before:
 there are plugins for popular debugging tools, like 
-ida\_gcc\_rtti~\cite{idagccrtti} for IDA Pro,
-or Ghidra-Cpp-Class-Analyzer~\cite{ghidracppclassanalyzer} for Ghidra;
+ida\_gcc\_rtti~\cite{idagccrtti} for IDA Pro (which requires a license),
+or Ghidra-Cpp-Class-Analyzer~\cite{ghidracppclassanalyzer} for Ghidra
+(but this information is only usable inside of the ghidra debugger);
 there are academic projects such as MARX~\cite{marx} that rely on heuristics 
 around VTables to find classes and inheritance information.
 The MARX project can recover classes when no RTTI is present (in the Chrome 
-project for example, where the \textbf{fno-rrti} compilation flag is used), but 
-not with 100\% accuracy.
-\lou{IDA : you need the license; Ghidra : not usable outside of ghidra; MARX : 
-different (and cite accuracy statistics)}
+project for example, where the \textbf{-fno-rrti} compilation flag is used),
+with around 90\% accuracy.
 
 % VTable => RTTI
 %   mention class data (Debian analysis)
-For this project we decided to focus on RTTIs which, as mentioned in the 
-Background chapter, are available for a class hierarchy tree when there is at 
-least one virtual method implemented by one of the classes.
-\lou{Why did we decide to focus on RTTIs ? We wanted to be able to get 
-information from C++ binaries, make it available through DWARF and use that 
-information in RetroWrite for a proof of concept.
-More complex analysis projects could use the same process in the future.}
+As we mentioned in the Background chapter, the RTTIs are available for a
+class hierarchy tree when there is at least one virtual method implemented
+by one of the classes.
 We decided to test if RTTIs occurred often in the wild : we proceed to download 
 every Debian package that listed C++ as a dependency (get the list with 
 \textbf{apt-cache rdepends libgcc1} on a Debian machine).
 Out of around 80'000 packages, 5827 of them list C++ as a dependency.
 Out of those, we extracted classes from 3194 (54\%).
-\lou{Maybe talk about the fact that the other 46\% might have classes, but they 
-are optimized aways in many cases.}
+This does not mean that the other 46\% of packages do not use classes,
+because in many cases these classes are optimized away by the compiler
+(in the more straightforward cases).
 We will share more details about this experiment in the Evaluation chapter.
 
 % Also: exceptions (we felt this needed to be handled)
 Exceptions are often implemented as classes, and our tool will naturally 
 recover information about programmer-defined exceptions.
-Future extension of this work might consider recovering more information about 
-exceptions.
-We also considered extracting information about exceptions, which is another 
-big feature that differentiates C++ from C. \lou{Remove / Rephrase this 
-sentence}
-We decided not to focus on this feature, as it did not seem to bring as much to 
-the project considering the evaluated development time.
 We did have to study and work with exceptions and exception handling frames for 
 the augmentation of RetroWrite (see the end of the Implementation chapter).
+Future extension of this work might consider recovering more information about 
+exceptions.
 
 % Why do we want DWARF data ?
 %   We want to make the info available to reversing tools
@@ -481,8 +477,8 @@ the augmentation of RetroWrite (see the end of the Implementation chapter).
 %        He would like to see DWARF used as a lingua franca for debugging
 % Also, exception's try/catch blocks & exception types
 % but dwarf is limited for this (=> future work)
-Next comes the question : what should we do with all of this information ? What 
-would be the most useful format to output the data in ?
+Next comes the question : what should we do with all of this class
+information ? What would be the most useful format to output the data in ?
 This is where DWARF~\cite{dwarf} comes in the picture. DWARF is the debugging 
 standard for programs.
 It is mostly used by developers trying to understand where their implementation 
@@ -490,8 +486,8 @@ fails,
 and by reverse engineers to get a better understanding of how a program was 
 conceived (although DWARF information is usually stripped from proprietary 
 software).
-This kind of debug data is mostly found in C and C++ projects. % Should I add 
-another language ?
+This kind of debug data is mostly found in C and C++ projects. 
+\lou{Should I add another language ?}
 By having DWARF data as an output, the information would become readable by 
 most modern reversing tools.
 
@@ -501,9 +497,8 @@ from DARPA.
 He has published a paper in 2011 where he was able to exploit certain features 
 of DWARF to control program execution : Exploiting the hard-working 
 DWARF~\cite{hardworkingdwarf}.
-\lou{Talk more about the hard-working DWARF : talk about what DWARF allows and 
-what it gives you (turing complete ?)
-Also: why is it becoming the lingua franca ? Why does it matter ?}
+In it, they prove that the DWARF information used during exception handling
+is Turing-complete and can be used to embed exploits in executables.
 
 % Injecting debug section & symbols
 With dis-cover, we are able to inject information in the debug and symbol 
@@ -526,22 +521,16 @@ code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
 We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most 
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
-\lou{Mention the fact that we're trying to enable the usage of the dis-cover 
-data in RetroWrite and other RE tools.}
 
-Another potential use of the class information is to implement defenses around 
-type confusion, working with the findings from the HexType~\cite{hextype} paper.
-We decided not to focus on this for our project, as it would have been out of 
-the scope of a 6-months master thesis.
-\lou{Not "out of the scope" but "we hope that future people will be able to do 
-it".}
+Dis-cover could be used in RetroWrite in order to add instrumentation around
+\textbf{Object Type Integrity}, as defined in the CFIXX paper~\cite{cfixx},
+or reenforcing typechecks as defined in the HexType paper~\cite{hextype} to
+avoid type confusion errors and vulnerabilities.
 
-One of the defining properties of RetroWrite is that it does not use heuristics 
-(and thus does not have probabilistic features and failures).
-Dis-cover has the same no-heuristics property, and thus could be used by the 
-RetroWrite project without breaking the property.
-\lou{(to make retrowrite more generic, we will need heuristics, but that is for 
-future people => we might accept analysis like MARX in the future)}
+One of the goals of the project was to augment RetroWrite's
+process using \textbf{dis-cover}'s output. As RetroWrite does not use
+heuristics, we decided to design dis-cover in a heuristics-free way if
+possible (which it is).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
