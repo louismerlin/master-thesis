@@ -341,9 +341,18 @@ citation for ASLR ?}
 We will talk more about PIE in \autoref{retrowritesection}.
 
 \section{Exceptions in C++}
-\ant{Exceptions and how they work :)}
-\lou{Relocation tables}
 
+Exceptions are one of the defining features that make C++ stand out from C.
+In contrast to C errors, which terminate the whole program, C++ exceptions
+can be caught and handled.
+
+In order for the program to be able to continue excution after an exception
+is caught, binaries need some way of safely doing \textbf{stack unwinding}.
+The information on how to safely unwind the stack is stored in the
+\textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
+(see the next section).
+
+\lou{Should I talk about relocation tables ? If yes how ?}
 
 \section{DWARF debugging standard}
 
