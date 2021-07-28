@@ -75,6 +75,7 @@ writing static analysis tools.
 Through careful research of the way C++ exeptions are implemented, we are also
 able to augment the capabilities of the RetroWrite static rewriting tool to
 support C++ binaries.
+\lou{Also: the type information is available in RetroWrite for instrumentation}
 
 By utilizing these two tools, we are able to successfuly reverse engineer
 several well-known large projects.
@@ -231,12 +232,13 @@ Dog or any other species.
 This Animal is sure to have the \textbf{speak} method and whatever other 
 properties and methods Animal could define.
 This logic is verified by the compiler.
+\lou{Talk about the fact that speak has to be overwritten.}
 
 \begin{figure}[h]
 \begin{lstlisting}
 class Animal {
 public:
-  virtual void speak() {}
+  virtual void speak() = 0
 };
 
 class Feline {
@@ -266,9 +268,11 @@ you don't need a lemur-specific implementation if appropriate.
 
 Polymorphic classes are defined by having at least one virtual method, which is 
 inheritable and overridable.
+\lou{Explain upcasting, downcasting, sidecasting. Walk through the cat
+example.}
 With this polymorphism comes type conversion, of which there are two kinds.
-The first, \textbf{static\_cast}~\cite{staticcast}, will check that the casting 
-is upcasting at compile time,
+The first, \textbf{static\_cast}~\cite{staticcast}, will check that the
+conversion is upcasting at compile time,
 but does not do any run-time checks to verify the validity of the conversion.
 The fact that a class is polymorphic will have no impact on this type of 
 casting.
@@ -281,6 +285,7 @@ the object's data type at run time.
 
 This is where Run-Time Type Information (\textbf{RTTI}) comes into the picture.
 The system will use this RTTI to infer type inheritance for dynamic casting.
+\lou{Define what vtables are.}
 We will now go into implementation details of RTTIs and VTables, which point to 
 them.
 
@@ -288,15 +293,14 @@ To make RTTIs appear in your C++ binary, you will to define classes that
 inherit from each other, as well as at least one virtual method in one of these 
 classes.
 \autoref{classes} shows an example of such classes.
-
-You will also need to instantiate these classes, and have some run time logic 
-to make the binary non-deterministic. \lou{deterministic is not the right word, 
-I mean to say that the binary depends on some input for its class-instantiating 
-logic}
-For example, a conditional dynamic cast between the two children classes we 
-defined in \autoref{classes}.
-If you do not do these things, the class logic will be abstracted away by the 
-compiler for optimization reasons.
+You will also need to instantiate these classes, and have some logic to make
+the class logic run-time dependent. 
+This is extremely common in practice, as it is the core motivation for
+polymorphism in the first place.
+For an example, see the conditional dynamic cast between the two child classes
+we defined in \autoref{classes}.
+If you do not do these things, the class logic is likely to be abstracted away
+by the compiler for optimization reasons.
 
 \begin{figure}[h]
 
@@ -327,6 +331,8 @@ Here are some examples of C++ name mangling :
 \textbf{\_ZTV6Feline} demangles to \textbf{vtable for Feline}.
 Mangling is especially useful when defining several methods in the same scope 
 with different arguments (this is called overloading),
+\lou{Mangling is also useful because certain characters need to be encoded,
+like ::.}
 in order to differentiate the different methods.
 The next values of the RTTI are pointers to the RTTIs of the parent classes.
 These are used at runtime to check the relationship between classes.
@@ -356,15 +362,17 @@ C++ binaries).
 
 Position-independence for code is a property that guarantees that code will 
 execute correctly no matter the absolute address of the body of code.
-This is mostly possible by computing relative positions instead of using 
+This is made possible by computing relative positions instead of using
 absolute addresses.
+\lou{Also mention relocations as another way (for what cannot be made
+relative).}
 
 PIC is most often found for shared libraries, so that they can be inserted into 
 an ELF file without worry.
 PIE binaries are seen as more secure because they allow for easy inserting of 
 security measures like address space layout 
 randomization~\cite{aslr}.\lou{@antony, what would be a more appropriate 
-citation for ASLR ?}
+citation for ASLR ? => use one of the cited papers in the wiki article.}
 We will talk more about PIE in \autoref{retrowritesection}.
 
 \section{Exceptions in C++}
@@ -379,8 +387,6 @@ is caught, binaries need some way of safely doing \textbf{stack unwinding}.
 The information on how to safely unwind the stack is stored in the
 \textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
 (see \autoref{dwarf}).
-
-\lou{Should I talk about relocation tables ? If yes how ?}
 
 \section{DWARF debugging standard}
 \label{dwarf}
@@ -421,15 +427,18 @@ used as well as the compiler.
 The \textbf{RetroWrite}\cite{dinesh20oakland} project is a project from the
 HexHive lab that aims to statically rewrite binaries (transform from binary
 to assembly) to instrument them later to improve fuzzing capabilities.
+\lou{Explain what static rewriting is in one sentence.}
 
 RetroWrite's core idea is to symbolize all of the addresses in the machine
 code. This means transforming an an address offset (+8) into a symbol
 (.LD1234) and adding the appropriate label at that location.
 This way, we can add any instruction after and before existing instructions
 without breaking relative offsets.
+\lou{These labels are what the assembler will use to compute the addresses of
+functions and data offsets etc.}
 
 RetroWrite only works on \textbf{x86\_64} position-independent executables
-(see \autoref{picpie}), compiled from C. This enables the program to stay
+(see \autoref{picpie}), compiled from C. This enables the RetroWrite to stay
 heuristics-free (meaning that it is designed to work for every example without
 exceptions).
 
@@ -495,6 +504,9 @@ offset at the beginning of the VTable : a primary base virtual table will have
 a value of $0$ as an offset, whereas a secondary virtual table will have an
 offset to the primary base virtual table.
 
+\lou{This could be diagrammed (RTTIs) => multiple inheritance, diamond 
+problem...}
+
 \subsection{DWARF}
 \label{dwarfdesign}
 
@@ -514,8 +526,8 @@ fails,
 and by reverse engineers to get a better understanding of how a program was 
 conceived (although DWARF information is usually stripped from proprietary 
 software).
-This kind of debug data is mostly found in C and C++ projects. 
-\lou{Should I add another language ?}
+This kind of debug data is mostly found in compiled binaries, written in C,
+C++ or Rust for example. 
 By having DWARF data as an output, the information would become readable by 
 most modern reversing tools.
 
@@ -527,6 +539,9 @@ of DWARF to control program execution : Exploiting the hard-working
 DWARF~\cite{hardworkingdwarf}.
 In it, they prove that the DWARF information used during exception handling
 is Turing-complete and can be used to embed exploits in executables.
+
+\lou{I could talk about design info of DWARF stuff here (with details and
+examples), to show off my DWARF skills}
 
 % Injecting debug section & symbols
 With dis-cover, we are able to inject information in the debug and symbol 
@@ -541,7 +556,7 @@ We had to study and work with exceptions and exception handling frames for
 the augmentation of RetroWrite (see \autoref{retrowriteimplementation}).
 Exceptions are often implemented as classes, and dis-cover will naturally 
 recover information about programmer-defined exceptions.
-Future extension of this work might consider recovering more information about 
+Future extensions of this work might consider recovering more information about 
 exceptions.
 
 % RetroWrite structure
@@ -559,6 +574,8 @@ code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
 We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most 
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
+
+\lou{Talk about except tables etc here}
 
 \section{Design for future integrations}
 
@@ -604,9 +621,6 @@ followed by a pointer to an RTTI.
 We simply have to pattern-match for zeroes directly followed by a pointer to 
 another part of the read-only data sections, and we have a potential RTTI 
 pointer.
-
-\lou{This could be diagrammed (RTTIs) => multiple inheritance, diamond 
-problem...}
 
 Next, we analyze the data at the pointer's value.
 We check that we have not already extracted a class at that address, and if
@@ -667,14 +681,15 @@ The strings themselves are stored in another section, \textbf{.debug\_str}, and
 are referred to with their offset in that section.
 
 \lou{The three dwarf sections should be explained in more detail in the 
-Background or Design sections.}
+Design section.}
 
 \section{Creating symbols}
 
 % symbols
-Symbols are mainly used for shared object loading, to import the \textbf{cout}
-object from \textbf{iostream} for example, the binary must be aware of an
-object named \textbf{cout}.
+Symbols are mainly used for shared object loading, to use the \textbf{printf}
+method from \textbf{stdio.h} for example, the binary must be aware of a
+method named \textbf{printf}. The same is true for
+\textbf{system\_clock} in C++ for example.
 Symbols are also used to have access to variable names, class names, function
 names or any other kind of text information when debugging a binary.
 In dis-cover, we want to create two symbols for every class we have found
@@ -789,7 +804,7 @@ These examples alone were not capable of letting us evaluate the full
 capabilities of dis-cover.
 We found a few big applications that could serve that purpose.
 
-\section{Big case studies}
+\section{Real-world case studies}
 
 % Big applications examples
 The first and smallest of these case studies was the \textbf{gold 
@@ -859,6 +874,7 @@ The total number of classes we found is 960'188, with 39\% of them unique
 across all packages (unique name in unique tree).
 
 % RetroWrite test
+\section{Testing RetroWrite}
 
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -886,7 +902,21 @@ probabilistic approach.
 They use six heuristics to locate the virtual tables, related to the table
 layout and content.
 
-\lou{What else can we talk about in this chapter ?}
+\lou{MARX could be a good candidate for future integration.}
+
+\lou{CFIXX and HexType
+
+=> First check how they get type information (maybe they could use dis-cover
+for closed-source binaries).
+
+=> Also check if they have cool class examples}
+
+
+\lou{What else can we talk about in this chapter ?
+
+=> The tools for gidra and IDA (too specific for these frameworks)
+
+=> The hard-working DWARF}
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
