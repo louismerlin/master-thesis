@@ -576,12 +576,15 @@ pointer.
 \lou{This could be diagrammed (RTTIs) => multiple inheritance, diamond 
 problem...}
 
-To check whether we have found an RTTI, we assert that the next value is a 
-pointer to a string located in a read-only data section.
-If it is, we can extract it, demangle it, and we have a class and a name.
+Next, we analyze the data at the pointer's value.
+We check that we have not already extracted a class at that address, and if
+not, we assert the following address is a pointer to a string located in a
+read-only data section.
+If it is, we can extract that string, demangle it, and we have a class name,
+a virtual table address and an RTTI address that we have extracted.
 The next values in the RTTI are pointers to the RTTIs the class inherits from.
 We can go through them and parse them if we have not already, to add this 
-inheritance information to the original class.
+inheritance information to the extracted class.
 
 This algorithm is $O(n)$, as adding a class only adds one more value to parse.
 
