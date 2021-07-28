@@ -495,15 +495,7 @@ offset at the beginning of the VTable : a primary base virtual table will have
 a value of $0$ as an offset, whereas a secondary virtual table will have an
 offset to the primary base virtual table.
 
-\subsection{Exceptions}
-
-% Also: exceptions (we felt this needed to be handled)
-Exceptions are often implemented as classes, and our tool will naturally 
-recover information about programmer-defined exceptions.
-We did have to study and work with exceptions and exception handling frames for 
-the augmentation of RetroWrite (see the end of the Implementation chapter).
-Future extension of this work might consider recovering more information about 
-exceptions.
+\subsection{DWARF}
 
 % Why do we want DWARF data ?
 %   We want to make the info available to reversing tools
@@ -511,8 +503,9 @@ exceptions.
 %        He would like to see DWARF used as a lingua franca for debugging
 % Also, exception's try/catch blocks & exception types
 % but dwarf is limited for this (=> future work)
-Next comes the question : what should we do with all of this class
-information ? What would be the most useful format to output the data in ?
+Once we have extracted class information from RTTI, next comes the question :
+what should we do with all of this class information ? What would be the most
+useful format to output the data in ?
 This is where DWARF~\cite{dwarf} comes in the picture. DWARF is the debugging 
 standard for programs.
 It is mostly used by developers trying to understand where their implementation 
@@ -539,6 +532,16 @@ With dis-cover, we are able to inject information in the debug and symbol
 sections of the binary, creating a new ELF file with all of this useful info 
 included.
 We will go more into the implementation details in the next chapter.
+
+\subsection{Exceptions}
+
+% Also: exceptions (we felt this needed to be handled)
+We had to study and work with exceptions and exception handling frames for 
+the augmentation of RetroWrite (see \autoref{retrowriteimplementation}).
+Exceptions are often implemented as classes, and dis-cover will naturally 
+recover information about programmer-defined exceptions.
+Future extension of this work might consider recovering more information about 
+exceptions.
 
 % RetroWrite structure
 %  x86_64 userspace and kernel, and arm_64
@@ -743,6 +746,8 @@ binary as closely as possible regarding headers and segments.
 
 % what it does and does not do
 
+\section{C++ capabilities in RetroWrite}
+\label{retrowriteimplementation}
 % RetroWrite implementation details
 % Refer to the other thesis
 
