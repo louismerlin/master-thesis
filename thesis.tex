@@ -51,11 +51,35 @@ instrumentation}
 \makeacks
 
 \begin{abstract}
-The abstract serves as an executive summary of your project.
-Your abstract should cover at least the following topics, 1-2 sentences for
-each: what area you are in, the problem you focus on, why existing work is
-insufficient, what the high-level intuition of your work is, maybe a neat
-design or implementation decision, and key results of your evaluation.
+% The abstract serves as an executive summary of your project.
+% Your abstract should cover at least the following topics, 1-2 sentences for
+% each: what area you are in, the problem you focus on, why existing work is
+% insufficient, what the high-level intuition of your work is, maybe a neat
+% design or implementation decision, and key results of your evaluation.
+
+The analysis of closed-source C++ programs is an arduous task.
+C++ adds several powerful functionalities to the C language, which leads to
+complex binaries.
+
+Knowledge of class types and hierarchies can prove valuable during the reverse
+engineering process.
+Fortunately, some of that information can be recovered from stripped binaries
+due to the way polymorphism is implemented in C++ compilers.
+
+With the dis-cover tool, we are able to extract class information and the
+hierarchy tree from a stripped C++ binary, and write DWARF debug information
+and symbols for the later use of that knowledge by any existing debugging tool.
+Through this method, we aim to demonstrate an open and collaborative way of
+writing static analysis tools.
+
+Through careful research of the way C++ exeptions are implemented, we are also
+able to augment the capabilities of the RetroWrite static rewriting tool to
+support C++ binaries.
+
+By utilizing these two tools, we are able to successfuly reverse engineer
+several well-known large projects.
+\lou{We will give a cool example here if we end up with one.}
+
 \end{abstract}
 
 % \begin{frenchabstract}
