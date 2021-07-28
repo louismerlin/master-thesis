@@ -496,6 +496,7 @@ a value of $0$ as an offset, whereas a secondary virtual table will have an
 offset to the primary base virtual table.
 
 \subsection{DWARF}
+\label{dwarfdesign}
 
 % Why do we want DWARF data ?
 %   We want to make the info available to reversing tools
@@ -559,15 +560,19 @@ We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
 
-Dis-cover could be used in RetroWrite in order to add instrumentation around
-\textbf{Object Type Integrity}, as defined in the CFIXX paper~\cite{cfixx},
-or reinforcing type checks as defined in the HexType paper~\cite{hextype} to
-avoid type confusion errors and vulnerabilities.
+\section{Design for future integrations}
 
-One of the goals of the project was to augment RetroWrite's
-process using \textbf{dis-cover}'s output. As RetroWrite does not use
-heuristics, we decided to design dis-cover in a heuristics-free way if
-possible (which it is).
+As described in \autoref{dwarfdesign}, we use the DWARF format as an output
+for the extracted information. This makes the knowledge easily reusable in
+other reverse engineering projects.
+
+For example, dis-cover output could be used in RetroWrite in order to add
+instrumentation around \textbf{Object Type Integrity}, as defined in the CFIXX
+paper~\cite{cfixx}, or reinforcing type checks as defined in the HexType
+paper~\cite{hextype} to avoid type confusion errors and vulnerabilities.
+
+We also were able to design dis-cover in a heuristics-free way, which fits
+perfectly with RetroWrite's current goal to avoid heuristics.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
