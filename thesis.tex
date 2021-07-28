@@ -865,17 +865,28 @@ across all packages (unique name in unique tree).
 \chapter{Related Work}
 %%%%%%%%%%%%%%%%%%%%%%
 
-The related work section covers closely related work. Here you can highlight
-the related work, how it solved the problem, and why it solved a different
-problem. Do not play down the importance of related work, all of these
-systems have been published and evaluated! Say what is different and how
-you overcome some of the weaknesses of related work by discussing the 
-trade-offs. Stay positive!
+% The related work section covers closely related work. Here you can highlight
+% the related work, how it solved the problem, and why it solved a different
+% problem. Do not play down the importance of related work, all of these
+% systems have been published and evaluated! Say what is different and how
+% you overcome some of the weaknesses of related work by discussing the 
+% trade-offs. Stay positive!
 
-This section is usually 3-5 pages.
+% This section is usually 3-5 pages.
 
-% Marx
+\section{MARX}
 
+MARX~\cite{marx} is a static analysis tool which is related to what dis-cover
+is trying to achieve. Using analysis of the virtual tables in a C++ binaries,
+they are able to accurately extract 90\% of the classes. This is done without
+the need for RTTIs, and thus can target a larger number of projects (such as
+the chrome browser and the nodejs runtime) at the cost of having a
+probabilistic approach.
+
+They use six heuristics to locate the virtual tables, related to the table
+layout and content.
+
+\lou{What else can we talk about in this chapter ?}
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
