@@ -230,10 +230,9 @@ In a large code base, with multiple teams of programmers working on different
 features,
 an Animal could be passed around without caring about whether it was a Cat, a 
 Dog or any other species.
-This Animal is sure to have the \textbf{speak} method and whatever other 
-properties and methods Animal could define.
+This Animal is sure to overwrite the \textbf{speak} method have whatever other 
+properties and methods Animal has defined.
 This logic is verified by the compiler.
-\lou{Talk about the fact that speak has to be overwritten.}
 
 \begin{figure}[h]
 \begin{lstlisting}
@@ -269,30 +268,34 @@ you don't need a lemur-specific implementation if appropriate.
 
 Polymorphic classes are defined by having at least one virtual method, which is 
 inheritable and overridable.
-\lou{Explain upcasting, downcasting, sidecasting. Walk through the cat
-example.}
 With this polymorphism comes type conversion, of which there are two kinds.
 The first, \textbf{static\_cast}~\cite{staticcast}, will check that the
 conversion is upcasting at compile time,
 but does not do any run-time checks to verify the validity of the conversion.
+An example of upcasting is converting a pointer of a \textbf{Cat} to a pointer
+of an \textbf{Animal}.
 The fact that a class is polymorphic will have no impact on this type of 
 casting.
 The second is the more interesting one for us. It is the 
 \textbf{dynamic\_cast}~\cite{dynamiccast} expression.
 Dynamic casting is a safe kind of type conversion that can handle downcasting 
 and sidecasting.
-In order to achieve that, the system must have some kind of information about 
-the object's data type at run time.
+An example of downcasting is converting a pointer of an \textbf{Animal} to a
+pointer of a \textbf{Cat}. This is not guaranteed to work.
+An example of sidecasting is converting a pointer of an \textbf{Animal} to a
+pointer of a \textbf{Feline}. This is also not guaranteed to work (if the
+Animal pointer was that of a Dog for example).
+In order to achieve a dynamic cast, the system must have some kind of
+information about the object's data type at run time.
 
 This is where Run-Time Type Information (\textbf{RTTI}) comes into the picture.
 The system will use this RTTI to infer type inheritance for dynamic casting.
-\lou{Define what vtables are.}
-We will now go into implementation details of RTTIs and VTables, which point to 
-them.
+We will now go into implementation details of RTTIs and virtual tables
+(\textbf{VTables}), which point to them.
 
-To make RTTIs appear in your C++ binary, you will to define classes that 
-inherit from each other, as well as at least one virtual method in one of these 
-classes.
+To make VTables and RTTIs appear in your C++ binary, you will to define
+classes that inherit from each other, as well as at least one virtual method
+in one of these classes.
 \autoref{classes} shows an example of such classes.
 You will also need to instantiate these classes, and have some logic to make
 the class logic run-time dependent. 
@@ -315,12 +318,12 @@ The structure of VTables and RTTIs is detailed in \autoref{rttigraph}.
 All of this is defined in the Itanium C++ ABI~\cite{cppabi}.
 An instance of a virtual class Animal will contain the \textbf{vtblptrAnimal}, 
 a pointer to the virtual table (\textbf{VTable}) for the Animal class.
-This VTable will contain pointers to the virtual methods of the class, which 
-are inherited and thus do not have to be duplicated for each class, they are 
-simply pointed to.
-The first value preceding the VTable is a pointer to the RTTI of the class. The 
-process finds out the class inheritance of a class instance by following this 
-pointer.
+This VTable will be shared by all instances of this class (even by instances
+of a class that inherits from Animal), and will contain pointers to the virtual
+methods of the class.
+The first value preceding the VTable is a pointer to the RTTI of the class. A
+program finds out the class inheritance of a class instance at runtime by
+following this pointer.
 
 The RTTI itself is composed of a pointer to a VTable for the typeinfo class 
 (defined by the compiler) and well as a pointer to the type name (this type 
@@ -331,10 +334,10 @@ Here are some examples of C++ name mangling :
 \textbf{\_ZTI6Feline} demangles to \textbf{typeinfo for Feline};
 \textbf{\_ZTV6Feline} demangles to \textbf{vtable for Feline}.
 Mangling is especially useful when defining several methods in the same scope 
-with different arguments (this is called overloading),
-\lou{Mangling is also useful because certain characters need to be encoded,
-like ::.}
-in order to differentiate the different methods.
+with different arguments (this is called overloading), in order to
+differentiate the different methods.
+Mangling is also useful because of special characters in class names, like the
+\textbf{::} characters who separate namespaces.
 The next values of the RTTI are pointers to the RTTIs of the parent classes.
 These are used at runtime to check the relationship between classes.
 See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer 
@@ -363,17 +366,14 @@ C++ binaries).
 
 Position-independence for code is a property that guarantees that code will 
 execute correctly no matter the absolute address of the body of code.
-This is made possible by computing relative positions instead of using
-absolute addresses.
-\lou{Also mention relocations as another way (for what cannot be made
-relative).}
+This is made possible by computing \textbf{relative positions} instead of
+using absolute addresses, as well as a feature called \textbf{relocations}.
 
 PIC is most often found for shared libraries, so that they can be inserted into 
 an ELF file without worry.
 PIE binaries are seen as more secure because they allow for easy inserting of 
 security measures like address space layout 
-randomization~\cite{aslr}.\lou{@antony, what would be a more appropriate 
-citation for ASLR ? => use one of the cited papers in the wiki article.}
+randomization~\cite{aslr}.
 We will talk more about PIE in \autoref{retrowritesection}.
 
 \section{Exceptions in C++}
@@ -426,17 +426,19 @@ used as well as the compiler.
 % How RetroWrite works
 
 The \textbf{RetroWrite}\cite{dinesh20oakland} project is a project from the
-HexHive lab that aims to statically rewrite binaries (transform from binary
-to assembly) to instrument them later to improve fuzzing capabilities.
-\lou{Explain what static rewriting is in one sentence.}
+HexHive lab that aims to statically rewrite binaries and instrument them, to
+improve fuzzing capabilities.
+Static binary rewriting is the process of taking a binary file, and modifying
+it such that there is a patch applied to it but the other functionalities
+remain the same.
 
 RetroWrite's core idea is to symbolize all of the addresses in the machine
 code. This means transforming an an address offset (+8) into a symbol
 (.LD1234) and adding the appropriate label at that location.
+These labels will be used by the assembler to compute the addresses of
+functions and data offsets for example.
 This way, we can add any instruction after and before existing instructions
 without breaking relative offsets.
-\lou{These labels are what the assembler will use to compute the addresses of
-functions and data offsets etc.}
 
 RetroWrite only works on \textbf{x86\_64} position-independent executables
 (see \autoref{picpie}), compiled from C. This enables the RetroWrite to stay
