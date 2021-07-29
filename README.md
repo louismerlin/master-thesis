@@ -3,8 +3,6 @@
 ##### Spring 2021
 ##### Louis Merlin
 
-[See the document](./thesis.pdf).
-
 
 # Acknowledgement
 
