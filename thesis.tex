@@ -389,6 +389,11 @@ The information on how to safely unwind the stack is stored in the
 \textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
 (see \autoref{dwarf}).
 
+\section{Global constructors in C++}
+\lou{Every 'translation unit' (cpp file, once all headers are pasted into it
+by the compiler)  will add an entry to this list to initialize its globals.
+It is important to making RW work for C++!}
+
 \section{DWARF debugging standard}
 \label{dwarf}
 
@@ -571,8 +576,6 @@ We will go more into the implementation details in \autoref{dwarfdump} and
 \subsection{Exceptions}
 
 % Also: exceptions (we felt this needed to be handled)
-We had to study and work with exceptions and exception handling frames for 
-the augmentation of RetroWrite (see \autoref{retrowriteimplementation}).
 Exceptions are often implemented as classes, and dis-cover will naturally 
 recover information about programmer-defined exceptions.
 Future extensions of this work might consider recovering more information about 
@@ -584,8 +587,9 @@ exceptions.
 %    Most widely used target
 %    Kernel drivers are mostly written in C
 % We still want to keep the deterministic ability of retrowrite
-Another focus of this project was the augmentation of RetroWrite for C++ 
-capabilities.
+We had to study and work with exceptions and exception handling frames for 
+the augmentation of RetroWrite with C++ capabilities (see
+\autoref{retrowriteimplementation}).
 Today, RetroWrite supports the reversing of x86\_64 position-independent 
 binaries.
 There was also work to augment RetroWrite to support kernel 
@@ -594,7 +598,16 @@ We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
 
-\lou{Talk about except tables etc here}
+Using RetroWrite on binaries that had C++ exception handling would cause
+crashes in the new binary, caused by the fact that the exceptions thrown were
+never caught.
+Exception behavior is described in the \textbf{Language Specific Data Area}
+(LSDA), which is found in the \textbf{gcc\_except\_table} section of the ELF
+file.
+This LSDA describes, row by row, actions to take for specific instruction in
+the code we are hitting while dealing with a thrown exception. These actions
+could be : destructing an out-of-scope variable, or examining a catch clause
+to see if they should catch the current exception.
 
 \section{Design for future integrations}
 
@@ -624,6 +637,8 @@ perfectly with RetroWrite's current goal to avoid heuristics.
 % Python script (because RetroWrite; and good tools) (1 sentence)
 We decided to write a python module for this project, as the python ecosystem 
 has great reverse engineering packages, and for easy integration in RetroWrite, 
+
+
 which is also written in python.
 
 \section{Finding RTTIs}
