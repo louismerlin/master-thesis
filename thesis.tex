@@ -938,21 +938,35 @@ probabilistic approach.
 They use six heuristics to locate the virtual tables, related to the table
 layout and content.
 
-\lou{MARX could be a good candidate for future integration.}
+This project could be a great candidate for future integration into
+RetroWrite, if we extend the tool to add defenses around type integrity for
+example.
 
-\lou{CFIXX and HexType
+\section{Plugins}
 
-=> First check how they get type information (maybe they could use dis-cover
-for closed-source binaries).
+There exists multiple plugins for reverse engineering frameworks that serve
+the same purpose as dis-cover. For IDA Pro, there exists \textbf{IDA GCC RTTI}
+~\cite{idagccrtti}, and for Ghidra there is the \textbf{Class and Run Time
+Type Information Analyzer}~\cite{ghidracppclassanalyzer}.
 
-=> Also check if they have cool class examples}
+These are very usefull, and integrade very well into the reverse engineering
+frameworks, but they cannot make that information available to other tools.
 
+The IDA Pro plugin does offer the option to create a \textbf{.dot} graph file
+that can be used to create a visual representation of the hierarchy tree.
+\lou{This is a potential upgrade to dis-cover, a script has already been
+written}
 
-\lou{What else can we talk about in this chapter ?
+\section{Type Integrity}
 
-=> The tools for Ghidra and IDA (too specific for these frameworks)
+\lou{check how they get type information (maybe they could use dis-cover
+for closed-source binaries).}
 
-=> The hard-working DWARF}
+\subsection{CFIXX}
+
+\subsection{HexType}
+
+\section{Exploiting the hard-working DWARF}
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
