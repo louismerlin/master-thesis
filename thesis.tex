@@ -543,14 +543,30 @@ DWARF~\cite{hardworkingdwarf}.
 In it, they prove that the DWARF information used during exception handling
 is Turing-complete and can be used to embed exploits in executables.
 
-\lou{I could talk about design info of DWARF stuff here (with details and
-examples), to show off my DWARF skills}
+DWARF data is structured as a tree of \textbf{Debug Information Entries} 
+(DIEs). These entries contain a \textbf{tag} and a list of
+\textbf{attributes}.
+These entries can describe how the original code is written, as well as
+information about classes, variables, types, and other structures in the
+binary.
+
+The DWARF format also uses abbreviations to compress the debug information.
+Instead of re-describing a DIE every time, their structure is defined in an
+abbreviation table (stored in the \textbf{debug\_abbrev} section of the ELF
+file).
+Each DIE will have an index in that table, which describes its tag and list
+if attributes names and types. The rest of the DIE is the list of its
+attributes, in the order they were defined in the abbreviation.
+
+In this project, we use very minimalistic DIE abbreviations, containing only
+what we could infer from the analysis.
 
 % Injecting debug section & symbols
 With dis-cover, we are able to inject information in the debug and symbol 
 sections of the binary, creating a new ELF file with all of this useful info 
 included.
-We will go more into the implementation details in the next chapter.
+We will go more into the implementation details in \autoref{dwarfdump} and
+\autoref{wrappingimplementation}.
 
 \subsection{Exceptions}
 
@@ -707,6 +723,7 @@ The two symbol sections are \textbf{.symtab}, which contains the information
 the strings related to these symbols.
 
 \section{Wrapping things together}
+\label{wrappingimplementation}
 
 \subsection{Creating a fake ELF file}
 
