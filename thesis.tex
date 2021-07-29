@@ -72,13 +72,13 @@ and symbols for the later use of that knowledge by any existing debugging tool.
 Through this method, we aim to demonstrate an open and collaborative way of
 writing static analysis tools.
 
-Through careful research of the way C++ exeptions are implemented, we are also
+Through careful research of the way C++ exceptions are implemented, we are also
 able to augment the capabilities of the RetroWrite static rewriting tool to
 support C++ binaries.
 We also show how the class information extracted by dis-cover could be used to
 improve the instrumentation done by RetroWrite
 
-By utilizing these two tools, we are able to successfuly reverse engineer
+By utilizing these two tools, we are able to successfully reverse engineer
 several well-known large projects.
 \lou{We will give a cool example here if we end up with one.}
 
@@ -125,7 +125,7 @@ because analysis methods found this way will often work on C++ binaries too.
 % C++-specific ELF sections are not as well documented as they could be (?);
 % Debuggers do not work as well as they should on non-C binaries;
 
-This has meant reverse engineering tools like ghidra~\cite{ghidra}, IDA 
+This has meant reverse engineering tools like Ghidra~\cite{ghidra}, IDA 
 Pro~\cite{ida} or Binary Ninja~\cite{binja} have treated non-C binaries as 
 second-class citizen.
 These tools will often show C++ specific features as passing comments, failing 
@@ -213,7 +213,40 @@ and what remains to be done for the implementation to work.
 
 % This section is usually 3-5 pages.
 
-\section{C++ and polymorphism}
+\section{Executable and Linkable Format (ELF)}
+
+The common standard \textbf{Executable and Linkable Format} (ELF) format is 
+mostly used as executable files, object code and shared libraries.
+It usually contains a program header table, which describes memory segments 
+(e.g. "this is read-only data", "this is executable instructions").
+It also usually contains a section header table, describing sections (their 
+name, size, offset and some flags). 
+The rest of an ELF file is taken up by sections.
+Famous sections include
+\textbf{.text} (where the instructions are),
+\textbf{.data} (where you will see global tables and other variables),
+\textbf{.rodata} (you will find strings in here)
+and \textbf{.eh\_frame} (where exception unwinding information is stored for 
+C++ binaries).
+
+\section{Position-Independent Code (PIC) and Executable (PIE)}
+\label{picpie}
+
+Position-independence for code is a property that guarantees that code will 
+execute correctly no matter the absolute address of the body of code.
+This is made possible by computing \textbf{relative positions} instead of
+using absolute addresses, as well as a feature called \textbf{relocations}.
+
+PIC is most often found for shared libraries, so that they can be inserted into 
+an ELF file without worry.
+PIE binaries are seen as more secure because they allow for easy inserting of 
+security measures like address space layout 
+randomization~\cite{aslr}.
+We will talk more about PIE in \autoref{retrowritesection}.
+
+\section{C++ features}
+
+\subsection{Polymorphism}
 \label{polymorphism}
 
 % C++ polymorphism (what, how, but also research like Marx) (+ exceptions) 
@@ -343,40 +376,8 @@ These are used at runtime to check the relationship between classes.
 See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer 
 to the Animal RTTI.
 
-\section{Executable and Linkable Format (ELF)}
 
-Now we will study how all of the previously mentioned data is stored and 
-organized.
-The common standard \textbf{Executable and Linkable Format} (ELF) format is 
-mostly used as executable files, object code and shared libraries.
-It usually contains a program header table, which describes memory segments 
-(e.g. "this is read-only data", "this is executable instructions").
-It also usually contains a section header table, describing sections (their 
-name, size, offset and some flags). 
-The rest of an ELF file is taken up by sections.
-Famous sections include
-\textbf{.text} (where the instructions are),
-\textbf{.data} (where you will see global tables and other variables),
-\textbf{.rodata} (you will find strings in here)
-and \textbf{.eh\_frame} (where exception unwinding information is stored for 
-C++ binaries).
-
-\section{Position-Independent Code (PIC) and Executable (PIE)}
-\label{picpie}
-
-Position-independence for code is a property that guarantees that code will 
-execute correctly no matter the absolute address of the body of code.
-This is made possible by computing \textbf{relative positions} instead of
-using absolute addresses, as well as a feature called \textbf{relocations}.
-
-PIC is most often found for shared libraries, so that they can be inserted into 
-an ELF file without worry.
-PIE binaries are seen as more secure because they allow for easy inserting of 
-security measures like address space layout 
-randomization~\cite{aslr}.
-We will talk more about PIE in \autoref{retrowritesection}.
-
-\section{Exceptions in C++}
+\subsection{Exceptions}
 \label{exceptions}
 
 Exceptions are one of the defining features that make C++ stand out from C.
@@ -389,7 +390,7 @@ The information on how to safely unwind the stack is stored in the
 \textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
 (see \autoref{dwarf}).
 
-\section{Global constructors in C++}
+\subsection{Global constructors}
 \lou{Every 'translation unit' (cpp file, once all headers are pasted into it
 by the compiler)  will add an entry to this list to initialize its globals.
 It is important to making RW work for C++!}
@@ -478,7 +479,7 @@ Class recovery from compiled C++ binaries has been tried multiple ways before:
 there are plugins for popular debugging tools, like 
 ida\_gcc\_rtti~\cite{idagccrtti} for IDA Pro (which requires a license),
 or Ghidra-Cpp-Class-Analyzer~\cite{ghidracppclassanalyzer} for Ghidra
-(but this information is only usable inside of the ghidra debugger);
+(but this information is only usable inside of the Ghidra debugger);
 there are academic projects such as MARX~\cite{marx} that rely on heuristics 
 around VTables to find classes and inheritance information.
 The MARX project can recover classes when no RTTI is present (in the Chrome 
@@ -563,7 +564,7 @@ Each DIE will have an index in that table, which describes its tag and list
 if attributes names and types. The rest of the DIE is the list of its
 attributes, in the order they were defined in the abbreviation.
 
-In this project, we use very minimalistic DIE abbreviations, containing only
+In this project, we use very minimalist DIE abbreviations, containing only
 what we could infer from the analysis.
 
 % Injecting debug section & symbols
@@ -602,7 +603,7 @@ Using RetroWrite on binaries that had C++ exception handling would cause
 crashes in the new binary, caused by the fact that the exceptions thrown were
 never caught.
 Exception behavior is described in the \textbf{Language Specific Data Area}
-(LSDA), which is found in the \textbf{gcc\_except\_table} section of the ELF
+(LSDA), which is found in the \textbf{.gcc\_except\_table} section of the ELF
 file.
 This LSDA describes, row by row, actions to take for specific instruction in
 the code we are hitting while dealing with a thrown exception. These actions
@@ -931,7 +932,7 @@ MARX~\cite{marx} is a static analysis tool which is related to what dis-cover
 is trying to achieve. Using analysis of the virtual tables in a C++ binaries,
 they are able to accurately extract 90\% of the classes. This is done without
 the need for RTTIs, and thus can target a larger number of projects (such as
-the chrome browser and the nodejs runtime) at the cost of having a
+the chrome browser and the Node.js runtime) at the cost of having a
 probabilistic approach.
 
 They use six heuristics to locate the virtual tables, related to the table
@@ -949,7 +950,7 @@ for closed-source binaries).
 
 \lou{What else can we talk about in this chapter ?
 
-=> The tools for gidra and IDA (too specific for these frameworks)
+=> The tools for Ghidra and IDA (too specific for these frameworks)
 
 => The hard-working DWARF}
 
