@@ -993,6 +993,16 @@ of the attack surface.
 
 \section{Exploiting the hard-working DWARF}
 
+\textbf{Exploiting the Hard-Working DWARF}~\cite{hardworkingdwarf}
+demonstrated that it was possible to incorporate exploits in the
+\textbf{.eh\_frame} and \textbf{.gcc\_except\_table} sections.
+They showed that the exception handling mechanism was a Turing-complete
+language, and they proved they could take control of the system when an
+exception was thrown.
+
+This paper rekindled a global interest in DWARF as an academic research topic,
+which lead to projects like this one.
+
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
 %%%%%%%%%%%%%%%%%%%%
