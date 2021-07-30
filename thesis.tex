@@ -973,12 +973,23 @@ written}
 
 \section{Type Integrity}
 
-\lou{check how they get type information (maybe they could use dis-cover
-for closed-source binaries).}
-
 \subsection{CFIXX}
 
+\textbf{CFIXX}~\cite{cfixx} introduces \textbf{Object Type Integrity}, which
+is a dynamic (runtime) mechanism that keeps track of object types and prevents
+adversaries from overwriting type information to hijack the control flow.
+It is applied at compile time.
+
+A future project could use the classes extracted with dis-cover and the
+rewriting capabilities of RetroWrite to implement object type integrity on
+closed-source binaries.
+
 \subsection{HexType}
+
+\textbf{HexType}~\cite{hextype} aims to remove \textbf{type confusion errors}
+from programs, by adding explicit run-time checks during compilation.
+This is done even for objects that are not polymorphic, so as to remove all
+of the attack surface.
 
 \section{Exploiting the hard-working DWARF}
 
