@@ -608,6 +608,9 @@ We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
 
+\section{RetroWrite}
+\label{retrowritedesign}
+
 The first bug we encountered while trying to use RetroWrite on C++ binaries
 was due to the fact that the \textbf{initialization array} (see
 \autoref{framedummy}) contained a pointer to the \textbf{frame dummy} and this
@@ -820,8 +823,23 @@ binary as closely as possible regarding headers and segments.
 \label{retrowriteimplementation}
 % RetroWrite implementation details
 % Refer to the other thesis
-
 % unwind tables etc
+
+The first modification we did to RetroWrite to add support for C++ binaries
+was to address the \textbf{init\_array} errors described in
+\autoref{retrowritedesign}.
+This meant treating the \textbf{frame\_dummy} method differently, as it was
+ignored by the symbolizer.
+
+The next modification was a larger one : the whole \textbf{Language Specific
+Data Area} (LSDA) had to be symbolized and rewritten.
+See \autoref{retrowritedesign} for more details.
+This table, contained in the \textbf{.gcc\_except\_table} section, has offsets
+to cleanup functions, as well as lengths of instructions (which we transform
+into label differences).
+
+The LSDA structure is quite complex, but in practice only a subset of actions
+are used by C++ compilers to describe the logic of exception handling.
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
