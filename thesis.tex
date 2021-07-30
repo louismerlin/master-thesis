@@ -390,10 +390,19 @@ The information on how to safely unwind the stack is stored in the
 \textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
 (see \autoref{dwarf}).
 
-\subsection{Global constructors}
-\lou{Every 'translation unit' (cpp file, once all headers are pasted into it
-by the compiler)  will add an entry to this list to initialize its globals.
-It is important to making RW work for C++!}
+\subsection{Global constructors and frame dummy}
+\label{framedummy}
+
+During the execution of an ELF file, some methods will be run before the main
+program starts. Pointers to these methods are stored in the
+\textbf{init\_array}.
+A simple C++ binary that uses exceptions will have an initialization array
+containing a pointer to the \textbf{frame\_dummy}. This method is in charge of
+setting up the stack frames to be able to unwind the frame during exception
+handling later on.
+In the initialization array, you will also find pointers to a global
+constructor for every compilation unit (usually, a compilation unit is a C++
+source file).
 
 \section{DWARF debugging standard}
 \label{dwarf}
@@ -599,9 +608,16 @@ We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
 
-Using RetroWrite on binaries that had C++ exception handling would cause
-crashes in the new binary, caused by the fact that the exceptions thrown were
-never caught.
+The first bug we encountered while trying to use RetroWrite on C++ binaries
+was due to the fact that the \textbf{initialization array} (see
+\autoref{framedummy}) contained a pointer to the \textbf{frame dummy} and this
+was not handled well during RetroWrite's symbolization process.
+By adding special treatment for that scenario, we were able to resolve this
+failure.
+
+Once that was fixed, we saw that using RetroWrite on binaries that had C++
+exception handling would cause crashes in the new binary, caused by the fact
+that the exceptions thrown were never caught.
 Exception behavior is described in the \textbf{Language Specific Data Area}
 (LSDA), which is found in the \textbf{.gcc\_except\_table} section of the ELF
 file.
@@ -949,7 +965,7 @@ the same purpose as dis-cover. For IDA Pro, there exists \textbf{IDA GCC RTTI}
 ~\cite{idagccrtti}, and for Ghidra there is the \textbf{Class and Run Time
 Type Information Analyzer}~\cite{ghidracppclassanalyzer}.
 
-These are very usefull, and integrade very well into the reverse engineering
+These are very useful, and integrate very well into the reverse engineering
 frameworks, but they cannot make that information available to other tools.
 
 The IDA Pro plugin does offer the option to create a \textbf{.dot} graph file
