@@ -65,6 +65,7 @@ Knowledge of class types and hierarchies can prove valuable during the reverse
 engineering process.
 Fortunately, some of that information can be recovered from stripped binaries
 due to the way polymorphism is implemented in C++ compilers.
+\lou{TODO : try striping binaries with more complex tools}
 
 With the dis-cover tool, we are able to extract class information and the
 hierarchy tree from a stripped C++ binary, and write DWARF debug information
@@ -80,6 +81,7 @@ improve the instrumentation done by RetroWrite
 
 By utilizing these two tools, we are able to successfully reverse engineer
 several well-known large projects.
+\lou{reverse engineer is not the right word => rewrite maybe ? Instruments ?}
 \lou{We will give a cool example here if we end up with one.}
 
 \end{abstract}
@@ -511,6 +513,7 @@ This does not mean that the other 46\% of packages do not use classes,
 because in many cases these classes are optimized away by the compiler
 (in the more straightforward cases).
 We will share more details about this experiment in the Evaluation chapter.
+\lou{Add link to Evaluation chapter}
 
 When looking at a binary's VTables and RTTIs, we only need to look for a
 specific subset of them : the primary base virtual tables and their RTTIs.
@@ -527,6 +530,9 @@ problem...}
 
 \subsection{DWARF}
 \label{dwarfdesign}
+
+\lou{Alternatives to DWARF ? Maybe on MacOS and Windows ? Maybe I should say
+debugging in **unix** binaries}
 
 % Why do we want DWARF data ?
 %   We want to make the info available to reversing tools
@@ -581,7 +587,7 @@ With dis-cover, we are able to inject information in the debug and symbol
 sections of the binary, creating a new ELF file with all of this useful info 
 included.
 We will go more into the implementation details in \autoref{dwarfdump} and
-\autoref{wrappingimplementation}.
+\autoref{wrappingimplementation}. \lou{figure 4.1 ?}
 
 \subsection{Exceptions}
 
@@ -607,6 +613,8 @@ code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
 We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most 
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
+\lou{Kernel target is not one we are going to consider because C++ is not used
+to its full extend}
 
 \section{RetroWrite}
 \label{retrowritedesign}
@@ -670,9 +678,13 @@ or \textbf{.rdata}.
 As per the Itanium C++ ABI, the base VTable of a class will contain an 
 "offset-to-top", which will be 0 in the primary base virtual table's case, 
 followed by a pointer to an RTTI.
+\lou{Actually these are pointers -2 and -1 (-0x10 and -0x08)}
 We simply have to pattern-match for zeroes directly followed by a pointer to 
 another part of the read-only data sections, and we have a potential RTTI 
 pointer.
+
+\lou{Add link to figure, it's easier to understand to an image / or a similar
+figure that helps better understand **this** part}
 
 Next, we analyze the data at the pointer's value.
 We check that we have not already extracted a class at that address, and if
