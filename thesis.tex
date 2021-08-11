@@ -65,7 +65,6 @@ Knowledge of class types and hierarchies can prove valuable during the reverse
 engineering process.
 Fortunately, some of that information can be recovered from stripped binaries
 due to the way polymorphism is implemented in C++ compilers.
-\lou{TODO : try striping binaries with more complex tools}
 
 With the dis-cover tool, we are able to extract class information and the
 hierarchy tree from a stripped C++ binary, and write DWARF debug information
@@ -79,9 +78,9 @@ support C++ binaries.
 We also show how the class information extracted by dis-cover could be used to
 improve the instrumentation done by RetroWrite
 
-By utilizing these two tools, we are able to successfully reverse engineer
-several well-known large projects.
-\lou{reverse engineer is not the right word => rewrite maybe ? Instruments ?}
+By utilizing these two tools, we are able to successfully extract useful
+information from closed-source applications like Zoom, and instrument
+large and well-known closed-source projects like {TODO}.
 \lou{We will give a cool example here if we end up with one.}
 
 \end{abstract}
@@ -512,8 +511,7 @@ Out of those, we extracted classes from 3194 (54\%).
 This does not mean that the other 46\% of packages do not use classes,
 because in many cases these classes are optimized away by the compiler
 (in the more straightforward cases).
-We will share more details about this experiment in the Evaluation chapter.
-\lou{Add link to Evaluation chapter}
+We will share more details about this experiment in \autoref{evalchapter}.
 
 When looking at a binary's VTables and RTTIs, we only need to look for a
 specific subset of them : the primary base virtual tables and their RTTIs.
@@ -531,9 +529,6 @@ problem...}
 \subsection{DWARF}
 \label{dwarfdesign}
 
-\lou{Alternatives to DWARF ? Maybe on MacOS and Windows ? Maybe I should say
-debugging in **unix** binaries}
-
 % Why do we want DWARF data ?
 %   We want to make the info available to reversing tools
 %   => input from Dr. Sergey Bratus
@@ -544,7 +539,7 @@ Once we have extracted class information from RTTI, next comes the question :
 what should we do with all of this class information ? What would be the most
 useful format to output the data in ?
 This is where DWARF~\cite{dwarf} comes in the picture. DWARF is the debugging 
-standard for programs.
+standard for unix programs.
 It is mostly used by developers trying to understand where their implementation 
 fails,
 and by reverse engineers to get a better understanding of how a program was 
@@ -586,8 +581,8 @@ what we could infer from the analysis.
 With dis-cover, we are able to inject information in the debug and symbol 
 sections of the binary, creating a new ELF file with all of this useful info 
 included.
-We will go more into the implementation details in \autoref{dwarfdump} and
-\autoref{wrappingimplementation}. \lou{figure 4.1 ?}
+We will go more into the implementation details in \autoref{dwarfdesign} and
+\autoref{wrappingimplementation}.
 
 \subsection{Exceptions}
 
@@ -613,8 +608,6 @@ code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
 We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most 
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
-\lou{Kernel target is not one we are going to consider because C++ is not used
-to its full extend}
 
 \section{RetroWrite}
 \label{retrowritedesign}
@@ -676,9 +669,8 @@ This is usually \textbf{.rodata} (read-only data) and \textbf{.data.rel.ro},
 but could sometimes also be related sections like \textbf{.data.rel.ro.local}, 
 or \textbf{.rdata}.
 As per the Itanium C++ ABI, the base VTable of a class will contain an 
-"offset-to-top", which will be 0 in the primary base virtual table's case, 
-followed by a pointer to an RTTI.
-\lou{Actually these are pointers -2 and -1 (-0x10 and -0x08)}
+"offset-to-top" at offset \textbf{-0x10}, which will be 0 in the primary base virtual table's case, 
+followed by a pointer to an RTTI at offset \textbf{-0x08}.
 We simply have to pattern-match for zeroes directly followed by a pointer to 
 another part of the read-only data sections, and we have a potential RTTI 
 pointer.
@@ -699,6 +691,7 @@ inheritance information to the extracted class.
 This algorithm is $O(n)$, as adding a class only adds one more value to parse.
 
 \section{Creating DWARF data}
+\label{dwarfimplementation}
 
 % Creating DIEs
 Next, we want to add that information to the debug sections of a new ELF file.
@@ -856,6 +849,7 @@ are used by C++ compilers to describe the logic of exception handling.
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
 %%%%%%%%%%%%%%%%%%%%
+\label{evalchapter}
 
 % In the evaluation you convince the reader that your design works as intended.
 % Describe the evaluation setup, the designed experiments, and how the
