@@ -431,6 +431,8 @@ All of this information is usually used in debuggers.
 
 The \textbf{.eh\_frame} section mentioned in \autoref{exceptions} is also used
 by debuggers to unwind the stack for debugging purposes.
+It gives information to identify where to catch exceptions, as well as what
+destructors to call while unwinding the stack.
 
 DWARF data takes the form of a tree of values.
 The root of the tree is called the \textbf{Compile Unit} (CU).
