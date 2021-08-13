@@ -519,6 +519,18 @@ offset to the primary base virtual table.
 \lou{TODO FIGURE : different small examples (multiple inheritance, diamond 
 problem...)}
 
+\ant{Agree with the todo. I think you should definitely explain RTTIs in 
+detail here, how they fit into vtables etc. Take inspiration from the MARX 
+paper. You can always remove detail, but adding it is harder!}
+\ant{I would do something like you have done, but: show some diagrams. Here is a 
+vtable, here is the multiple inheritence case, here is the multiple inheritence 
+case with two/three classes, as you can see we only need the primary one. 
+I would also potentially quote, or reword, parts of the cxx-abi here: what is in 
+an RTTI entry and what do the key fields mean? In particular this part: https://itanium-cxx-abi.github.io/cxx-abi/abi.html#rtti-layout - you could put 
+the fields into a table based on what is said here. Absolutely don't be afraid 
+to reword what they've done, condense it and present it in a nice way. 
+Provided you cite this site as the source there's no issue.}
+
 \subsection{DWARF}
 \label{dwarfdesign}
 
@@ -559,6 +571,11 @@ These entries can describe how the original code is written, as well as
 information about classes, variables, types, and other structures in the
 binary.
 
+\ant{Examples, pictures and diagrams? I know they are quite time-consuming to 
+do, but on the other hand they communicate the information quite effectively. 
+Showing the tree structure (compilation unit->...) I think will be really 
+helpful.}
+
 The DWARF format also uses abbreviations to compress the debug information.
 Instead of re-describing a DIE every time, their structure is defined in an
 abbreviation table (stored in the \textbf{debug\_abbrev} section of the ELF
@@ -569,6 +586,9 @@ attributes, in the order they were defined in the abbreviation.
 
 In this project, we use very minimalist DIE abbreviations, containing only
 what we could infer from the analysis.
+
+\ant{Once you have some diagrams of DWARF here, how to do this below will 
+hopefully be quite obvious}
 
 % Injecting debug section & symbols
 With dis-cover, we are able to inject information in the debug and symbol 
@@ -592,7 +612,21 @@ exceptions.
 %    Kernel drivers are mostly written in C
 % We still want to keep the deterministic ability of retrowrite
 We had to study and work with exceptions and exception handling frames for 
-the augmentation of RetroWrite with C++ capabilities (see
+the augmentation of RetroWrite with C++ capabilities 
+\ant{Did DWARF allow us to express exception information in its debug format? 
+I don't think it did. So perhaps we can also add something like: we initially 
+hoped to be able to expose exception information to DWARF as well, but 
+this would require an extension to the DWARF format. However, by adding 
+exception support to retrowrite, instrumentation tools can still work with 
+exceptions.}
+\ant{This is the key point I think: our goal was to make this information 
+available to help add instrumentation to compile binaries. We discovered we 
+couldn't do this for DWARF as it stands, but we can make retrowrite support it, 
+and by doing so you can use that information during the analysis}
+\ant{You can then cite the goal of making DWARF a lingua franca of binary 
+analysis again. We hoped to help with this, we failed, but we did the work to 
+parse exceptions that is a very important step on the way to that.}
+(see
 \autoref{retrowriteimplementation}).
 Today, RetroWrite supports the reversing of x86\_64 position-independent 
 binaries.
@@ -601,6 +635,13 @@ code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
 We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most 
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
+
+\ant{You definitely now know a lot more about how exceptions work. I know 
+it is technically quite involved, but I think you should describe it. 
+Perhaps the logical way to do this is like this: an example piece of C++ code, 
+followed by what happens when an exception is triggered: how does the runtime 
+decide where that exception should be handled? You could do this in the 
+retrowrite section below if you think that works better.}
 
 \section{RetroWrite}
 \label{retrowritedesign}
@@ -637,6 +678,12 @@ paper~\cite{hextype} to avoid type confusion errors and vulnerabilities.
 We also were able to design dis-cover in a heuristics-free way, which fits
 perfectly with RetroWrite's current goal to avoid heuristics.
 
+\ant{Maybe you can also talk about tradeoffs here. A heuristic-free way won't 
+work with all scenarios, but we have tried to keep to this for C++ and for 
+Retrowrite to demonstrate the technique is viable. Tools can then be extended 
+with heuristics later. It is OK to describe the limits of what we do provided 
+we actually did something positive, which we have done - you are demonstrating 
+you understand how your research fits into the 'big picture'}
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementation}
@@ -994,6 +1041,9 @@ written}
 is a dynamic (runtime) mechanism that keeps track of object types and prevents
 adversaries from overwriting type information to hijack the control flow.
 It is applied at compile time.
+
+\ant{Stretch goal: expand a little on how it does this. Not too much, just 
+enough to show that you understand how it fits with what you have learned.}
 
 A future project could use the classes extracted with dis-cover and the
 rewriting capabilities of RetroWrite to implement object type integrity on
