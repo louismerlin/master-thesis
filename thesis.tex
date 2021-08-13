@@ -1056,6 +1056,8 @@ from programs, by adding explicit run-time checks during compilation.
 This is done even for objects that are not polymorphic, so as to remove all
 of the attack surface.
 
+\ant{Same stretch goal as for cfixx. Do last}
+
 \section{Exploiting the hard-working DWARF}
 
 \textbf{Exploiting the Hard-Working DWARF}~\cite{hardworkingdwarf}
@@ -1064,6 +1066,15 @@ demonstrated that it was possible to incorporate exploits in the
 They showed that the exception handling mechanism was a Turing-complete
 language, and they proved they could take control of the system when an
 exception was thrown.
+
+\ant{I think you should definitely expand on a few points from this work. 
+They built a dwarf-extracting tool. I would also change take control of the 
+system to be more detailed: they can include arbitrary programs in the DWARF 
+language and execute them where the programmer expects exception logic to 
+happen. This is interesting because that is not what we expect when we analyze 
+a binary for malware: would existing RE tools be able to detect this? What 
+does this tell us about DWARF itself? Does this justify Sergey's statement that 
+DWARF should be the lingua franca of reversing frameworks? :)}
 
 This paper rekindled a global interest in DWARF as an academic research topic,
 which lead to projects like this one.
