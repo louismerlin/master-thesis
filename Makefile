@@ -1,9 +1,15 @@
-
 name=thesis
 
-all: *.tex *.bib
+all: build *.tex *.bib
+	@docker run -it --rm \
+		-u $$(id -u):$$(id -g) \
+		-v "${PWD}:/app" \
+		-v "${PWD}/.texlive2018:/root/.texlive2018" \
+		master-thesis \
+		rubber --pdf $(name).tex
+ 
+build: Dockerfile
 	docker build -t master-thesis .
-	docker run -it --rm -v "${PWD}:/app" master-thesis rubber --pdf $(name).tex
 
 nodocker:
 	rubber --pdf $(name).tex
@@ -19,5 +25,6 @@ wordcount:
 	@echo "Goal : between 12k and 16k"
 	@pdftotext thesis.pdf - | tr -d '.' | wc -w
 
-clean:
+clean: build
 	docker run -it --rm -v "${PWD}:/app" master-thesis rubber --clean --pdf $(name).tex
+

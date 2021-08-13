@@ -1,4 +1,4 @@
-FROM debian
+FROM debian:buster-slim
 
 RUN apt-get update && \
     apt-get install -y make texlive-base texlive-bibtex-extra texlive-latex-base \
