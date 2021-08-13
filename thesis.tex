@@ -408,15 +408,6 @@ source file).
 \section{DWARF debugging standard}
 \label{dwarf}
 
-\ant{MOAR!! :) There is quite a bit you can say here. DWARF powers debuggers, 
-and lets you do things like map source to binary code, recover variable 
-names, function names that might not be external symbols, as well as class 
-information.
-Another key point to mention for later will be the structure of how it is used 
-in EH\_Frame. DWARF uses an abstract representation of the processor, so its 
-register 1 for example must be mapped to the processor.}
-\lou{Regarding Antony's comment => more info about the justification for using 
-DWARF.}
 % DWARF DIEs
 \textbf{DWARF} is the debugging standard used widely in conjunction with 
 executable ELF files.
@@ -525,8 +516,8 @@ offset at the beginning of the VTable : a primary base virtual table will have
 a value of $0$ as an offset, whereas a secondary virtual table will have an
 offset to the primary base virtual table.
 
-\lou{This could be diagrammed (RTTIs) => multiple inheritance, diamond 
-problem...}
+\lou{TODO FIGURE : different small examples (multiple inheritance, diamond 
+problem...)}
 
 \subsection{DWARF}
 \label{dwarfdesign}
@@ -671,14 +662,15 @@ This is usually \textbf{.rodata} (read-only data) and \textbf{.data.rel.ro},
 but could sometimes also be related sections like \textbf{.data.rel.ro.local}, 
 or \textbf{.rdata}.
 As per the Itanium C++ ABI, the base VTable of a class will contain an 
-"offset-to-top" at offset \textbf{-0x10}, which will be 0 in the primary base virtual table's case, 
-followed by a pointer to an RTTI at offset \textbf{-0x08}.
+"offset-to-top" at offset \textbf{-0x10}, which will be 0 in the primary base 
+virtual table's case, followed by a pointer to an RTTI at offset
+\textbf{-0x08}.
 We simply have to pattern-match for zeroes directly followed by a pointer to 
 another part of the read-only data sections, and we have a potential RTTI 
 pointer.
 
-\lou{Add link to figure, it's easier to understand to an image / or a similar
-figure that helps better understand **this** part}
+\lou{TODO FIGURE : hexdump of an example of vtable, rtti and string, with
+highlighting and arrows}
 
 Next, we analyze the data at the pointer's value.
 We check that we have not already extracted a class at that address, and if
@@ -738,9 +730,6 @@ and one inheriting from the other.
 
 The strings themselves are stored in another section, \textbf{.debug\_str}, and 
 are referred to with their offset in that section.
-
-\lou{The three dwarf sections should be explained in more detail in the 
-Design section.}
 
 \section{Creating symbols}
 
