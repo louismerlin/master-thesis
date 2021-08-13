@@ -1022,9 +1022,21 @@ which lead to projects like this one.
 \chapter{Conclusion}
 %%%%%%%%%%%%%%%%%%%%
 
-In the conclusion you repeat the main result and finalize the discussion of
-your project. Mention the core results and why as well as how your system
-advances the status quo.
+% In the conclusion you repeat the main result and finalize the discussion of
+% your project. Mention the core results and why as well as how your system
+% advances the status quo.
+
+In conclusion we develop \textbf{dis-cover}, a static analysis tool for C++
+binaries that can find polymorphic class hierarchies without using heuristics.
+The tool injects its findings in the analyzed binary as DWARF debug
+information and ELF symbols, so it can be used in any debugging tool.
+We hope this serves as an example for future binary analysis tools.
+
+We also extend the static position-independent binary rewriter RetroWrite with
+C++ support, and are able to [TODO].
+To our knowledge, RetroWrite is the first static rewriter that can add
+instrumentation like AddressSanitizer to closed-source C++ binaries that make
+use of exceptions.
 
 \cleardoublepage
 \phantomsection
