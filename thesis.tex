@@ -15,6 +15,7 @@
 \usepackage[MScThesis,lablogo]{EPFLreport}
 \usepackage{xspace}
 \usepackage{listings}
+\usepackage{soul}
 % Enable all todo comments.
 \usepackage[]{todonotes}
 % Uncomment this to disable the comment blocks
@@ -526,7 +527,8 @@ paper. You can always remove detail, but adding it is harder!}
 vtable, here is the multiple inheritence case, here is the multiple inheritence 
 case with two/three classes, as you can see we only need the primary one. 
 I would also potentially quote, or reword, parts of the cxx-abi here: what is in 
-an RTTI entry and what do the key fields mean? In particular this part: https://itanium-cxx-abi.github.io/cxx-abi/abi.html#rtti-layout - you could put 
+an RTTI entry and what do the key fields mean? In particular this part:
+https://itanium-cxx-abi.github.io/cxx-abi/abi.html\#rtti-layout - you could put 
 the fields into a table based on what is said here. Absolutely don't be afraid 
 to reword what they've done, condense it and present it in a nice way. 
 Provided you cite this site as the source there's no issue.}
@@ -714,10 +716,16 @@ virtual table's case, followed by a pointer to an RTTI at offset
 \textbf{-0x08}.
 We simply have to pattern-match for zeroes directly followed by a pointer to 
 another part of the read-only data sections, and we have a potential RTTI 
-pointer.
+pointer. See \autoref{hexdump} for a hexdump of VTables and RTTIs in an ELF
+file.
 
-\lou{TODO FIGURE : hexdump of an example of vtable, rtti and string, with
-highlighting and arrows}
+\begin{figure}[h]
+
+\includegraphics[width=16cm]{hexdump.png}
+\caption{Hexdump of the location of VTables and RTTIs in an ELF file}
+\label{hexdump}
+
+\end{figure}
 
 Next, we analyze the data at the pointer's value.
 We check that we have not already extracted a class at that address, and if
