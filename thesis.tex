@@ -708,12 +708,13 @@ paper~\cite{hextype} to avoid type confusion errors and vulnerabilities.
 We also were able to design dis-cover in a heuristics-free way, which fits
 perfectly with RetroWrite's current goal to avoid heuristics.
 
-\ant{Maybe you can also talk about trade-offs here. A heuristic-free way won't 
-work with all scenarios, but we have tried to keep to this for C++ and for 
-RetroWrite to demonstrate the technique is viable. Tools can then be extended 
-with heuristics later. It is OK to describe the limits of what we do provided 
-we actually did something positive, which we have done - you are demonstrating 
-you understand how your research fits into the 'big picture'}
+This heuristics-free design should not be an end goal though.
+If later additions to RetroWrite were to improve its capabilities with
+heuristics like those defined in the MARX paper for example (see
+\autoref{relatedworksmarx}), it would only make the tool stronger and more
+reliable.
+The fact that we used the DWARF format as an output is what we consider the
+most interesting part of the dis-cover tool.
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementation}
@@ -1039,6 +1040,7 @@ across all packages (unique name in unique tree).
 % This section is usually 3-5 pages.
 
 \section{MARX}
+\label{relatedworksmarx}
 
 MARX~\cite{marx} is a static analysis tool which is related to what dis-cover
 is trying to achieve. Using analysis of the virtual tables in a C++ binaries,
