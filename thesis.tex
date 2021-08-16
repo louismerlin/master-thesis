@@ -511,22 +511,23 @@ When looking at a binary's VTables and RTTIs, we only need to look for a
 specific subset of them : the primary base virtual tables and their RTTIs.
 There is one of each for each class defined in the binary. Secondary virtual
 tables occur when there is multiple inheritance and complex method overwrites.
-They define only a subset of a class' methods, and do not contain RTTIs.
+They define only a subset of a class' methods, and may not contain RTTIs.
 We can differentiate the two kinds of virtual tables by the presence of an
 offset at the beginning of the VTable : a primary base virtual table will have
 a value of $0$ as an offset, whereas a secondary virtual table will have an
-offset to the primary base virtual table.
+offset to the primary base virtual table. See
+\autoref{multipleinheritancegraph} for a visual example of RTTIs and VTables
+in a multiple inheritance scenario.
 
-\lou{TODO FIGURE : different small examples (multiple inheritance, diamond 
-problem...)}
+\begin{figure}[h]
 
-\ant{Agree with the todo. I think you should definitely explain RTTIs in 
-detail here, how they fit into vtables etc. Take inspiration from the MARX 
-paper. You can always remove detail, but adding it is harder!}
-\ant{I would do something like you have done, but: show some diagrams. Here is a 
-vtable, here is the multiple inheritence case, here is the multiple inheritence 
-case with two/three classes, as you can see we only need the primary one. 
-I would also potentially quote, or reword, parts of the cxx-abi here: what is in 
+\includegraphics[width=16cm]{Feline.png}
+\caption{Overview of an example of VTables and RTTI in memory with multiple inheritance}
+\label{multipleinheritancegraph}
+
+\end{figure}
+
+\ant{I would potentially quote, or reword, parts of the cxx-abi here: what is in 
 an RTTI entry and what do the key fields mean? In particular this part:
 https://itanium-cxx-abi.github.io/cxx-abi/abi.html\#rtti-layout - you could put 
 the fields into a table based on what is said here. Absolutely don't be afraid 
