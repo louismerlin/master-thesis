@@ -66,7 +66,7 @@ engineering process.
 Fortunately, some of that information can be recovered from stripped binaries
 due to the way polymorphism is implemented in C++ compilers.
 
-With the dis-cover tool, we are able to extract class information and the
+With the dis-cover tool \dam{I would add something like "with the discover tool we developped". Otherwise one does not know at this stage what dis-cover is.}, we are able to extract class information and the
 hierarchy tree from a stripped C++ binary, and write DWARF debug information
 and symbols for the later use of that knowledge by any existing debugging tool.
 Through this method, we aim to demonstrate an open and collaborative way of
@@ -76,7 +76,7 @@ Through careful research of the way C++ exceptions are implemented, we are also
 able to augment the capabilities of the RetroWrite static rewriting tool to
 support C++ binaries.
 We also show how the class information extracted by dis-cover could be used to
-improve the instrumentation done by RetroWrite
+improve the instrumentation done by RetroWrite.
 
 By utilizing these two tools, we are able to successfully extract useful
 information from closed-source applications like Zoom, and instrument
@@ -118,8 +118,8 @@ itself~\cite{stackoverflowpopularity}.
 Examples of well-known C++ projects include modern browsers like 
 Chrome~\cite{chrome} and Firefox~\cite{firefox}, the Qt Framework~\cite{qt}, or 
 the zoom~\cite{zoom} conferencing software.
-Nevertheless, reverse-engineering efforts have been focused towards C binaries, 
-because analysis methods found this way will often work on C++ binaries too.
+Nevertheless, most reverse-engineering efforts have been focused towards C binaries, 
+because analysis methods found this way will often work on C++ binaries too. \dam{And probably becasue it is easier, e.g. no execptions, etc.}
 
 
 % Main challenge:
@@ -153,7 +153,7 @@ binary, but also certain information remaining.
 
 The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a 
 static rewriting tool for x86\_64 position-independent binaries.
-It enables the instrumentation of projects when we do not have access to the 
+It enables the instrumentation \dam{Maybe explain in 1 sentence what instrumentation means and can be used for.} of projects when we do not have access to the 
 source code.
 This can include a legacy project, a closed-source product or even malware.
 
@@ -217,11 +217,11 @@ and what remains to be done for the implementation to work.
 \section{Executable and Linkable Format (ELF)}
 
 The common standard \textbf{Executable and Linkable Format} (ELF) format is 
-mostly used as executable files, object code and shared libraries.
+mostly used as executable files, object code and shared libraries. \dam{Maybe mention that it is the most used executable file format on UNIX-based systems.}
 It usually contains a program header table, which describes memory segments 
 (e.g. "this is read-only data", "this is executable instructions").
 It also usually contains a section header table, describing sections (their 
-name, size, offset and some flags). 
+name, size, offset and some flags). \dam{Maybe mention the difference between segments and sections.}
 The rest of an ELF file is taken up by sections.
 Famous sections include
 \textbf{.text} (where the instructions are),
@@ -250,6 +250,7 @@ We will talk more about PIE in \autoref{retrowritesection}.
 \subsection{Polymorphism}
 \label{polymorphism}
 
+\dam{Most references are not correclty printed (at least for me not) - shown as ??. Just double check that references are correct when you print the PDF.}
 % C++ polymorphism (what, how, but also research like Marx) (+ exceptions) 
 % also talk about how compilers will optimize this out in certain situtations
 The C++ programming language implements polymorphism.
@@ -264,7 +265,7 @@ In a large code base, with multiple teams of programmers working on different
 features,
 an Animal could be passed around without caring about whether it was a Cat, a 
 Dog or any other species.
-This Animal is sure to overwrite the \textbf{speak} method have whatever other 
+This Animal is sure to overwrite the \textbf{speak} method and have whatever other 
 properties and methods Animal has defined.
 This logic is verified by the compiler.
 
@@ -294,6 +295,7 @@ public:
 
 \end{figure}
 
+\dam{Maybe add a static and dynamic cast in Figure 2.1 or in a separate figure.}
 This polymorphism feature also enables re-use of functionality by inheriting 
 parent classes.
 If you want to implement a Lemur and your Animal class already has an 
@@ -327,7 +329,7 @@ The system will use this RTTI to infer type inheritance for dynamic casting.
 We will now go into implementation details of RTTIs and virtual tables
 (\textbf{VTables}), which point to them.
 
-To make VTables and RTTIs appear in your C++ binary, you will to define
+To make VTables and RTTIs appear in your C++ binary, you will need to define
 classes that inherit from each other, as well as at least one virtual method
 in one of these classes.
 \autoref{classes} shows an example of such classes.
@@ -335,7 +337,7 @@ You will also need to instantiate these classes, and have some logic to make
 the class logic run-time dependent. 
 This is extremely common in practice, as it is the core motivation for
 polymorphism in the first place.
-For an example, see the conditional dynamic cast between the two child classes
+For an example, see the conditional dynamic cast \dam{See the conditional dynamic cast? You probably want to say something like: "Consider for example a conditional dynamic cast...", right?} between the two child classes
 we defined in \autoref{classes}.
 If you do not do these things, the class logic is likely to be abstracted away
 by the compiler for optimization reasons.
@@ -359,8 +361,8 @@ The first value preceding the VTable is a pointer to the RTTI of the class. A
 program finds out the class inheritance of a class instance at runtime by
 following this pointer.
 
-The RTTI itself is composed of a pointer to a VTable for the typeinfo class 
-(defined by the compiler) and well as a pointer to the type name (this type 
+The RTTI itself is composed of a pointer to a VTable for the typeinfo class \dam{Where can we see this in the figure?}
+(defined by the compiler) as well as a pointer to the type name (this type 
 name is not removed by simple stripping of the binary, like with 
 \textbf{objdcopy --strip-all}).
 This name is mangled using C++ mangling, and can trivially be demangled.
@@ -386,7 +388,7 @@ In contrast to C errors, which terminate the whole program, C++ exceptions
 can be caught and handled.
 
 In order for the program to be able to continue execution after an exception
-is caught, binaries need some way of safely doing \textbf{stack unwinding}.
+is caught, binaries need some way of safely doing \textbf{stack unwinding}. \dam{Maybe add in one sentence what stack unwinding means?}
 The information on how to safely unwind the stack is stored in the
 \textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
 (see \autoref{dwarf}).
@@ -436,13 +438,13 @@ used as well as the compiler.
 
 The \textbf{RetroWrite}\cite{dinesh20oakland} project is a project from the
 HexHive lab that aims to statically rewrite binaries and instrument them, to
-improve fuzzing capabilities.
+improve fuzzing capabilities. \dam{There are other applications than fuzzing, like e.g. retrofitting security measures. I would probably not only mention fuzzing.}
 Static binary rewriting is the process of taking a binary file, and modifying
 it such that there is a patch applied to it but the other functionalities
 remain the same.
 
 RetroWrite's core idea is to symbolize all of the addresses in the machine
-code. This means transforming an an address offset (+8) into a symbol
+code. This means transforming an address offset (+8) into a symbol
 (.LD1234) and adding the appropriate label at that location.
 These labels will be used by the assembler to compute the addresses of
 functions and data offsets for example.
@@ -453,6 +455,7 @@ RetroWrite only works on \textbf{x86\_64} position-independent executables
 (see \autoref{picpie}), compiled from C. This enables the RetroWrite to stay
 heuristics-free (meaning that it is designed to work for every example without
 exceptions).
+\dam{Maybe a sentence why it requires PIC to work would be interesting.}
 
 
 %%%%%%%%%%%%%%%%
@@ -508,7 +511,7 @@ We will share more details about this experiment in \autoref{evalchapter}.
 
 When looking at a binary's VTables and RTTIs, we only need to look for a
 specific subset of them : the primary base virtual tables and their RTTIs.
-There is one of each for each class defined in the binary. Secondary virtual
+There is one for each class defined in the binary. Secondary virtual
 tables occur when there is multiple inheritance and complex method overwrites.
 They define only a subset of a class' methods, and do not contain RTTIs.
 We can differentiate the two kinds of virtual tables by the presence of an
@@ -575,6 +578,7 @@ binary.
 do, but on the other hand they communicate the information quite effectively. 
 Showing the tree structure (compilation unit->...) I think will be really 
 helpful.}
+\dam{Definitely agree!}
 
 The DWARF format also uses abbreviations to compress the debug information.
 Instead of re-describing a DIE every time, their structure is defined in an
@@ -612,7 +616,7 @@ exceptions.
 %    Kernel drivers are mostly written in C
 % We still want to keep the deterministic ability of retrowrite
 We had to study and work with exceptions and exception handling frames for 
-the augmentation of RetroWrite with C++ capabilities 
+the augmentation of RetroWrite with C++ capabilities.
 \ant{Did DWARF allow us to express exception information in its debug format? 
 I don't think it did. So perhaps we can also add something like: we initially 
 hoped to be able to expose exception information to DWARF as well, but 
@@ -642,6 +646,7 @@ Perhaps the logical way to do this is like this: an example piece of C++ code,
 followed by what happens when an exception is triggered: how does the runtime 
 decide where that exception should be handled? You could do this in the 
 retrowrite section below if you think that works better.}
+\dam{Maybe another figure could help on this as well.}
 
 \section{RetroWrite}
 \label{retrowritedesign}
@@ -774,6 +779,7 @@ and one inheriting from the other.
 \caption{Extract of a dwarfdump output showing simple inheritance}
 \label{dwarfdump}
 \end{figure}
+\dam{For consistency, you could stick with the animal example.}
 
 The strings themselves are stored in another section, \textbf{.debug\_str}, and 
 are referred to with their offset in that section.
@@ -781,7 +787,7 @@ are referred to with their offset in that section.
 \section{Creating symbols}
 
 % symbols
-Symbols are mainly used for shared object loading, to use the \textbf{printf}
+Symbols are mainly used for shared object loading. To use the \textbf{printf}
 method from \textbf{stdio.h} for example, the binary must be aware of a
 method named \textbf{printf}. The same is true for
 \textbf{system\_clock} in C++ for example.
@@ -800,6 +806,8 @@ the strings related to these symbols.
 
 \section{Wrapping things together}
 \label{wrappingimplementation}
+
+\dam{Maybe include the figure you had in the Cyber Alp Retreat presentation.}
 
 \subsection{Creating a fake ELF file}
 
@@ -842,6 +850,8 @@ header table, the sections we built and the section header table.
 Next, we will create a stripped version of the original ELF file.
 We use the \textbf{objcopy --strip-all} command.
 This is to avoid section conflicts in the next step.
+
+\dam{One does not really understand why this is needed. OK, this is explained at the end of the next section. Maybe it would be easier if you would move the last paragraph of the next section here?}
 
 \subsection{Combining the two ELF files}
 \label{combiningelf}
@@ -916,6 +926,8 @@ These examples alone were not capable of letting us evaluate the full
 capabilities of dis-cover.
 We found a few big applications that could serve that purpose.
 
+\dam{I would probably mention that dis-cover can recover all of this samples.}
+
 \section{Real-world case studies}
 
 % Big applications examples
@@ -937,6 +949,7 @@ After fixing the bug, we were noticing around 10\% more inheritance links in
 some projects (but not more classes).
 Being able to go check with the open-source LibreOffice code that we had found 
 the right inheritance links was extremely helpful.
+\dam{How did you finally check that all classes / inheritance was recovered?}
 
 \begin{figure}[h]
 
@@ -972,6 +985,8 @@ of classes recovered  \\
     zoom 5.5.7938.0228 & 76M & 16M & 5m50.626s & 6039 
   \end{tabular}
   }
+
+\dam{It would be interesting to know what percentage of effective classes was recovered.}
 
 \caption{Benchmarks of dis-cover on a machine running Ubuntu 20.04 with a 2.6 
 GHz dedicated vCPU}
@@ -1018,6 +1033,8 @@ This project could be a great candidate for future integration into
 RetroWrite, if we extend the tool to add defenses around type integrity for
 example.
 
+\dam{I would mention that you achieve 100%, but on less targets (when compared to MARX).}
+
 \section{Plugins}
 
 There exists multiple plugins for reverse engineering frameworks that serve
@@ -1032,6 +1049,8 @@ The IDA Pro plugin does offer the option to create a \textbf{.dot} graph file
 that can be used to create a visual representation of the hierarchy tree.
 \lou{This is a potential upgrade to dis-cover, a script has already been
 written}
+
+\dam{Do these plugins exactly the same as dis-cover (without DWARF output)? Or have they less or more advanced features?}
 
 \section{Type Integrity}
 
@@ -1077,7 +1096,7 @@ which lead to projects like this one.
 % advances the status quo.
 
 In conclusion we develop \textbf{dis-cover}, a static analysis tool for C++
-binaries that can find polymorphic class hierarchies without using heuristics.
+binaries that can find polymorphic class hierarchies without using heuristics. \dam{but requiring RTTI (compared to MARX), right?}
 The tool injects its findings in the analyzed binary as DWARF debug
 information and ELF symbols, so it can be used in any debugging tool.
 We hope this serves as an example for future binary analysis tools.
