@@ -15,6 +15,7 @@
 \usepackage[MScThesis,lablogo]{EPFLreport}
 \usepackage{xspace}
 \usepackage{listings}
+\usepackage{soul}
 % Enable all todo comments.
 \usepackage[]{todonotes}
 % Uncomment this to disable the comment blocks
@@ -529,7 +530,8 @@ paper. You can always remove detail, but adding it is harder!}
 vtable, here is the multiple inheritence case, here is the multiple inheritence 
 case with two/three classes, as you can see we only need the primary one. 
 I would also potentially quote, or reword, parts of the cxx-abi here: what is in 
-an RTTI entry and what do the key fields mean? In particular this part: https://itanium-cxx-abi.github.io/cxx-abi/abi.html#rtti-layout - you could put 
+an RTTI entry and what do the key fields mean? In particular this part:
+https://itanium-cxx-abi.github.io/cxx-abi/abi.html\#rtti-layout - you could put 
 the fields into a table based on what is said here. Absolutely don't be afraid 
 to reword what they've done, condense it and present it in a nice way. 
 Provided you cite this site as the source there's no issue.}
@@ -719,10 +721,16 @@ virtual table's case, followed by a pointer to an RTTI at offset
 \textbf{-0x08}.
 We simply have to pattern-match for zeroes directly followed by a pointer to 
 another part of the read-only data sections, and we have a potential RTTI 
-pointer.
+pointer. See \autoref{hexdump} for a hexdump of VTables and RTTIs in an ELF
+file.
 
-\lou{TODO FIGURE : hexdump of an example of vtable, rtti and string, with
-highlighting and arrows}
+\begin{figure}[h]
+
+\includegraphics[width=16cm]{hexdump.png}
+\caption{Hexdump of the location of VTables and RTTIs in an ELF file}
+\label{hexdump}
+
+\end{figure}
 
 Next, we analyze the data at the pointer's value.
 We check that we have not already extracted a class at that address, and if
@@ -766,12 +774,12 @@ and one inheriting from the other.
 < 1><0x0000001a>    DW_TAG_class_type
                       DW_AT_containing_type       <0x0000001a>
                       DW_AT_calling_convention    DW_CC_pass_by_reference
-                      DW_AT_name                  Shape
+                      DW_AT_name                  Animal
                       DW_AT_byte_size             0x00000008
 < 1><0x00000026>    DW_TAG_class_type
                       DW_AT_containing_type       <0x00000026>
                       DW_AT_calling_convention    DW_CC_pass_by_reference
-                      DW_AT_name                  Rectangle
+                      DW_AT_name                  Dog
                       DW_AT_byte_size             0x00000008
 < 2><0x00000031>      DW_TAG_inheritance
                         DW_AT_type                  <0x0000001a>
@@ -1075,6 +1083,8 @@ from programs, by adding explicit run-time checks during compilation.
 This is done even for objects that are not polymorphic, so as to remove all
 of the attack surface.
 
+\ant{Same stretch goal as for cfixx. Do last}
+
 \section{Exploiting the hard-working DWARF}
 
 \textbf{Exploiting the Hard-Working DWARF}~\cite{hardworkingdwarf}
@@ -1083,6 +1093,15 @@ demonstrated that it was possible to incorporate exploits in the
 They showed that the exception handling mechanism was a Turing-complete
 language, and they proved they could take control of the system when an
 exception was thrown.
+
+\ant{I think you should definitely expand on a few points from this work. 
+They built a dwarf-extracting tool. I would also change take control of the 
+system to be more detailed: they can include arbitrary programs in the DWARF 
+language and execute them where the programmer expects exception logic to 
+happen. This is interesting because that is not what we expect when we analyze 
+a binary for malware: would existing RE tools be able to detect this? What 
+does this tell us about DWARF itself? Does this justify Sergey's statement that 
+DWARF should be the lingua franca of reversing frameworks? :)}
 
 This paper rekindled a global interest in DWARF as an academic research topic,
 which lead to projects like this one.
