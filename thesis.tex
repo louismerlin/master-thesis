@@ -522,12 +522,14 @@ in a multiple inheritance scenario.
 \begin{figure}[h]
 
 \includegraphics[width=16cm]{Feline.png}
-\caption{Overview of an example of VTables and RTTI in memory with multiple inheritance}
+\caption{Overview of an example of VTables and RTTI in memory with multiple 
+inheritance}
 \label{multipleinheritancegraph}
 
 \end{figure}
 
-\ant{I would potentially quote, or reword, parts of the cxx-abi here: what is in 
+\ant{I would potentially quote, or reword, parts of the cxx-abi here: what is 
+in 
 an RTTI entry and what do the key fields mean? In particular this part:
 https://itanium-cxx-abi.github.io/cxx-abi/abi.html\#rtti-layout - you could put 
 the fields into a table based on what is said here. Absolutely don't be afraid 
@@ -547,7 +549,7 @@ Once we have extracted class information from RTTI, next comes the question :
 what should we do with all of this class information ? What would be the most
 useful format to output the data in ?
 This is where DWARF~\cite{dwarf} comes in the picture. DWARF is the debugging 
-standard for unix programs.
+standard for UNIX programs.
 It is mostly used by developers trying to understand where their implementation 
 fails,
 and by reverse engineers to get a better understanding of how a program was 
@@ -572,12 +574,39 @@ DWARF data is structured as a tree of \textbf{Debug Information Entries}
 \textbf{attributes}.
 These entries can describe how the original code is written, as well as
 information about classes, variables, types, and other structures in the
-binary.
+binary. \autoref{dwarfdies} shows an example of such entries, describing
+pointers and methods in a simple program. Lines beginning with \textbf{DW\_TAG}
+describe the type of the debug information entry, and the following lines
+beginning with \textbf{DW\_AT} describe the attributes of this entry.
 
-\ant{Examples, pictures and diagrams? I know they are quite time-consuming to 
-do, but on the other hand they communicate the information quite effectively. 
-Showing the tree structure (compilation unit->...) I think will be really 
-helpful.}
+\begin{figure}[h]
+\begin{lstlisting}
+< 1><0x00001d94>    DW_TAG_class_type
+                      DW_AT_containing_type       <0x00001d94>
+                      DW_AT_calling_convention    DW_CC_pass_by_reference
+                      DW_AT_name                  Animal
+                      DW_AT_byte_size             0x00000008
+                      DW_AT_decl_file             0x00000022 /tmp/animals.cpp
+                      DW_AT_decl_line             0x00000006
+< 2><0x00001da1>      DW_TAG_member
+                        DW_AT_name                  _vptr$Animal
+                        DW_AT_type                  <0x00001dd2>
+                        DW_AT_data_member_location  0
+                        DW_AT_artificial            yes(1)
+< 2><0x00001dab>      DW_TAG_subprogram
+                        DW_AT_linkage_name          _ZN6Animal5speakEv
+                        DW_AT_name                  speak
+                        DW_AT_decl_file             0x00000022 /tmp/animals.cpp
+                        DW_AT_decl_line             0x00000008
+                        DW_AT_virtuality            DW_VIRTUALITY_virtual
+                        DW_AT_declaration           yes(1)
+                        DW_AT_external              yes(1)
+                        DW_AT_accessibility         DW_ACCESS_public
+                        DW_AT_containing_type       <0x00001d94>
+\end{lstlisting}
+\caption{Extract of a dwarfdump output showing pointers and methods}
+\label{dwarfdies}
+\end{figure}
 
 The DWARF format also uses abbreviations to compress the debug information.
 Instead of re-describing a DIE every time, their structure is defined in an
@@ -589,9 +618,6 @@ attributes, in the order they were defined in the abbreviation.
 
 In this project, we use very minimalist DIE abbreviations, containing only
 what we could infer from the analysis.
-
-\ant{Once you have some diagrams of DWARF here, how to do this below will 
-hopefully be quite obvious}
 
 % Injecting debug section & symbols
 With dis-cover, we are able to inject information in the debug and symbol 
@@ -620,11 +646,11 @@ the augmentation of RetroWrite with C++ capabilities
 I don't think it did. So perhaps we can also add something like: we initially 
 hoped to be able to expose exception information to DWARF as well, but 
 this would require an extension to the DWARF format. However, by adding 
-exception support to retrowrite, instrumentation tools can still work with 
+exception support to RetroWrite, instrumentation tools can still work with 
 exceptions.}
 \ant{This is the key point I think: our goal was to make this information 
 available to help add instrumentation to compile binaries. We discovered we 
-couldn't do this for DWARF as it stands, but we can make retrowrite support it, 
+couldn't do this for DWARF as it stands, but we can make RetroWrite support it, 
 and by doing so you can use that information during the analysis}
 \ant{You can then cite the goal of making DWARF a lingua franca of binary 
 analysis again. We hoped to help with this, we failed, but we did the work to 
@@ -644,7 +670,7 @@ it is technically quite involved, but I think you should describe it.
 Perhaps the logical way to do this is like this: an example piece of C++ code, 
 followed by what happens when an exception is triggered: how does the runtime 
 decide where that exception should be handled? You could do this in the 
-retrowrite section below if you think that works better.}
+RetroWrite section below if you think that works better.}
 
 \section{RetroWrite}
 \label{retrowritedesign}
@@ -681,9 +707,9 @@ paper~\cite{hextype} to avoid type confusion errors and vulnerabilities.
 We also were able to design dis-cover in a heuristics-free way, which fits
 perfectly with RetroWrite's current goal to avoid heuristics.
 
-\ant{Maybe you can also talk about tradeoffs here. A heuristic-free way won't 
+\ant{Maybe you can also talk about trade-offs here. A heuristic-free way won't 
 work with all scenarios, but we have tried to keep to this for C++ and for 
-Retrowrite to demonstrate the technique is viable. Tools can then be extended 
+RetroWrite to demonstrate the technique is viable. Tools can then be extended 
 with heuristics later. It is OK to describe the limits of what we do provided 
 we actually did something positive, which we have done - you are demonstrating 
 you understand how your research fits into the 'big picture'}
