@@ -634,14 +634,9 @@ recover information about programmer-defined exceptions.
 Future extensions of this work might consider recovering more information about 
 exceptions.
 
-% RetroWrite structure
-%  x86_64 userspace and kernel, and arm_64
-%  We've decided to focus on the x86_64 userspace
-%    Most widely used target
-%    Kernel drivers are mostly written in C
-% We still want to keep the deterministic ability of retrowrite
 We had to study and work with exceptions and exception handling frames for 
 the augmentation of RetroWrite with C++ capabilities 
+
 \ant{Did DWARF allow us to express exception information in its debug format? 
 I don't think it did. So perhaps we can also add something like: we initially 
 hoped to be able to expose exception information to DWARF as well, but 
@@ -655,8 +650,14 @@ and by doing so you can use that information during the analysis}
 \ant{You can then cite the goal of making DWARF a lingua franca of binary 
 analysis again. We hoped to help with this, we failed, but we did the work to 
 parse exceptions that is a very important step on the way to that.}
-(see
-\autoref{retrowriteimplementation}).
+\lou{Yes, the exception try/catch blacks are declared as "blocks" in DWARF,
+but I do not recall them being tagged as "try" and "catch" blocks. It
+definitely was an akward process, mostly because it was not displayed well in
+debuggers. IIRC, we decided not to get dis-cover to tag them because tagging
+them did not bring out any additional information compared to what the
+debuggers already had with the eh_frame etc.}
+
+(see \autoref{retrowriteimplementation}).
 Today, RetroWrite supports the reversing of x86\_64 position-independent 
 binaries.
 There was also work to augment RetroWrite to support kernel 
