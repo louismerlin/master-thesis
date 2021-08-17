@@ -67,9 +67,10 @@ engineering process.
 Fortunately, some of that information can be recovered from stripped binaries
 due to the way polymorphism is implemented in C++ compilers.
 
-With the dis-cover tool \dam{I would add something like "with the discover tool we developped". Otherwise one does not know at this stage what dis-cover is.}, we are able to extract class information and the
-hierarchy tree from a stripped C++ binary, and write DWARF debug information
-and symbols for the later use of that knowledge by any existing debugging tool.
+With dis-cover, the tool we developped, we are able to extract class
+information and the hierarchy tree from a stripped C++ binary, and write DWARF
+debug information and symbols for the later use of that knowledge by any
+existing debugging tool.
 Through this method, we aim to demonstrate an open and collaborative way of
 writing static analysis tools.
 
@@ -119,8 +120,9 @@ itself~\cite{stackoverflowpopularity}.
 Examples of well-known C++ projects include modern browsers like 
 Chrome~\cite{chrome} and Firefox~\cite{firefox}, the Qt Framework~\cite{qt}, or 
 the zoom~\cite{zoom} conferencing software.
-Nevertheless, most reverse-engineering efforts have been focused towards C binaries, 
-because analysis methods found this way will often work on C++ binaries too. \dam{And probably becasue it is easier, e.g. no execptions, etc.}
+Nevertheless, most reverse-engineering efforts have been focused towards C
+binaries, because analysis methods found this way are simpler and will often
+work on C++ binaries too.
 
 
 % Main challenge:
@@ -154,9 +156,11 @@ binary, but also certain information remaining.
 
 The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a 
 static rewriting tool for x86\_64 position-independent binaries.
-It enables the instrumentation \dam{Maybe explain in 1 sentence what instrumentation means and can be used for.} of projects when we do not have access to the 
+It enables the instrumentation of projects when we do not have access to the 
 source code.
-This can include a legacy project, a closed-source product or even malware.
+Instrumentation is the process of adding instructions to a binary, to add
+additional security checks for example.
+The target can be a legacy project, a closed-source product or even malware.
 
 % Does anything else try to do retrowriting C++ ?
 % Does anything else try to extract classes ? (Marx / plugins)
@@ -1070,7 +1074,7 @@ This project could be a great candidate for future integration into
 RetroWrite, if we extend the tool to add defenses around type integrity for
 example.
 
-\dam{I would mention that you achieve 100%, but on less targets (when compared to MARX).}
+\dam{I would mention that you achieve 100\%, but on less targets (when compared to MARX).}
 
 \section{Plugins}
 
