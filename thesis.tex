@@ -222,12 +222,18 @@ and what remains to be done for the implementation to work.
 \section{Executable and Linkable Format (ELF)}
 
 The common standard \textbf{Executable and Linkable Format} (ELF) format is 
-mostly used as executable files, object code and shared libraries. \dam{Maybe mention that it is the most used executable file format on UNIX-based systems.}
-It usually contains a program header table, which describes memory segments 
+mostly used as executable files, object code and shared libraries.
+It is the current standard format for executable files on UNIX
+systems~\cite{elfstandard}.
+
+An ELF file contains a program header table, which describes memory segments 
 (e.g. "this is read-only data", "this is executable instructions").
 It also usually contains a section header table, describing sections (their 
-name, size, offset and some flags). \dam{Maybe mention the difference between segments and sections.}
-The rest of an ELF file is taken up by sections.
+name, size, offset and some flags).
+Memory segments contain information that is used at run time, while sections
+contain relocation and linking information.
+
+The rest of an ELF file is taken up by different sections.
 Famous sections include
 \textbf{.text} (where the instructions are),
 \textbf{.data} (where you will see global tables and other variables),
@@ -255,7 +261,6 @@ We will talk more about PIE in \autoref{retrowritesection}.
 \subsection{Polymorphism}
 \label{polymorphism}
 
-\dam{Most references are not correclty printed (at least for me not) - shown as ??. Just double check that references are correct when you print the PDF.}
 % C++ polymorphism (what, how, but also research like Marx) (+ exceptions) 
 % also talk about how compilers will optimize this out in certain situtations
 The C++ programming language implements polymorphism.
@@ -276,12 +281,19 @@ This logic is verified by the compiler.
 
 \begin{figure}[h]
 \begin{lstlisting}
+#include <iostream>
+#include <string.h>
+
+using namespace std;
+
+
 class Animal {
 public:
-  virtual void speak() = 0
+  virtual void speak() {}
 };
 
 class Feline {
+public:
   virtual void retract_claws() {}
 };
 
@@ -294,13 +306,45 @@ class Dog : public Animal {
 public:
   virtual void speak() { cout << "Woof" << endl; }
 };
+
+
+int main (int argc, char *argv[]) {
+  Animal *my_animal = nullptr;
+
+  if (argc == 2) {
+
+    // We can instanciate an instance of a subclass into a pointer of type
+    // Animal*.
+    if (strcmp("cat", argv[1]) == 0) {
+      my_animal = new Cat();
+
+    } else if (strcmp("dog", argv[1]) == 0) {
+      my_animal = new Dog();
+
+    } else {
+      return 1;
+    }
+
+    my_animal->speak();
+
+    // We can dynamic_cast an Animal* into a Feline*, even though one does not
+    // inherit from the other (but Cat inherits from both).
+    Feline *my_feline = dynamic_cast<Feline*>(my_animal);
+
+    if (my_feline) {
+      my_feline->retract_claws();
+      cout << "This feline could retract its claws" << endl;
+    }
+  }
+
+  return 0;
+}
 \end{lstlisting}
 \caption{Polymorphic classes in C++}
 \label{classes}
 
 \end{figure}
 
-\dam{Maybe add a static and dynamic cast in Figure 2.1 or in a separate figure.}
 This polymorphism feature also enables re-use of functionality by inheriting 
 parent classes.
 If you want to implement a Lemur and your Animal class already has an 
@@ -342,10 +386,10 @@ You will also need to instantiate these classes, and have some logic to make
 the class logic run-time dependent. 
 This is extremely common in practice, as it is the core motivation for
 polymorphism in the first place.
-For an example, see the conditional dynamic cast \dam{See the conditional dynamic cast? You probably want to say something like: "Consider for example a conditional dynamic cast...", right?} between the two child classes
-we defined in \autoref{classes}.
-If you do not do these things, the class logic is likely to be abstracted away
-by the compiler for optimization reasons.
+For an example, see the conditional creation of the my\_animal variable, as
+well as dynamic cast between Animal and Feline we defined in \autoref{classes}.
+If you do not do one of these things, the class logic is likely to be abstracted
+away by the compiler for optimization reasons.
 
 \begin{figure}[h]
 
@@ -366,7 +410,7 @@ The first value preceding the VTable is a pointer to the RTTI of the class. A
 program finds out the class inheritance of a class instance at runtime by
 following this pointer.
 
-The RTTI itself is composed of a pointer to a VTable for the typeinfo class \dam{Where can we see this in the figure?}
+The RTTI itself is composed of a pointer to a VTable for the typeinfo class
 (defined by the compiler) as well as a pointer to the type name (this type 
 name is not removed by simple stripping of the binary, like with 
 \textbf{objdcopy --strip-all}).
@@ -393,10 +437,51 @@ In contrast to C errors, which terminate the whole program, C++ exceptions
 can be caught and handled.
 
 In order for the program to be able to continue execution after an exception
-is caught, binaries need some way of safely doing \textbf{stack unwinding}. \dam{Maybe add in one sentence what stack unwinding means?}
+is caught, binaries need some way of safely doing \textbf{stack unwinding}.
+This means that the system needs to safely release memory that is outside of
+the scope reached after an exception is caught.
+See \autoref{unwinding} for an example of code that will only guarantee safety
+if there is stack unwinding.
+
 The information on how to safely unwind the stack is stored in the
 \textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
 (see \autoref{dwarf}).
+
+\begin{figure}[h]
+\begin{lstlisting}
+#include <iostream>
+
+using namespace std;
+
+
+void this_method_might_throw(int x) {
+  // This buffer is instanciated.
+  char* this_object_could_leak = new char[1024];
+
+  // If the throw is called, the buffer will stay instanciated if there is
+  // no stack unwinding.
+  if (x) throw runtime_error(":explosion:");
+
+  // If the throw is not called, we free the buffer ourselves.
+  delete [] this_object_could_leak;
+}
+
+int main() {
+  try {
+    this_method_might_throw(10);
+  } catch (const exception& e) {
+    return 1;
+  }
+  // Thanks to stack unwinding, we can be sure that the buffer from
+  // this_method_might_throw was freed and will not leak.
+  return 0;
+}
+\end{lstlisting}
+\caption{Example of C++ exception throwing and catching to illustrate stack unwinding}
+\label{unwinding}
+
+\end{figure}
+
 
 \subsection{Global constructors and frame dummy}
 \label{framedummy}
@@ -443,7 +528,7 @@ used as well as the compiler.
 
 The \textbf{RetroWrite}\cite{dinesh20oakland} project is a project from the
 HexHive lab that aims to statically rewrite binaries and instrument them, to
-improve fuzzing capabilities. \dam{There are other applications than fuzzing, like e.g. retrofitting security measures. I would probably not only mention fuzzing.}
+improve fuzzing capabilities, or retrofit security measures.
 Static binary rewriting is the process of taking a binary file, and modifying
 it such that there is a patch applied to it but the other functionalities
 remain the same.
@@ -460,7 +545,13 @@ RetroWrite only works on \textbf{x86\_64} position-independent executables
 (see \autoref{picpie}), compiled from C. This enables the RetroWrite to stay
 heuristics-free (meaning that it is designed to work for every example without
 exceptions).
-\dam{Maybe a sentence why it requires PIC to work would be interesting.}
+
+If you try to rewrite a binary that is not position-independent, the
+positions (pointers) in you binary are undistinguishable from data, and it
+becomes an unsolvable problem to differenciate between data and a pointer
+(which is why you would need heuristics in that scenario).
+
+\lou{@antony could you please verify the formulation of this last paragraph ?}
 
 
 %%%%%%%%%%%%%%%%
