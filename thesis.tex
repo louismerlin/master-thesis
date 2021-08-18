@@ -910,7 +910,6 @@ and one inheriting from the other.
 \caption{Extract of a dwarfdump output showing simple inheritance}
 \label{dwarfdump}
 \end{figure}
-\dam{For consistency, you could stick with the animal example.}
 
 The strings themselves are stored in another section, \textbf{.debug\_str}, and 
 are referred to with their offset in that section.
@@ -938,18 +937,30 @@ the strings related to these symbols.
 \section{Wrapping things together}
 \label{wrappingimplementation}
 
-\dam{Maybe include the figure you had in the Cyber Alp Retreat presentation.}
-
-\subsection{Creating a fake ELF file}
-
-% eu-unstrip etc
 Once we have the three debug sections ready
 (\textbf{.debug\_abbrev} with the debug types, \textbf{.debug\_info} with the 
 debug information, and \textbf{debug\_str} with the strings)
-as well as the two symbol sections, we have to make them available to the user.
+as well as the two symbol sections, we want to make them available to the user.
 They contain all of the information we were able to extract from the binary.
-The first step is building an empty ELF file with only these five sections in 
-them. We will discuss why in \autoref{combiningelf}.
+
+We now have to go through a few hoops to make the debug and symbol information
+available in one binary because these sections do not come alone : they have to
+be accompanied by machine code and data.
+We did not want to recreate a whole compiler to assemble all of this data.
+Luckily, the \textbf{eu-unstrip} tool was created as an utility application
+to "combine stripped files with separate symbols and debug information".
+\autoref{recovergraph} shows a diagram of the process we will explain in this
+section.
+
+\begin{figure}[h]
+
+\includegraphics[width=16cm]{recover.png}
+\caption{Combining the ELF files}
+\label{recovergraph}
+
+\end{figure}
+
+\subsection{Creating a fake ELF file}
 
 We start by constructing a \textbf{program header table}.
 This table contains information about the offset and size of each segment of 
@@ -976,13 +987,14 @@ and sections we have built.
 We can now create a fake ELF file by appending the elf header, the program 
 header table, the sections we built and the section header table.
 
+In order to use eu-unstrip, we had to make the fake binary match the original
+binary as closely as possible regarding headers and segments.
+
 \subsection{Stripping the original ELF file}
 
 Next, we will create a stripped version of the original ELF file.
 We use the \textbf{objcopy --strip-all} command.
 This is to avoid section conflicts in the next step.
-
-\dam{One does not really understand why this is needed. OK, this is explained at the end of the next section. Maybe it would be easier if you would move the last paragraph of the next section here?}
 
 \subsection{Combining the two ELF files}
 \label{combiningelf}
@@ -991,15 +1003,6 @@ Now, we can use the ELF utility program \textbf{eu-unstrip} to combine the two
 ELF files we have created into one.
 The newly created combined ELF file will contain all of the code and data from 
 the original file, as well as the debug and symbol sections we have created.
-
-The reason why we had to go through these hoops to make the debug and symbol
-information available to the user is because these sections do not come alone
-: they have to be accompanied by machine code and data.
-We did not want to recreate a whole compiler to assemble all of this data.
-Luckily, the \textbf{eu-unstrip} tool was created as an utility application
-to "combine stripped files with separate symbols and debug information".
-In order to use this tool, we had to make the fake binary match the original
-binary as closely as possible regarding headers and segments.
 
 % what it does and does not do
 
