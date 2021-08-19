@@ -549,7 +549,7 @@ instructions between the "try" and "catch blocks (here defined as the
 
 The actions are defined under the call site table, in the action table. You
 can see them defined at the \texttt{Lcst\_end1} label.
-The first action is defined as "catch typeinfo 1". The TypeInfos are defined
+The first action is defined as "catch TypeInfo 1". The TypeInfos are defined
 bellow the actions, as a list of pointers to the different exceptions we might
 be catching. Here, typeinfo 1 is a simple "exception", which matches with our
 C++ code.
@@ -558,7 +558,9 @@ Coming back to the first call site : the landing pad of this call site is, in
 this case, a pointer to code that will free and clean up the buffers and
 variables that might have been instantiated.
 
-
+Quite interestingly, the "TypeInfo" types are checked against the Run Time
+Type Information (RTTI) we talked about in the previous subsection.
+We will have more to say about RTTIs in the following chapters.
 
 \subsection{Global constructors and frame dummy}
 \label{framedummy}
@@ -702,14 +704,6 @@ inheritance}
 \label{multipleinheritancegraph}
 
 \end{figure}
-
-\ant{I would potentially quote, or reword, parts of the cxx-abi here: what is 
-in 
-an RTTI entry and what do the key fields mean? In particular this part:
-https://itanium-cxx-abi.github.io/cxx-abi/abi.html\#rtti-layout - you could put 
-the fields into a table based on what is said here. Absolutely don't be afraid 
-to reword what they've done, condense it and present it in a nice way. 
-Provided you cite this site as the source there's no issue.}
 
 \subsection{DWARF}
 \label{dwarfdesign}
