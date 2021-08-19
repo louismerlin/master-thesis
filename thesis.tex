@@ -1051,16 +1051,14 @@ problem).
 
 We also created a script that would compile these three programs using
 different levels of compiler optimization.
-We could then use dis-cover to see if we could recover every class and the 
-correct tree from the binaries.
+We could then use dis-cover to recover every class and the correct hierarchy
+tree from the binaries.
 This served as a useful benchmark to check whether dis-cover was functioning 
 correctly if we tried to apply changes to it.
 
 These examples alone were not capable of letting us evaluate the full 
 capabilities of dis-cover.
 We found a few big applications that could serve that purpose.
-
-\dam{I would probably mention that dis-cover can recover all of this samples.}
 
 \section{Real-world case studies}
 
@@ -1161,14 +1159,16 @@ the need for RTTIs, and thus can target a larger number of projects (such as
 the chrome browser and the Node.js runtime) at the cost of having a
 probabilistic approach.
 
-They use six heuristics to locate the virtual tables, related to the table
+In comparison, dis-cover can recover 100\% of the classes present in a binary,
+but only if the RTTIs were kept at compilation time (so no class can be
+recovered from the chrome browser and the Node.js runtime).
+
+MARX uses six heuristics to locate the virtual tables, related to the table
 layout and content.
 
 This project could be a great candidate for future integration into
 RetroWrite, if we extend the tool to add defenses around type integrity for
 example.
-
-\dam{I would mention that you achieve 100\%, but on less targets (when compared to MARX).}
 
 \section{Plugins}
 
@@ -1185,7 +1185,11 @@ that can be used to create a visual representation of the hierarchy tree.
 \lou{This is a potential upgrade to dis-cover, a script has already been
 written}
 
-\dam{Do these plugins exactly the same as dis-cover (without DWARF output)? Or have they less or more advanced features?}
+\dam{Do these plugins exactly the same as dis-cover (without DWARF output)?
+Or have they less or more advanced features?}
+\lou{The key here is "integrate very well into the RE frameworks". They use
+these tools' built-in UI to represent the data however they want, which we
+cannot do.}
 
 \section{Type Integrity}
 
@@ -1242,7 +1246,8 @@ which lead to projects like this one.
 % advances the status quo.
 
 In conclusion we develop \textbf{dis-cover}, a static analysis tool for C++
-binaries that can find polymorphic class hierarchies without using heuristics. \dam{but requiring RTTI (compared to MARX), right?}
+binaries that can find polymorphic class hierarchies without using heuristics,
+if the compiler was told to keep the run time type information.
 The tool injects its findings in the analyzed binary as DWARF debug
 information and ELF symbols, so it can be used in any debugging tool.
 We hope this serves as an example for future binary analysis tools.
