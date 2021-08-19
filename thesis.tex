@@ -438,14 +438,17 @@ can be caught and handled.
 
 In order for the program to be able to continue execution after an exception
 is caught, binaries need some way of safely doing \textbf{stack unwinding}.
-This means that the system needs to safely release memory that is outside of
-the scope reached after an exception is caught.
-See \autoref{unwinding} for an example of code that will only guarantee safety
-if there is stack unwinding.
+This means that the systems needs to restore the stack variables to the state
+they were before entering the try block.
 
 The information on how to safely unwind the stack is stored in the
 \textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
 (see \autoref{dwarf}).
+
+The system also needs to safely release memory that is outside of the scope
+reached after an exception is caught.
+See \autoref{unwinding} for an example of code that will only guarantee safety
+if there is this mechanism in place.
 
 \begin{figure}[h]
 \begin{lstlisting}
@@ -482,6 +485,79 @@ unwinding}
 \label{unwinding}
 
 \end{figure}
+
+\begin{figure}[h]
+\begin{lstlisting}
+	.section	.gcc_except_table,"a",@progbits
+	.p2align	2
+GCC_except_table2:
+
+.Lexception1:
+	.byte	255                     # @LPStart Encoding = omit
+	.byte	3                       # @TType Encoding = udata4
+	.uleb128 .Lttbase0-.Lttbaseref0
+
+.Lttbaseref0:
+	.byte	1                       # Call site Encoding = uleb128
+	.uleb128 .Lcst_end1-.Lcst_begin1
+
+.Lcst_begin1:
+	.uleb128 .Ltmp3-.Lfunc_begin1   # >> Call Site 1 <<
+	.uleb128 .Ltmp4-.Ltmp3          #   Call between "try" and "catch"
+	.uleb128 .Ltmp5-.Lfunc_begin1   #     jumps to .Ltmp5 (cleanup function)
+	.byte	1                       #   On action: 1
+
+	.uleb128 .Ltmp4-.Lfunc_begin1   # >> Call Site 2 <<
+	.uleb128 .Lfunc_end2-.Ltmp4     #   Call after "catch"
+	.byte	0                       #     has no landing pad (do nothing)
+	.byte	0                       #   On action: cleanup
+
+.Lcst_end1:
+	.byte	1                       # >> Action Record 1 <<
+                                        #   Catch TypeInfo 1
+	.byte	0                       #   No further actions
+	.p2align	2
+                                        # >> Catch TypeInfos <<
+	.long	_ZTISt9exception        # TypeInfo 1 (what we are catching)
+\end{lstlisting}
+\caption{assembly representation of an except\_table for a simple program}
+\label{excepttable}
+\end{figure}
+
+This memory safety logic is defined in a table called the \textbf{Language
+Specific Data Area}, in a section of the binary called the
+\textbf{.gcc\_except\_table}~\cite{airsexcepttable}.
+
+In figure \autoref{excepttable} you can see a \textbf{.gcc\_except\_table} that was
+generated from the code in \autoref{unwinding}. We will now go through line by
+line to explain the inner workings of this table.
+This will help us explain why they are so important, and later why we had to
+rewrite them (see \autoref{retrowritedesign})
+
+The first three lines define that "this is an except table starting".
+
+The following seven lines define the parameters of this except table.
+These are, for example, the encoding of the values present in the table (the
+\texttt{.byte 3} and \texttt{.byte 1} lines), or the length of the table (the
+\texttt{.uleb128 .Lcst\_end1-.Lcst\_begin1} line).
+
+Next, we have the beginning of the call site table at \texttt{Lcst\_begin1}.
+The first call site defines that if an exception is thrown while executing
+instructions between the "try" and "catch blocks (here defined as the
+\texttt{Ltmp3} and \texttt{Ltmp4} labels), then you see if it matches
+\textbf{action 1} before jumping to the landing pad (here \texttt{Ltmp5}).
+
+The actions are defined under the call site table, in the action table. You
+can see them defined at the \texttt{Lcst\_end1} label.
+The first action is defined as "catch typeinfo 1". The TypeInfos are defined
+bellow the actions, as a list of pointers to the different exceptions we might
+be catching. Here, typeinfo 1 is a simple "exception", which matches with our
+C++ code.
+
+Coming back to the first call site : the landing pad of this call site is, in
+this case, a pointer to code that will free and clean up the buffers and
+variables that might have been instantiated.
+
 
 
 \subsection{Global constructors and frame dummy}
@@ -734,7 +810,7 @@ Future extensions of this work might consider recovering more information about
 exceptions.
 
 We had to study and work with exceptions and exception handling frames for 
-the augmentation of RetroWrite with C++ capabilities 
+the augmentation of RetroWrite with C++ capabilities
 
 \ant{Did DWARF allow us to express exception information in its debug format? 
 I don't think it did. So perhaps we can also add something like: we initially 
@@ -756,7 +832,8 @@ debuggers. IIRC, we decided not to get dis-cover to tag them because tagging
 them did not bring out any additional information compared to what the
 debuggers already had with the eh\_frame etc.}
 
-(see \autoref{retrowriteimplementation}).
+(see \autoref{retrowriteimplementation}, \autoref{retrowritedesign} and
+\autoref{exceptions} for more details).
 Today, RetroWrite supports the reversing of x86\_64 position-independent 
 binaries.
 There was also work to augment RetroWrite to support kernel 
@@ -764,14 +841,6 @@ code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
 We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most 
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
-
-\ant{You definitely now know a lot more about how exceptions work. I know 
-it is technically quite involved, but I think you should describe it. 
-Perhaps the logical way to do this is like this: an example piece of C++ code, 
-followed by what happens when an exception is triggered: how does the runtime 
-decide where that exception should be handled? You could do this in the 
-RetroWrite section below if you think that works better.}
-\dam{Maybe another figure could help on this as well.}
 
 \section{RetroWrite}
 \label{retrowritedesign}
@@ -792,7 +861,12 @@ file.
 This LSDA describes, row by row, actions to take for specific instruction in
 the code we are hitting while dealing with a thrown exception. These actions
 could be : destructing an out-of-scope variable, or examining a catch clause
-to see if they should catch the current exception.
+to see if they should catch the current exception. See \autoref{exceptions}
+for an example of this process.
+
+We had to rewrite the LSDA in our new assembly representation, with the
+appropriate labels and values, in order to make the exceptions work as they
+should.
 
 \section{Design for future integrations}
 
@@ -1021,7 +1095,7 @@ ignored by the symbolizer.
 
 The next modification was a larger one : the whole \textbf{Language Specific
 Data Area} (LSDA) had to be symbolized and rewritten.
-See \autoref{retrowritedesign} for more details.
+See \autoref{retrowritedesign} and \autoref{exceptions} for more details.
 This table, contained in the \textbf{.gcc\_except\_table} section, has offsets
 to cleanup functions, as well as lengths of instructions (which we transform
 into label differences).
