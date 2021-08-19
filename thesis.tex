@@ -528,9 +528,9 @@ This memory safety logic is defined in a table called the \textbf{Language
 Specific Data Area}, in a section of the binary called the
 \textbf{.gcc\_except\_table}~\cite{airsexcepttable}.
 
-In figure \autoref{excepttable} you can see a \textbf{.gcc\_except\_table} that was
-generated from the code in \autoref{unwinding}. We will now go through line by
-line to explain the inner workings of this table.
+In figure \autoref{excepttable} you can see a \textbf{.gcc\_except\_table} that 
+was generated from the code in \autoref{unwinding}. We will now go through line
+by line to explain the inner workings of this table.
 This will help us explain why they are so important, and later why we had to
 rewrite them (see \autoref{retrowritedesign})
 
@@ -1271,7 +1271,7 @@ adversaries from overwriting type information to hijack the control flow.
 Indeed, some attacks rely on overwriting the pointer to an object's virtual
 table with another one, to modify the methods called by the code and tamper
 with the control flow integrity of the program.
-Object Type Integrity is achived by making sure that the right virtual table is
+Object Type Integrity is achieved by making sure that the right virtual table is
 accessed at runtime for each specific object.
 
 A future project could use the classes extracted with dis-cover and the
@@ -1289,7 +1289,7 @@ Type confusion errors occur when a type cast is done on incompatible types.
 This can then lead to errors that can be abused to attack programs and gain
 control of systems.
 
-Adding runtime checks during compliation allows for great coverage and low
+Adding runtime checks during compilation allows for great coverage and low
 overhead.
 
 \section{Exploiting the hard-working DWARF}
