@@ -230,7 +230,7 @@ An ELF file contains a program header table, which describes memory segments
 (e.g. "this is read-only data", "this is executable instructions").
 It also usually contains a section header table, describing sections (their 
 name, size, offset and some flags).
-Memory segments contain information that is used at run time, while sections
+Memory segments contain information that is used at runtime, while sections
 contain relocation and linking information.
 
 The rest of an ELF file is taken up by different sections.
@@ -356,7 +356,7 @@ inheritable and overridable.
 With this polymorphism comes type conversion, of which there are two kinds.
 The first, \textbf{static\_cast}~\cite{staticcast}, will check that the
 conversion is upcasting at compile time,
-but does not do any run-time checks to verify the validity of the conversion.
+but does not do any runtime checks to verify the validity of the conversion.
 An example of upcasting is converting a pointer of a \textbf{Cat} to a pointer
 of an \textbf{Animal}.
 The fact that a class is polymorphic will have no impact on this type of 
@@ -371,7 +371,7 @@ An example of sidecasting is converting a pointer of an \textbf{Animal} to a
 pointer of a \textbf{Feline}. This is also not guaranteed to work (if the
 Animal pointer was that of a Dog for example).
 In order to achieve a dynamic cast, the system must have some kind of
-information about the object's data type at run time.
+information about the object's data type at runtime.
 
 This is where Run-Time Type Information (\textbf{RTTI}) comes into the picture.
 The system will use this RTTI to infer type inheritance for dynamic casting.
@@ -383,7 +383,7 @@ classes that inherit from each other, as well as at least one virtual method
 in one of these classes.
 \autoref{classes} shows an example of such classes.
 You will also need to instantiate these classes, and have some logic to make
-the class logic run-time dependent. 
+the class logic runtime dependent. 
 This is extremely common in practice, as it is the core motivation for
 polymorphism in the first place.
 For an example, see the conditional creation of the my\_animal variable, as
@@ -558,7 +558,7 @@ Coming back to the first call site : the landing pad of this call site is, in
 this case, a pointer to code that will free and clean up the buffers and
 variables that might have been instantiated.
 
-Quite interestingly, the "TypeInfo" types are checked against the Run Time
+Quite interestingly, the "TypeInfo" types are checked against the Run-Time
 Type Information (RTTI) we talked about in the previous subsection.
 We will have more to say about RTTIs in the following chapters.
 
@@ -1243,7 +1243,7 @@ example.
 
 There exists multiple plugins for reverse engineering frameworks that serve
 the same purpose as dis-cover. For IDA Pro, there exists \textbf{IDA GCC RTTI}
-~\cite{idagccrtti}, and for Ghidra there is the \textbf{Class and Run Time
+~\cite{idagccrtti}, and for Ghidra there is the \textbf{Class and Run-Time
 Type Information Analyzer}~\cite{ghidracppclassanalyzer}.
 
 These are very useful, and integrate very well into the reverse engineering
@@ -1281,11 +1281,16 @@ closed-source binaries.
 \subsection{HexType}
 
 \textbf{HexType}~\cite{hextype} aims to remove \textbf{type confusion errors}
-from programs, by adding explicit run-time checks during compilation.
+from programs, by adding explicit runtime checks during compilation.
 This is done even for objects that are not polymorphic, so as to remove all
 of the attack surface.
 
-\ant{Same stretch goal as for cfixx. Do last}
+Type confusion errors occur when a type cast is done on incompatible types.
+This can then lead to errors that can be abused to attack programs and gain
+control of systems.
+
+Adding runtime checks during compliation allows for great coverage and low
+overhead.
 
 \section{Exploiting the hard-working DWARF}
 
@@ -1318,7 +1323,7 @@ which lead to projects like this one.
 
 In conclusion we develop \textbf{dis-cover}, a static analysis tool for C++
 binaries that can find polymorphic class hierarchies without using heuristics,
-if the compiler was told to keep the run time type information.
+if the compiler was told to keep the Run-Time Type Information.
 The tool injects its findings in the analyzed binary as DWARF debug
 information and ELF symbols, so it can be used in any debugging tool.
 We hope this serves as an example for future binary analysis tools.
