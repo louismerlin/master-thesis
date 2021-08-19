@@ -67,22 +67,23 @@ engineering process.
 Fortunately, some of that information can be recovered from stripped binaries
 due to the way polymorphism is implemented in C++ compilers.
 
-With dis-cover, the tool we developed, we are able to extract class
-information and the hierarchy tree from a stripped C++ binary, and write DWARF
-debug information and symbols for the later use of that knowledge by any
-existing debugging tool.
+With dis-cover, the tool we developed, we extract class information and the
+hierarchy tree from a stripped C++ binary, and write DWARF debug information
+and symbols for the later use of that knowledge by any existing debugging
+tool.
 Through this method, we aim to demonstrate an open and collaborative way of
 writing static analysis tools.
 
-Through careful research of the way C++ exceptions are implemented, we are also
-able to augment the capabilities of the RetroWrite static rewriting tool to
-support C++ binaries.
+Through careful research of the way C++ exceptions are implemented, we augment
+the capabilities of the RetroWrite static rewriting tool to support C++
+binaries.
 We also show how the class information extracted by dis-cover could be used to
 improve the instrumentation done by RetroWrite.
 
-By utilizing these two tools, we are able to successfully extract useful
-information from closed-source applications like Zoom, and instrument
-large and well-known closed-source projects like {TODO}.
+By utilizing these two tools, we successfully extract useful information from
+closed-source applications like Zoom, and instrument large and well-known
+closed-source projects like {TODO}.
+
 \lou{We will give a cool example here if we end up with one.}
 
 \end{abstract}
@@ -182,8 +183,8 @@ as well as improvements made to RetroWrite to support C++ binaries.
 % to rewrite C++ binaries before, this could lead to very interesting 
 % discoveries;
 
-The dis-cover tool is able to extract information from a C++ binary, and 
-re-inject it as debug information using the DWARF format into the binary.
+The dis-cover tool extracts information from a C++ binary, and re-inject it as
+debug information using the DWARF format into the binary.
 This enables other debugging tools to see and display this information.
 
 
@@ -436,8 +437,8 @@ Exceptions are one of the defining features that make C++ stand out from C.
 In contrast to C errors, which terminate the whole program, C++ exceptions
 can be caught and handled.
 
-In order for the program to be able to continue execution after an exception
-is caught, binaries need some way of safely doing \textbf{stack unwinding}.
+In order for the program to continue execution after an exception is caught,
+binaries need some way of safely doing \textbf{stack unwinding}.
 This means that the systems needs to restore the stack variables to the state
 they were before entering the try block.
 
@@ -570,8 +571,8 @@ program starts. Pointers to these methods are stored in the
 \textbf{init\_array}.
 A simple C++ binary that uses exceptions will have an initialization array
 containing a pointer to the \textbf{frame\_dummy}. This method is in charge of
-setting up the stack frames to be able to unwind the frame during exception
-handling later on.
+setting up the stack frames to unwind the frame during exception handling
+later on.
 In the initialization array, you will also find pointers to a global
 constructor for every compilation unit (usually, a compilation unit is a C++
 source file).
@@ -646,8 +647,8 @@ becomes an unsolvable problem to differentiate between data and a pointer
 \section{Goals}
 
 The primary goal of this project was to extract some debug information from a
-stripped C++ binary, make it available through DWARF in order to be able to
-use that information in other projects, as a proof of concept.
+stripped C++ binary, make it available through DWARF in order to use that
+information in other projects, as a proof of concept.
 The hope is that this process will be re-used in other projects in the future.
 For this project, we decided to focus on recovering class information from
 Run-Time Type Information (RTTI, see \autoref{polymorphism}).
@@ -732,8 +733,8 @@ most modern reversing tools.
 There is a current push for DWARF to become the lingua franca for reverse 
 engineering tools, lead by researchers like Dr. Sergey Bratus~\cite{bratus} 
 from DARPA.
-He has published a paper in 2011 where he was able to exploit certain features 
-of DWARF to control program execution : Exploiting the hard-working 
+He has published a paper in 2011 where he exploits certain features of DWARF to
+control program execution : Exploiting the hard-working
 DWARF~\cite{hardworkingdwarf}.
 In it, they prove that the DWARF information used during exception handling
 is Turing-complete and can be used to embed exploits in executables.
@@ -789,9 +790,8 @@ In this project, we use very minimalist DIE abbreviations, containing only
 what we could infer from the analysis.
 
 % Injecting debug section & symbols
-With dis-cover, we are able to inject information in the debug and symbol 
-sections of the binary, creating a new ELF file with all of this useful info 
-included.
+With dis-cover, we inject information in the debug and symbol sections of the
+binary, creating a new ELF file with all of this useful info included.
 We will go more into the implementation details in \autoref{dwarfdesign} and
 \autoref{wrappingimplementation}.
 
@@ -808,8 +808,8 @@ the augmentation of RetroWrite with C++ capabilities
 
 \ant{Did DWARF allow us to express exception information in its debug format? 
 I don't think it did. So perhaps we can also add something like: we initially 
-hoped to be able to expose exception information to DWARF as well, but 
-this would require an extension to the DWARF format. However, by adding 
+hoped to expose exception information to DWARF as well, but this would require
+an extension to the DWARF format. However, by adding 
 exception support to RetroWrite, instrumentation tools can still work with 
 exceptions.}
 \ant{This is the key point I think: our goal was to make this information 
@@ -843,8 +843,7 @@ The first bug we encountered while trying to use RetroWrite on C++ binaries
 was due to the fact that the \textbf{initialization array} (see
 \autoref{framedummy}) contained a pointer to the \textbf{frame dummy} and this
 was not handled well during RetroWrite's symbolization process.
-By adding special treatment for that scenario, we were able to resolve this
-failure.
+By adding special treatment for that scenario, we resolved this failure.
 
 Once that was fixed, we saw that using RetroWrite on binaries that had C++
 exception handling would cause crashes in the new binary, caused by the fact
@@ -873,8 +872,8 @@ instrumentation around \textbf{Object Type Integrity}, as defined in the CFIXX
 paper~\cite{cfixx}, or reinforcing type checks as defined in the HexType
 paper~\cite{hextype} to avoid type confusion errors and vulnerabilities.
 
-We also were able to design dis-cover in a heuristics-free way, which fits
-perfectly with RetroWrite's current goal to avoid heuristics.
+We also designed dis-cover in a heuristics-free way, which fits perfectly with
+RetroWrite's current goal to avoid heuristics.
 
 This heuristics-free design should not be an end goal though.
 If later additions to RetroWrite were to improve its capabilities with
@@ -1010,7 +1009,7 @@ Once we have the three debug sections ready
 (\textbf{.debug\_abbrev} with the debug types, \textbf{.debug\_info} with the 
 debug information, and \textbf{debug\_str} with the strings)
 as well as the two symbol sections, we want to make them available to the user.
-They contain all of the information we were able to extract from the binary.
+They contain all of the information we extracted from the binary.
 
 We now have to go through a few hoops to make the debug and symbol information
 available in one binary because these sections do not come alone : they have to
@@ -1137,7 +1136,7 @@ We found a few big applications that could serve that purpose.
 % Big applications examples
 The first and smallest of these case studies was the \textbf{gold 
 linker}~\cite{gold}.
-We were able to find 571 classes in version 1.16 of the program.
+We found 571 classes in version 1.16 of the program.
 This provides a good benchmark, but the classes themselves do not make use of 
 multiple inheritance (only a "simple" inheritance tree).
 
@@ -1151,7 +1150,7 @@ This particular example was very important for verifying a big bug that was
 present in an early version of dis-cover.
 After fixing the bug, we were noticing around 10\% more inheritance links in 
 some projects (but not more classes).
-Being able to go check with the open-source LibreOffice code that we had found 
+Having access to the open-source LibreOffice code to check that we had found 
 the right inheritance links was extremely helpful.
 
 \begin{figure}[h]
@@ -1162,15 +1161,14 @@ the right inheritance links was extremely helpful.
 
 \end{figure}
 
-Finally, we also were able to study the closed-source \textbf{zoom}~\cite{zoom} 
-binary.
+Finally, we also studied the closed-source \textbf{zoom}~\cite{zoom} binary.
 This test case is very interesting in two ways.
-First, we are able to find \textbf{6039 classes} in the binary, with 
-\textbf{5601 edges} in the class hierarchy graph.
+First, we found \textbf{6039 classes} in the binary, with \textbf{5601 edges}
+in the class hierarchy graph.
 Second, as a large (76M) and complex ELF file, it served as a perfect benchmark 
 for the performance of the algorithm.
-By adding a simple check earlier in the RTTI-spotting pipeline, we were able to 
-speed up the analysis of the zoom binary 13.37 times, from over an hour to five 
+By adding a simple check earlier in the RTTI-spotting pipeline, we sped up the
+analysis of the zoom binary 13.37 times, from over an hour to around five
 minutes.
 
 \autoref{discoverbenchmarks} details the benchmarks we conducted on many 
@@ -1197,7 +1195,7 @@ GHz dedicated vCPU}
 
 % Debian test
 As we have shown before, out of the 5827 Debian packages that list C++ as a 
-dependency, we were able to extract classes from 3194 (54\%).
+dependency, we extracted classes from 3194 (54\%).
 The total number of classes we found is 960'188, with 39\% of them unique 
 across all packages (unique name in unique tree).
 
@@ -1223,10 +1221,10 @@ across all packages (unique name in unique tree).
 
 MARX~\cite{marx} is a static analysis tool which is related to what dis-cover
 is trying to achieve. Using analysis of the virtual tables in a C++ binaries,
-they are able to accurately extract 90\% of the classes. This is done without
-the need for RTTIs, and thus can target a larger number of projects (such as
-the chrome browser and the Node.js runtime) at the cost of having a
-probabilistic approach.
+they accurately extract 90\% of the classes. This is done without the need for
+RTTIs, and thus can target a larger number of projects (such as the chrome
+browser and the Node.js runtime) at the cost of having a probabilistic
+approach.
 
 In comparison, dis-cover can recover 100\% of the classes present in a binary,
 but only if the RTTIs were kept at compilation time (so no class can be
@@ -1330,7 +1328,7 @@ information and ELF symbols, so it can be used in any debugging tool.
 We hope this serves as an example for future binary analysis tools.
 
 We also extend the static position-independent binary rewriter RetroWrite with
-C++ support, and are able to [TODO].
+C++ support, and [TODO].
 To our knowledge, RetroWrite is the first static rewriter that can add
 instrumentation like AddressSanitizer to closed-source C++ binaries that make
 use of exceptions.
