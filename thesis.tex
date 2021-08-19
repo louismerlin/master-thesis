@@ -67,7 +67,7 @@ engineering process.
 Fortunately, some of that information can be recovered from stripped binaries
 due to the way polymorphism is implemented in C++ compilers.
 
-With dis-cover, the tool we developped, we are able to extract class
+With dis-cover, the tool we developed, we are able to extract class
 information and the hierarchy tree from a stripped C++ binary, and write DWARF
 debug information and symbols for the later use of that knowledge by any
 existing debugging tool.
@@ -275,8 +275,8 @@ In a large code base, with multiple teams of programmers working on different
 features,
 an Animal could be passed around without caring about whether it was a Cat, a 
 Dog or any other species.
-This Animal is sure to overwrite the \textbf{speak} method and have whatever other 
-properties and methods Animal has defined.
+This Animal is sure to overwrite the \textbf{speak} method and have whatever 
+other properties and methods Animal has defined.
 This logic is verified by the compiler.
 
 \begin{figure}[h]
@@ -313,7 +313,7 @@ int main (int argc, char *argv[]) {
 
   if (argc == 2) {
 
-    // We can instanciate an instance of a subclass into a pointer of type
+    // We can instantiate an instance of a subclass into a pointer of type
     // Animal*.
     if (strcmp("cat", argv[1]) == 0) {
       my_animal = new Cat();
@@ -455,10 +455,10 @@ using namespace std;
 
 
 void this_method_might_throw(int x) {
-  // This buffer is instanciated.
+  // This buffer is instantiated.
   char* this_object_could_leak = new char[1024];
 
-  // If the throw is called, the buffer will stay instanciated if there is
+  // If the throw is called, the buffer will stay instantiated if there is
   // no stack unwinding.
   if (x) throw runtime_error(":explosion:");
 
@@ -477,7 +477,8 @@ int main() {
   return 0;
 }
 \end{lstlisting}
-\caption{Example of C++ exception throwing and catching to illustrate stack unwinding}
+\caption{Example of C++ exception throwing and catching to illustrate stack 
+unwinding}
 \label{unwinding}
 
 \end{figure}
@@ -547,8 +548,8 @@ heuristics-free (meaning that it is designed to work for every example without
 exceptions).
 
 If you try to rewrite a binary that is not position-independent, the
-positions (pointers) in you binary are undistinguishable from data, and it
-becomes an unsolvable problem to differenciate between data and a pointer
+positions (pointers) in you binary are indistinguishable from data, and it
+becomes an unsolvable problem to differentiate between data and a pointer
 (which is why you would need heuristics in that scenario).
 
 \lou{@antony could you please verify the formulation of this last paragraph ?}
@@ -750,7 +751,7 @@ analysis again. We hoped to help with this, we failed, but we did the work to
 parse exceptions that is a very important step on the way to that.}
 \lou{Yes, the exception try/catch blacks are declared as "blocks" in DWARF,
 but I do not recall them being tagged as "try" and "catch" blocks. It
-definitely was an akward process, mostly because it was not displayed well in
+definitely was an awkward process, mostly because it was not displayed well in
 debuggers. IIRC, we decided not to get dis-cover to tag them because tagging
 them did not bring out any additional information compared to what the
 debuggers already had with the eh\_frame etc.}
@@ -1118,7 +1119,8 @@ of classes recovered  \\
   \end{tabular}
   }
 
-\dam{It would be interesting to know what percentage of effective classes was recovered.}
+\dam{It would be interesting to know what percentage of effective classes was 
+recovered.}
 
 \caption{Benchmarks of dis-cover on a machine running Ubuntu 20.04 with a 2.6 
 GHz dedicated vCPU}
