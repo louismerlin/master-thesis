@@ -1295,23 +1295,24 @@ overhead.
 \section{Exploiting the hard-working DWARF}
 
 \textbf{Exploiting the Hard-Working DWARF}~\cite{hardworkingdwarf}
-demonstrated that it was possible to incorporate exploits in the
-\textbf{.eh\_frame} and \textbf{.gcc\_except\_table} sections.
-They showed that the exception handling mechanism was a Turing-complete
-language, and they proved they could take control of the system when an
-exception was thrown.
+demonstrates that it is possible to incorporate exploits in the
+\textbf{.eh\_frame} and \textbf{.gcc\_except\_table} sections of an ELF file.
 
-\ant{I think you should definitely expand on a few points from this work. 
-They built a dwarf-extracting tool. I would also change take control of the 
-system to be more detailed: they can include arbitrary programs in the DWARF 
-language and execute them where the programmer expects exception logic to 
-happen. This is interesting because that is not what we expect when we analyze 
-a binary for malware: would existing RE tools be able to detect this? What 
-does this tell us about DWARF itself? Does this justify Sergey's statement that 
-DWARF should be the lingua franca of reversing frameworks? :)}
+They show that the exception handling mechanism of ELF files is a
+Turing-complete language, and that they can incorporate arbitrary programs
+into DWARF sections that get executed whenever an exception is thrown by the
+code.
+These arbitrary programs can be used to take control over the system.
+
+This is quite interesting, as malware-finding software usually does not scan
+these debug sections for malicious code, and existing reverse engineering
+tools do not know how to interpret these malformed DWARF sections.
 
 This paper rekindled a global interest in DWARF as an academic research topic,
 which lead to projects like this one.
+
+This project also shows both the power of the DWARF debugging format and the
+need for more research to be done around this topic.
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Conclusion}
