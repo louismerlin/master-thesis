@@ -1126,8 +1126,11 @@ problem).
 
 We also created a script that would compile these three programs using
 different levels of compiler optimization.
+We also compiled the programs with DWARF information included, and we could
+extract from these binaries the number of classes that were present in the
+program, to use as a base comparison number.
 We could then use dis-cover to recover every class and the correct hierarchy
-tree from the binaries.
+tree from the other binaries.
 This served as a useful benchmark to check whether dis-cover was functioning 
 correctly if we tried to apply changes to it.
 
@@ -1156,7 +1159,6 @@ After fixing the bug, we were noticing around 10\% more inheritance links in
 some projects (but not more classes).
 Being able to go check with the open-source LibreOffice code that we had found 
 the right inheritance links was extremely helpful.
-\dam{How did you finally check that all classes / inheritance was recovered?}
 
 \begin{figure}[h]
 
@@ -1192,9 +1194,6 @@ of classes recovered  \\
     zoom 5.5.7938.0228 & 76M & 16M & 5m50.626s & 6039 
   \end{tabular}
   }
-
-\dam{It would be interesting to know what percentage of effective classes was 
-recovered.}
 
 \caption{Benchmarks of dis-cover on a machine running Ubuntu 20.04 with a 2.6 
 GHz dedicated vCPU}
