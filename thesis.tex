@@ -1267,10 +1267,12 @@ cannot do.}
 \textbf{CFIXX}~\cite{cfixx} introduces \textbf{Object Type Integrity}, which
 is a dynamic (runtime) mechanism that keeps track of object types and prevents
 adversaries from overwriting type information to hijack the control flow.
-It is applied at compile time.
 
-\ant{Stretch goal: expand a little on how it does this. Not too much, just 
-enough to show that you understand how it fits with what you have learned.}
+Indeed, some attacks rely on overwriting the pointer to an object's virtual
+table with another one, to modify the methods called by the code and tamper
+with the control flow integrity of the program.
+Object Type Integrity is achived by making sure that the right virtual table is
+accessed at runtime for each specific object.
 
 A future project could use the classes extracted with dis-cover and the
 rewriting capabilities of RetroWrite to implement object type integrity on
