@@ -374,12 +374,12 @@ Animal pointer was that of a Dog for example).
 In order to achieve a dynamic cast, the system must have some kind of
 information about the object's data type at runtime.
 
-This is where Run-Time Type Information (\emph{RTTI}) comes into the picture.
+This is where \emph{Run-Time Type Information} (RTTI) comes into the picture.
 The system will use this RTTI to infer type inheritance for dynamic casting.
-We will now go into implementation details of RTTIs and virtual tables
-(\emph{VTables}), which point to them.
+We will now go into implementation details of RTTIs and \emph{virtual tables}
+(vtables), which point to them.
 
-To make VTables and RTTIs appear in your C++ binary, you will need to define
+To make vtables and RTTIs appear in your C++ binary, you will need to define
 classes that inherit from each other, as well as at least one virtual method
 in one of these classes.
 \autoref{classes} shows an example of such classes.
@@ -395,23 +395,23 @@ away by the compiler for optimization reasons.
 \begin{figure}[h]
 
 \includegraphics[width=16cm]{RTTI_graph.png}
-\caption{Overview of an example of VTables and RTTI in memory}
+\caption{Overview of an example of vtables and RTTI in memory}
 \label{rttigraph}
 
 \end{figure}
 
-The structure of VTables and RTTIs is detailed in \autoref{rttigraph}.
+The structure of vtables and RTTIs is detailed in \autoref{rttigraph}.
 All of this is defined in the Itanium C++ ABI~\cite{cppabi}.
 An instance of a virtual class Animal will contain the \emph{vtblptrAnimal}, 
-a pointer to the virtual table (\emph{VTable}) for the Animal class.
-This VTable will be shared by all instances of this class (even by instances
+a pointer to the \emph{virtual table} (vtable) for the Animal class.
+This vtable will be shared by all instances of this class (even by instances
 of a class that inherits from Animal), and will contain pointers to the virtual
 methods of the class.
-The first value preceding the VTable is a pointer to the RTTI of the class. A
+The first value preceding the vtable is a pointer to the RTTI of the class. A
 program finds out the class inheritance of a class instance at runtime by
 following this pointer.
 
-The RTTI itself is composed of a pointer to a VTable for the typeinfo class
+The RTTI itself is composed of a pointer to a vtable for the typeinfo class
 (defined by the compiler) as well as a pointer to the type name (this type 
 name is not removed by simple stripping of the binary, like with 
 \emph{objdcopy --strip-all}).
@@ -559,8 +559,9 @@ Coming back to the first call site : the landing pad of this call site is, in
 this case, a pointer to code that will free and clean up the buffers and
 variables that might have been instantiated.
 
-Quite interestingly, the "TypeInfo" types are checked against the Run-Time
-Type Information (RTTI) we talked about in the previous subsection.
+Quite interestingly, the "TypeInfo" types are checked against the
+\emph{Run-Time Type Information} (RTTI) we talked about in the previous
+subsection.
 We will have more to say about RTTIs in the following chapters.
 
 \subsection{Global constructors and frame dummy}
@@ -651,7 +652,7 @@ stripped C++ binary, make it available through DWARF in order to use that
 information in other projects, as a proof of concept.
 The hope is that this process will be re-used in other projects in the future.
 For this project, we decided to focus on recovering class information from
-Run-Time Type Information (RTTI, see \autoref{polymorphism}).
+\emph{Run-Time Type Information} (RTTI, see \autoref{polymorphism}).
 
 % Design => Decisions
 % We decided not to reproduce Marx's work
@@ -663,14 +664,14 @@ ida\_gcc\_rtti~\cite{idagccrtti} for IDA Pro (which requires a license),
 or Ghidra-Cpp-Class-Analyzer~\cite{ghidracppclassanalyzer} for Ghidra
 (but this information is only usable inside of the Ghidra debugger);
 there are academic projects such as MARX~\cite{marx} that rely on heuristics 
-around VTables to find classes and inheritance information.
+around vtables to find classes and inheritance information.
 The MARX project can recover classes when no RTTI is present (in the Chrome 
 project for example, where the \emph{-fno-rrti} compilation flag is used),
 with around 90\% accuracy.
 
 \subsection{Finding Run-Time Type Information}
 
-% VTable => RTTI
+% vtable => RTTI
 %   mention class data (Debian analysis)
 As we mentioned in the Background chapter, the RTTIs are available for a
 class hierarchy tree when there is at least one virtual method implemented
@@ -685,22 +686,22 @@ because in many cases these classes are optimized away by the compiler
 (in the more straightforward cases).
 We will share more details about this experiment in \autoref{evalchapter}.
 
-When looking at a binary's VTables and RTTIs, we only need to look for a
+When looking at a binary's vtables and RTTIs, we only need to look for a
 specific subset of them : the primary base virtual tables and their RTTIs.
 There is one for each class defined in the binary. Secondary virtual
 tables occur when there is multiple inheritance and complex method overwrites.
 They define only a subset of a class' methods, and may not contain RTTIs.
 We can differentiate the two kinds of virtual tables by the presence of an
-offset at the beginning of the VTable : a primary base virtual table will have
+offset at the beginning of the vtable : a primary base virtual table will have
 a value of $0$ as an offset, whereas a secondary virtual table will have an
 offset to the primary base virtual table. See
-\autoref{multipleinheritancegraph} for a visual example of RTTIs and VTables
+\autoref{multipleinheritancegraph} for a visual example of RTTIs and vtables
 in a multiple inheritance scenario.
 
 \begin{figure}[h]
 
 \includegraphics[width=16cm]{Feline.png}
-\caption{Overview of an example of VTables and RTTI in memory with multiple 
+\caption{Overview of an example of vtables and RTTI in memory with multiple 
 inheritance}
 \label{multipleinheritancegraph}
 
@@ -900,25 +901,25 @@ which is also written in python.
 
 \section{Finding RTTIs}
 
-% RTTI and VTable
-The first thing dis-cover does is find ELF sections where the VTables and RTTIs 
+% RTTI and vtable
+The first thing dis-cover does is find ELF sections where the vtables and RTTIs 
 could be hiding.
 This is usually \texttt{.rodata} (read-only data) and \texttt{.data.rel.ro}, 
 but could sometimes also be related sections like \texttt{.data.rel.ro.local}, 
 or \texttt{.rdata}.
-As per the Itanium C++ ABI, the base VTable of a class will contain an 
+As per the Itanium C++ ABI, the base vtable of a class will contain an 
 "offset-to-top" at offset \emph{-0x10}, which will be 0 in the primary base 
 virtual table's case, followed by a pointer to an RTTI at offset
 \emph{-0x08}.
 We simply have to pattern-match for zeroes directly followed by a pointer to 
 another part of the read-only data sections, and we have a potential RTTI 
-pointer. See \autoref{hexdump} for a hexdump of VTables and RTTIs in an ELF
+pointer. See \autoref{hexdump} for a hexdump of vtables and RTTIs in an ELF
 file.
 
 \begin{figure}[h]
 
 \includegraphics[width=16cm]{hexdump.png}
-\caption{Hexdump of the location of VTables and RTTIs in an ELF file}
+\caption{Hexdump of the location of vtables and RTTIs in an ELF file}
 \label{hexdump}
 
 \end{figure}
@@ -992,7 +993,7 @@ method named \emph{printf}. The same is true for
 Symbols are also used to have access to variable names, class names, function
 names or any other kind of text information when debugging a binary.
 In dis-cover, we want to create two symbols for every class we have found
-during the analysis : one pointing to the VTable and one pointing to the RTTI,
+during the analysis : one pointing to the vtable and one pointing to the RTTI,
 and labeling them as such.
 
 In order to create new symbol sections, we take the symbol table from the 
@@ -1322,7 +1323,7 @@ need for more research to be done around this topic.
 
 In conclusion we develop \emph{dis-cover}, a static analysis tool for C++
 binaries that can find polymorphic class hierarchies without using heuristics,
-if the compiler was told to keep the Run-Time Type Information.
+if the compiler was told to keep the \emph{Run-Time Type Information}.
 The tool injects its findings in the analyzed binary as DWARF debug
 information and ELF symbols, so it can be used in any debugging tool.
 We hope this serves as an example for future binary analysis tools.
