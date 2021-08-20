@@ -67,15 +67,15 @@ engineering process.
 Fortunately, some of that information can be recovered from stripped binaries
 due to the way polymorphism is implemented in C++ compilers.
 
-With dis-cover, the tool we developed, we extract class information and the
-hierarchy tree from a stripped C++ binary, and write DWARF debug information
-and symbols for the later use of that knowledge by any existing debugging
-tool.
+With \emph{dis-cover}, the tool we developed, we \emph{extract class
+information} and the hierarchy tree from a stripped C++ binary, and write DWARF
+debug information and symbols for the later use of that knowledge by any
+existing debugging tool.
 Through this method, we aim to demonstrate an open and collaborative way of
 writing static analysis tools.
 
 Through careful research of the way C++ exceptions are implemented, we augment
-the capabilities of the RetroWrite static rewriting tool to support C++
+the capabilities of the \emph{RetroWrite} static rewriting tool to support C++
 binaries.
 We also show how the class information extracted by dis-cover could be used to
 improve the instrumentation done by RetroWrite.
@@ -173,7 +173,7 @@ The target can be a legacy project, a closed-source product or even malware.
 % Fixing RetroWrite to support C++ binaries;
 
 In this thesis we would like to present the 
-\textbf{dis-cover}~\cite{discovergithub} static analysis tool,
+\emph{dis-cover}~\cite{discovergithub} static analysis tool,
 as well as improvements made to RetroWrite to support C++ binaries.
 
 
@@ -222,7 +222,7 @@ and what remains to be done for the implementation to work.
 
 \section{Executable and Linkable Format (ELF)}
 
-The common standard \textbf{Executable and Linkable Format} (ELF) format is 
+The common standard \emph{Executable and Linkable Format} (ELF) format is 
 mostly used as executable files, object code and shared libraries.
 It is the current standard format for executable files on UNIX
 systems~\cite{elfstandard}.
@@ -236,10 +236,10 @@ contain relocation and linking information.
 
 The rest of an ELF file is taken up by different sections.
 Famous sections include
-\textbf{.text} (where the instructions are),
-\textbf{.data} (where you will see global tables and other variables),
-\textbf{.rodata} (you will find strings in here)
-and \textbf{.eh\_frame} (where exception unwinding information is stored for 
+\texttt{.text} (where the instructions are),
+\texttt{.data} (where you will see global tables and other variables),
+\texttt{.rodata} (you will find strings in here)
+and \texttt{.eh\_frame} (where exception unwinding information is stored for 
 C++ binaries).
 
 \section{Position-Independent Code (PIC) and Executable (PIE)}
@@ -247,8 +247,8 @@ C++ binaries).
 
 Position-independence for code is a property that guarantees that code will 
 execute correctly no matter the absolute address of the body of code.
-This is made possible by computing \textbf{relative positions} instead of
-using absolute addresses, as well as a feature called \textbf{relocations}.
+This is made possible by computing \emph{relative positions} instead of
+using absolute addresses, as well as a feature called \emph{relocations}.
 
 PIC is most often found for shared libraries, so that they can be inserted into 
 an ELF file without worry.
@@ -268,15 +268,15 @@ The C++ programming language implements polymorphism.
 This feature enables complex code logic that can comply with external business 
 logic.
 Here we will introduce the example that will follow us throughout this thesis :
-in \autoref{classes} we define two abstract base classes \textbf{Animal} and 
-\textbf{Feline},
-and the two classes \textbf{Cat} (that inherits from Animal and Feline) and 
-\textbf{Dog} (that inherits from Animal).
+in \autoref{classes} we define two abstract base classes \emph{Animal} and 
+\emph{Feline},
+and the two classes \emph{Cat} (that inherits from Animal and Feline) and 
+\emph{Dog} (that inherits from Animal).
 In a large code base, with multiple teams of programmers working on different 
 features,
 an Animal could be passed around without caring about whether it was a Cat, a 
 Dog or any other species.
-This Animal is sure to overwrite the \textbf{speak} method and have whatever 
+This Animal is sure to overwrite the \emph{speak} method and have whatever 
 other properties and methods Animal has defined.
 This logic is verified by the compiler.
 
@@ -355,29 +355,29 @@ you don't need a lemur-specific implementation if appropriate.
 Polymorphic classes are defined by having at least one virtual method, which is 
 inheritable and overridable.
 With this polymorphism comes type conversion, of which there are two kinds.
-The first, \textbf{static\_cast}~\cite{staticcast}, will check that the
+The first, \emph{static\_cast}~\cite{staticcast}, will check that the
 conversion is upcasting at compile time,
 but does not do any runtime checks to verify the validity of the conversion.
-An example of upcasting is converting a pointer of a \textbf{Cat} to a pointer
-of an \textbf{Animal}.
+An example of upcasting is converting a pointer of a \emph{Cat} to a pointer
+of an \emph{Animal}.
 The fact that a class is polymorphic will have no impact on this type of 
 casting.
 The second is the more interesting one for us. It is the 
-\textbf{dynamic\_cast}~\cite{dynamiccast} expression.
+\emph{dynamic\_cast}~\cite{dynamiccast} expression.
 Dynamic casting is a safe kind of type conversion that can handle downcasting 
 and sidecasting.
-An example of downcasting is converting a pointer of an \textbf{Animal} to a
-pointer of a \textbf{Cat}. This is not guaranteed to work.
-An example of sidecasting is converting a pointer of an \textbf{Animal} to a
-pointer of a \textbf{Feline}. This is also not guaranteed to work (if the
+An example of downcasting is converting a pointer of an \emph{Animal} to a
+pointer of a \emph{Cat}. This is not guaranteed to work.
+An example of sidecasting is converting a pointer of an \emph{Animal} to a
+pointer of a \emph{Feline}. This is also not guaranteed to work (if the
 Animal pointer was that of a Dog for example).
 In order to achieve a dynamic cast, the system must have some kind of
 information about the object's data type at runtime.
 
-This is where Run-Time Type Information (\textbf{RTTI}) comes into the picture.
+This is where Run-Time Type Information (\emph{RTTI}) comes into the picture.
 The system will use this RTTI to infer type inheritance for dynamic casting.
 We will now go into implementation details of RTTIs and virtual tables
-(\textbf{VTables}), which point to them.
+(\emph{VTables}), which point to them.
 
 To make VTables and RTTIs appear in your C++ binary, you will need to define
 classes that inherit from each other, as well as at least one virtual method
@@ -402,8 +402,8 @@ away by the compiler for optimization reasons.
 
 The structure of VTables and RTTIs is detailed in \autoref{rttigraph}.
 All of this is defined in the Itanium C++ ABI~\cite{cppabi}.
-An instance of a virtual class Animal will contain the \textbf{vtblptrAnimal}, 
-a pointer to the virtual table (\textbf{VTable}) for the Animal class.
+An instance of a virtual class Animal will contain the \emph{vtblptrAnimal}, 
+a pointer to the virtual table (\emph{VTable}) for the Animal class.
 This VTable will be shared by all instances of this class (even by instances
 of a class that inherits from Animal), and will contain pointers to the virtual
 methods of the class.
@@ -414,16 +414,16 @@ following this pointer.
 The RTTI itself is composed of a pointer to a VTable for the typeinfo class
 (defined by the compiler) as well as a pointer to the type name (this type 
 name is not removed by simple stripping of the binary, like with 
-\textbf{objdcopy --strip-all}).
+\emph{objdcopy --strip-all}).
 This name is mangled using C++ mangling, and can trivially be demangled.
 Here are some examples of C++ name mangling :
-\textbf{\_ZTI6Feline} demangles to \textbf{typeinfo for Feline};
-\textbf{\_ZTV6Feline} demangles to \textbf{vtable for Feline}.
+\emph{\_ZTI6Feline} demangles to \emph{typeinfo for Feline};
+\emph{\_ZTV6Feline} demangles to \emph{vtable for Feline}.
 Mangling is especially useful when defining several methods in the same scope 
 with different arguments (this is called overloading), in order to
 differentiate the different methods.
 Mangling is also useful because of special characters in class names, like the
-\textbf{::} characters who separate namespaces.
+\emph{::} characters who separate namespaces.
 The next values of the RTTI are pointers to the RTTIs of the parent classes.
 These are used at runtime to check the relationship between classes.
 See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer 
@@ -438,12 +438,12 @@ In contrast to C errors, which terminate the whole program, C++ exceptions
 can be caught and handled.
 
 In order for the program to continue execution after an exception is caught,
-binaries need some way of safely doing \textbf{stack unwinding}.
+binaries need some way of safely doing \emph{stack unwinding}.
 This means that the systems needs to restore the stack variables to the state
 they were before entering the try block.
 
 The information on how to safely unwind the stack is stored in the
-\textbf{.eh\_frame} section. It is encoded in a format similar to DWARF data
+\texttt{.eh\_frame} section. It is encoded in a format similar to DWARF data
 (see \autoref{dwarf}).
 
 The system also needs to safely release memory that is outside of the scope
@@ -525,11 +525,11 @@ GCC_except_table2:
 \label{excepttable}
 \end{figure}
 
-This memory safety logic is defined in a table called the \textbf{Language
+This memory safety logic is defined in a table called the \emph{Language
 Specific Data Area}, in a section of the binary called the
-\textbf{.gcc\_except\_table}~\cite{airsexcepttable}.
+\texttt{.gcc\_except\_table}~\cite{airsexcepttable}.
 
-In figure \autoref{excepttable} you can see a \textbf{.gcc\_except\_table} that 
+In figure \autoref{excepttable} you can see a \texttt{.gcc\_except\_table} that 
 was generated from the code in \autoref{unwinding}. We will now go through line
 by line to explain the inner workings of this table.
 This will help us explain why they are so important, and later why we had to
@@ -546,7 +546,7 @@ Next, we have the beginning of the call site table at \texttt{Lcst\_begin1}.
 The first call site defines that if an exception is thrown while executing
 instructions between the "try" and "catch blocks (here defined as the
 \texttt{Ltmp3} and \texttt{Ltmp4} labels), then you see if it matches
-\textbf{action 1} before jumping to the landing pad (here \texttt{Ltmp5}).
+\emph{action 1} before jumping to the landing pad (here \texttt{Ltmp5}).
 
 The actions are defined under the call site table, in the action table. You
 can see them defined at the \texttt{Lcst\_end1} label.
@@ -568,9 +568,9 @@ We will have more to say about RTTIs in the following chapters.
 
 During the execution of an ELF file, some methods will be run before the main
 program starts. Pointers to these methods are stored in the
-\textbf{init\_array}.
+\emph{init\_array}.
 A simple C++ binary that uses exceptions will have an initialization array
-containing a pointer to the \textbf{frame\_dummy}. This method is in charge of
+containing a pointer to the \emph{frame\_dummy}. This method is in charge of
 setting up the stack frames to unwind the frame during exception handling
 later on.
 In the initialization array, you will also find pointers to a global
@@ -581,24 +581,24 @@ source file).
 \label{dwarf}
 
 % DWARF DIEs
-\textbf{DWARF} is the debugging standard used widely in conjunction with 
+\emph{DWARF} is the debugging standard used widely in conjunction with 
 executable ELF files.
-It is often included in these ELF files in the \textbf{.debug\_info} section 
+It is often included in these ELF files in the \texttt{.debug\_info} section 
 (and other related sections).
 This debug information is made up of Debugging Information Entries 
-(\textbf{DIEs}).
+(\emph{DIEs}).
 These entries can contain information about variable names, method definitions, 
 the compilation process, or more importantly for us, class names and class 
 inheritance. You can also map source code to binary code.
 All of this information is usually used in debuggers.
 
-The \textbf{.eh\_frame} section mentioned in \autoref{exceptions} is also used
+The \texttt{.eh\_frame} section mentioned in \autoref{exceptions} is also used
 by debuggers to unwind the stack for debugging purposes.
 It gives information to identify where to catch exceptions, as well as what
 destructors to call while unwinding the stack.
 
 DWARF data takes the form of a tree of values.
-The root of the tree is called the \textbf{Compile Unit} (CU).
+The root of the tree is called the \emph{Compile Unit} (CU).
 It contains information about the source code file, the programming language
 used as well as the compiler.
 
@@ -606,7 +606,7 @@ used as well as the compiler.
 
 % How RetroWrite works
 
-The \textbf{RetroWrite}\cite{dinesh20oakland} project is a project from the
+The \emph{RetroWrite}\cite{dinesh20oakland} project is a project from the
 HexHive lab that aims to statically rewrite binaries and instrument them, to
 improve fuzzing capabilities, or retrofit security measures.
 Static binary rewriting is the process of taking a binary file, and modifying
@@ -621,7 +621,7 @@ functions and data offsets for example.
 This way, we can add any instruction after and before existing instructions
 without breaking relative offsets.
 
-RetroWrite only works on \textbf{x86\_64} position-independent executables
+RetroWrite only works on \emph{x86\_64} position-independent executables
 (see \autoref{picpie}), compiled from C. This enables the RetroWrite to stay
 heuristics-free (meaning that it is designed to work for every example without
 exceptions).
@@ -665,7 +665,7 @@ or Ghidra-Cpp-Class-Analyzer~\cite{ghidracppclassanalyzer} for Ghidra
 there are academic projects such as MARX~\cite{marx} that rely on heuristics 
 around VTables to find classes and inheritance information.
 The MARX project can recover classes when no RTTI is present (in the Chrome 
-project for example, where the \textbf{-fno-rrti} compilation flag is used),
+project for example, where the \emph{-fno-rrti} compilation flag is used),
 with around 90\% accuracy.
 
 \subsection{Finding Run-Time Type Information}
@@ -677,7 +677,7 @@ class hierarchy tree when there is at least one virtual method implemented
 by one of the classes.
 We decided to test if RTTIs occurred often in the wild : we proceed to download 
 every Debian package that listed C++ as a dependency (get the list with 
-\textbf{apt-cache rdepends libgcc1} on a Debian machine).
+\emph{apt-cache rdepends libgcc1} on a Debian machine).
 Out of around 80'000 packages, 5827 of them list C++ as a dependency.
 Out of those, we extracted classes from 3194 (54\%).
 This does not mean that the other 46\% of packages do not use classes,
@@ -739,15 +739,15 @@ DWARF~\cite{hardworkingdwarf}.
 In it, they prove that the DWARF information used during exception handling
 is Turing-complete and can be used to embed exploits in executables.
 
-DWARF data is structured as a tree of \textbf{Debug Information Entries} 
-(DIEs). These entries contain a \textbf{tag} and a list of
-\textbf{attributes}.
+DWARF data is structured as a tree of \emph{Debug Information Entries} 
+(DIEs). These entries contain a \emph{tag} and a list of
+\emph{attributes}.
 These entries can describe how the original code is written, as well as
 information about classes, variables, types, and other structures in the
 binary. \autoref{dwarfdies} shows an example of such entries, describing
-pointers and methods in a simple program. Lines beginning with \textbf{DW\_TAG}
+pointers and methods in a simple program. Lines beginning with \emph{DW\_TAG}
 describe the type of the debug information entry, and the following lines
-beginning with \textbf{DW\_AT} describe the attributes of this entry.
+beginning with \emph{DW\_AT} describe the attributes of this entry.
 
 \begin{figure}[h]
 \begin{lstlisting}
@@ -780,7 +780,7 @@ beginning with \textbf{DW\_AT} describe the attributes of this entry.
 
 The DWARF format also uses abbreviations to compress the debug information.
 Instead of re-describing a DIE every time, their structure is defined in an
-abbreviation table (stored in the \textbf{debug\_abbrev} section of the ELF
+abbreviation table (stored in the \emph{debug\_abbrev} section of the ELF
 file).
 Each DIE will have an index in that table, which describes its tag and list
 if attributes names and types. The rest of the DIE is the list of its
@@ -840,16 +840,16 @@ little tweaking to ARM and other architectures).
 \label{retrowritedesign}
 
 The first bug we encountered while trying to use RetroWrite on C++ binaries
-was due to the fact that the \textbf{initialization array} (see
-\autoref{framedummy}) contained a pointer to the \textbf{frame dummy} and this
+was due to the fact that the \emph{initialization array} (see
+\autoref{framedummy}) contained a pointer to the \emph{frame dummy} and this
 was not handled well during RetroWrite's symbolization process.
 By adding special treatment for that scenario, we resolved this failure.
 
 Once that was fixed, we saw that using RetroWrite on binaries that had C++
 exception handling would cause crashes in the new binary, caused by the fact
 that the exceptions thrown were never caught.
-Exception behavior is described in the \textbf{Language Specific Data Area}
-(LSDA), which is found in the \textbf{.gcc\_except\_table} section of the ELF
+Exception behavior is described in the \emph{Language Specific Data Area}
+(LSDA), which is found in the \texttt{.gcc\_except\_table} section of the ELF
 file.
 This LSDA describes, row by row, actions to take for specific instruction in
 the code we are hitting while dealing with a thrown exception. These actions
@@ -868,7 +868,7 @@ for the extracted information. This makes the knowledge easily reusable in
 other reverse engineering projects.
 
 For example, dis-cover output could be used in RetroWrite in order to add
-instrumentation around \textbf{Object Type Integrity}, as defined in the CFIXX
+instrumentation around \emph{Object Type Integrity}, as defined in the CFIXX
 paper~\cite{cfixx}, or reinforcing type checks as defined in the HexType
 paper~\cite{hextype} to avoid type confusion errors and vulnerabilities.
 
@@ -903,13 +903,13 @@ which is also written in python.
 % RTTI and VTable
 The first thing dis-cover does is find ELF sections where the VTables and RTTIs 
 could be hiding.
-This is usually \textbf{.rodata} (read-only data) and \textbf{.data.rel.ro}, 
-but could sometimes also be related sections like \textbf{.data.rel.ro.local}, 
-or \textbf{.rdata}.
+This is usually \texttt{.rodata} (read-only data) and \texttt{.data.rel.ro}, 
+but could sometimes also be related sections like \texttt{.data.rel.ro.local}, 
+or \texttt{.rdata}.
 As per the Itanium C++ ABI, the base VTable of a class will contain an 
-"offset-to-top" at offset \textbf{-0x10}, which will be 0 in the primary base 
+"offset-to-top" at offset \emph{-0x10}, which will be 0 in the primary base 
 virtual table's case, followed by a pointer to an RTTI at offset
-\textbf{-0x08}.
+\emph{-0x08}.
 We simply have to pattern-match for zeroes directly followed by a pointer to 
 another part of the read-only data sections, and we have a potential RTTI 
 pointer. See \autoref{hexdump} for a hexdump of VTables and RTTIs in an ELF
@@ -944,19 +944,19 @@ Next, we want to add that information to the debug sections of a new ELF file.
 % DIE Bytecode
 In order to write DWARF data, the first step is defining the types we will be 
 using, and their fields.
-This is done by writing bytes in the \textbf{.debug\_abbrev} section.
-For example, we create an abbrev of type \textbf{class\_type}, which has a 
-\textbf{name}, and can have sub-field (children).
-Then, we create the abbrev of type \textbf{inheritance}, which has a 
-\textbf{type} (a reference to the parent type).
+This is done by writing bytes in the \texttt{.debug\_abbrev} section.
+For example, we create an abbrev of type \emph{class\_type}, which has a 
+\emph{name}, and can have sub-field (children).
+Then, we create the abbrev of type \emph{inheritance}, which has a 
+\emph{type} (a reference to the parent type).
 
-We can then populate the \textbf{.debug\_info} with classes and their 
+We can then populate the \texttt{.debug\_info} with classes and their 
 inheritance data.
 DWARF data takes the form of a tree of values. We have to create a 
-\textbf{compile\_unit} value at the root, and then the branches will be 
-\textbf{class\_type}s.
-These \textbf{class\_type}s will themselves have as children 
-\textbf{inheritance} values if the class inherits from another class.
+\emph{compile\_unit} value at the root, and then the branches will be 
+\emph{class\_type}s.
+These \emph{class\_type}s will themselves have as children 
+\emph{inheritance} values if the class inherits from another class.
 \autoref{dwarfdump} shows a very simple example of this, with two class types 
 and one inheriting from the other.
 
@@ -979,16 +979,16 @@ and one inheriting from the other.
 \label{dwarfdump}
 \end{figure}
 
-The strings themselves are stored in another section, \textbf{.debug\_str}, and 
+The strings themselves are stored in another section, \texttt{.debug\_str}, and 
 are referred to with their offset in that section.
 
 \section{Creating symbols}
 
 % symbols
-Symbols are mainly used for shared object loading. To use the \textbf{printf}
-method from \textbf{stdio.h} for example, the binary must be aware of a
-method named \textbf{printf}. The same is true for
-\textbf{system\_clock} in C++ for example.
+Symbols are mainly used for shared object loading. To use the \emph{printf}
+method from \emph{stdio.h} for example, the binary must be aware of a
+method named \emph{printf}. The same is true for
+\emph{system\_clock} in C++ for example.
 Symbols are also used to have access to variable names, class names, function
 names or any other kind of text information when debugging a binary.
 In dis-cover, we want to create two symbols for every class we have found
@@ -998,16 +998,16 @@ and labeling them as such.
 In order to create new symbol sections, we take the symbol table from the 
 original binary (if there was one) and append the aforementioned symbols.
 
-The two symbol sections are \textbf{.symtab}, which contains the information 
-(offset, size, type, ...) for each symbol, and \textbf{.strtab}, which contains 
+The two symbol sections are \texttt{.symtab}, which contains the information 
+(offset, size, type, ...) for each symbol, and \texttt{.strtab}, which contains 
 the strings related to these symbols.
 
 \section{Wrapping things together}
 \label{wrappingimplementation}
 
 Once we have the three debug sections ready
-(\textbf{.debug\_abbrev} with the debug types, \textbf{.debug\_info} with the 
-debug information, and \textbf{debug\_str} with the strings)
+(\texttt{.debug\_abbrev} with the debug types, \texttt{.debug\_info} with the 
+debug information, and \emph{debug\_str} with the strings)
 as well as the two symbol sections, we want to make them available to the user.
 They contain all of the information we extracted from the binary.
 
@@ -1015,7 +1015,7 @@ We now have to go through a few hoops to make the debug and symbol information
 available in one binary because these sections do not come alone : they have to
 be accompanied by machine code and data.
 We did not want to recreate a whole compiler to assemble all of this data.
-Luckily, the \textbf{eu-unstrip} tool was created as an utility application
+Luckily, the \emph{eu-unstrip} tool was created as an utility application
 to "combine stripped files with separate symbols and debug information".
 \autoref{recovergraph} shows a diagram of the process we will explain in this
 section.
@@ -1030,7 +1030,7 @@ section.
 
 \subsection{Creating a fake ELF file}
 
-We start by constructing a \textbf{program header table}.
+We start by constructing a \emph{program header table}.
 This table contains information about the offset and size of each segment of 
 the binary (which segment is used for what, and their read/write permissions).
 The ELF file we're creating will not be run, but only used temporarily.
@@ -1039,17 +1039,17 @@ for the process to work.
 We simply copy this program header table almost as-is from the original binary.
 
 Next, we use the individual sections we built earlier and construct the 
-\textbf{section header table}.
+\emph{section header table}.
 For every section present in the original binary, we create an entry in the 
 section header table, reusing most values from the original section header 
 table.
 The only values we modify is the offset.
 For every section that we have created, we add the appropriate row in the 
 section header table.
-Every section name gets added to the \textbf{.shstrtab} section, as per the 
+Every section name gets added to the \texttt{.shstrtab} section, as per the 
 convention.
 
-Finally, we construct the \textbf{elf header}, taking some of the values from 
+Finally, we construct the \emph{elf header}, taking some of the values from 
 the original binaries, and calculating some others from the size of the tables 
 and sections we have built.
 We can now create a fake ELF file by appending the elf header, the program 
@@ -1061,13 +1061,13 @@ binary as closely as possible regarding headers and segments.
 \subsection{Stripping the original ELF file}
 
 Next, we will create a stripped version of the original ELF file.
-We use the \textbf{objcopy --strip-all} command.
+We use the \emph{objcopy --strip-all} command.
 This is to avoid section conflicts in the next step.
 
 \subsection{Combining the two ELF files}
 \label{combiningelf}
 
-Now, we can use the ELF utility program \textbf{eu-unstrip} to combine the two 
+Now, we can use the ELF utility program \emph{eu-unstrip} to combine the two 
 ELF files we have created into one.
 The newly created combined ELF file will contain all of the code and data from 
 the original file, as well as the debug and symbol sections we have created.
@@ -1081,15 +1081,15 @@ the original file, as well as the debug and symbol sections we have created.
 % unwind tables etc
 
 The first modification we did to RetroWrite to add support for C++ binaries
-was to address the \textbf{init\_array} errors described in
+was to address the \emph{init\_array} errors described in
 \autoref{retrowritedesign}.
-This meant treating the \textbf{frame\_dummy} method differently, as it was
+This meant treating the \emph{frame\_dummy} method differently, as it was
 ignored by the symbolizer.
 
-The next modification was a larger one : the whole \textbf{Language Specific
+The next modification was a larger one : the whole \emph{Language Specific
 Data Area} (LSDA) had to be symbolized and rewritten.
 See \autoref{retrowritedesign} and \autoref{exceptions} for more details.
-This table, contained in the \textbf{.gcc\_except\_table} section, has offsets
+This table, contained in the \texttt{.gcc\_except\_table} section, has offsets
 to cleanup functions, as well as lengths of instructions (which we transform
 into label differences).
 
@@ -1134,18 +1134,18 @@ We found a few big applications that could serve that purpose.
 \section{Real-world case studies}
 
 % Big applications examples
-The first and smallest of these case studies was the \textbf{gold 
+The first and smallest of these case studies was the \emph{gold 
 linker}~\cite{gold}.
 We found 571 classes in version 1.16 of the program.
 This provides a good benchmark, but the classes themselves do not make use of 
 multiple inheritance (only a "simple" inheritance tree).
 
-\textbf{LibreOffice}~\cite{libreoffice} on the other hand provided us with a 
+\emph{LibreOffice}~\cite{libreoffice} on the other hand provided us with a 
 great test case :
 the program is fragmented into many small libraries, containing some 
 interesting uses of multiple inheritance.
 See \autoref{libloglo} for an example of multiple inheritance in the 
-\textbf{libloglo.so} library from LibreOffice.
+\emph{libloglo.so} library from LibreOffice.
 This particular example was very important for verifying a big bug that was 
 present in an early version of dis-cover.
 After fixing the bug, we were noticing around 10\% more inheritance links in 
@@ -1161,9 +1161,9 @@ the right inheritance links was extremely helpful.
 
 \end{figure}
 
-Finally, we also studied the closed-source \textbf{zoom}~\cite{zoom} binary.
+Finally, we also studied the closed-source \emph{zoom}~\cite{zoom} binary.
 This test case is very interesting in two ways.
-First, we found \textbf{6039 classes} in the binary, with \textbf{5601 edges}
+First, we found \emph{6039 classes} in the binary, with \emph{5601 edges}
 in the class hierarchy graph.
 Second, as a large (76M) and complex ELF file, it served as a perfect benchmark 
 for the performance of the algorithm.
@@ -1240,14 +1240,14 @@ example.
 \section{Plugins}
 
 There exists multiple plugins for reverse engineering frameworks that serve
-the same purpose as dis-cover. For IDA Pro, there exists \textbf{IDA GCC RTTI}
-~\cite{idagccrtti}, and for Ghidra there is the \textbf{Class and Run-Time
+the same purpose as dis-cover. For IDA Pro, there exists \emph{IDA GCC RTTI}
+~\cite{idagccrtti}, and for Ghidra there is the \emph{Class and Run-Time
 Type Information Analyzer}~\cite{ghidracppclassanalyzer}.
 
 These are very useful, and integrate very well into the reverse engineering
 frameworks, but they cannot make that information available to other tools.
 
-The IDA Pro plugin does offer the option to create a \textbf{.dot} graph file
+The IDA Pro plugin does offer the option to create a \emph{.dot} graph file
 that can be used to create a visual representation of the hierarchy tree.
 \lou{This is a potential upgrade to dis-cover, a script has already been
 written}
@@ -1262,7 +1262,7 @@ cannot do.}
 
 \subsection{CFIXX}
 
-\textbf{CFIXX}~\cite{cfixx} introduces \textbf{Object Type Integrity}, which
+\emph{CFIXX}~\cite{cfixx} introduces \emph{Object Type Integrity}, which
 is a dynamic (runtime) mechanism that keeps track of object types and prevents
 adversaries from overwriting type information to hijack the control flow.
 
@@ -1278,7 +1278,7 @@ closed-source binaries.
 
 \subsection{HexType}
 
-\textbf{HexType}~\cite{hextype} aims to remove \textbf{type confusion errors}
+\emph{HexType}~\cite{hextype} aims to remove \emph{type confusion errors}
 from programs, by adding explicit runtime checks during compilation.
 This is done even for objects that are not polymorphic, so as to remove all
 of the attack surface.
@@ -1292,9 +1292,9 @@ overhead.
 
 \section{Exploiting the hard-working DWARF}
 
-\textbf{Exploiting the Hard-Working DWARF}~\cite{hardworkingdwarf}
+\emph{Exploiting the Hard-Working DWARF}~\cite{hardworkingdwarf}
 demonstrates that it is possible to incorporate exploits in the
-\textbf{.eh\_frame} and \textbf{.gcc\_except\_table} sections of an ELF file.
+\texttt{.eh\_frame} and \texttt{.gcc\_except\_table} sections of an ELF file.
 
 They show that the exception handling mechanism of ELF files is a
 Turing-complete language, and that they can incorporate arbitrary programs
@@ -1320,7 +1320,7 @@ need for more research to be done around this topic.
 % your project. Mention the core results and why as well as how your system
 % advances the status quo.
 
-In conclusion we develop \textbf{dis-cover}, a static analysis tool for C++
+In conclusion we develop \emph{dis-cover}, a static analysis tool for C++
 binaries that can find polymorphic class hierarchies without using heuristics,
 if the compiler was told to keep the Run-Time Type Information.
 The tool injects its findings in the analyzed binary as DWARF debug
