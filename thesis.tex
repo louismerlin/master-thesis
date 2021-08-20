@@ -1156,8 +1156,48 @@ As we have shown before, out of the 5827 Debian packages that list C++ as a
 dependency, we extracted classes from 3194 (54\%).
 The total number of classes we found is 960'188, with 39\% of them unique 
 across all packages (unique name in unique tree).
+The mean number of classes in packages where there are classes is 300.
 
-\lou{TODO write more stats here, maybe a graph}
+In \autoref{classdistribution}, we can see the graph of the number of classes
+in individual packages. We excluded the 20 projects with the most classes, as
+they made the graph much less readable (some packages had more then 10,000
+classes).
+
+\begin{figure}[h]
+
+\includegraphics[width=16cm]{package_distribution.png}
+\caption{Class quantity distribution in Debian packages with C++ as a
+dependency (y log scale)}
+\label{classdistribution}
+
+\end{figure}
+
+Using data from the Debian Popularity Contest~\cite{popcon} (popcon), we
+analyzed the most popular packages to see if the numbers evolved.
+In \autoref{toppackages} you can examine our results.
+We can observe there are more classes (more frequently and in greater numbers)
+in the most popular Debian packages then in the overall population of Debian
+packages.
+
+\begin{table}[h]
+  \centering
+  {\small
+  \begin{tabular}{r | l | r | r}
+    Number of packages & Sorting criteria & Percentage of packages & Mean number of classes \\
+    & & with classes recovered & per package with classes \\
+    \hline
+    100 & usage & 71\% & 330 \\
+    100 & installations & 61\% & 356 \\
+    1000 & usage & 64\% & 171 \\
+    1000 & installations & 61\% & 169 \\
+    5827 & - & 54\% & 300
+  \end{tabular}
+  }
+
+\caption{Class statistics on the most popular packages of Debian}
+\label{toppackages}
+
+\end{table}
 
 
 \section{Testing RetroWrite}
