@@ -684,7 +684,7 @@ Out of those, we extracted classes from 3194 (54\%).
 This does not mean that the other 46\% of packages do not use classes,
 because in many cases these classes are optimized away by the compiler
 (in the more straightforward cases).
-We will share more details about this experiment in \autoref{evalchapter}.
+We will share more details about this experiment in \autoref{debiansection}.
 
 When looking at a binary's vtables and RTTIs, we only need to look for a
 specific subset of them : the primary base virtual tables and their RTTIs.
@@ -1073,6 +1073,22 @@ ELF files we have created into one.
 The newly created combined ELF file will contain all of the code and data from 
 the original file, as well as the debug and symbol sections we have created.
 
+\section{Visualizing and analyzing the output}
+
+The \emph{dis-cover} tool also comes with two options for the visualization
+and further analysis of the class hierarchy we have found.
+
+The first of these options is writing the data to a \texttt{.dot} file, that
+can be later used with the well-known Graphviz~\cite{graphviz} tool to create
+a useful visual representation of the classes and their relationships to each
+other. An example of such a graph can be found in \autoref{libloglo}. This is
+only a partial view of a much larger graph.
+
+The second option is serializing the data to a \texttt{.pickle}
+file~\cite{pickle}, that can later be opened by another python script for
+further analysis.
+This is how we conducted the research detailed in \autoref{debiansection}.
+
 % what it does and does not do
 
 \section{C++ capabilities in RetroWrite}
@@ -1194,14 +1210,21 @@ GHz dedicated vCPU}
 
 \end{table}
 
+\section{Analysis of Debian packages}
+\label{debiansection}
+
 % Debian test
 As we have shown before, out of the 5827 Debian packages that list C++ as a 
 dependency, we extracted classes from 3194 (54\%).
 The total number of classes we found is 960'188, with 39\% of them unique 
 across all packages (unique name in unique tree).
 
+\lou{TODO write more stats here, maybe a graph}
+
 % RetroWrite test
 \section{Testing RetroWrite}
+
+\lou{TODO if we end up with a working version of C++ capabilities in RetroWrite}
 
 
 %%%%%%%%%%%%%%%%%%%%%%
