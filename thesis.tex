@@ -111,10 +111,6 @@ closed-source projects like {TODO}.
 
 % This section is usually 3-5 pages.
 
-
-% Setting: compiled binaries; RetroWrite; [need for a compatible exchange 
-% format => DWARF;] closed-source C++ binaries in the wild (android?).
-
 Work on C++ began in 1979, as a "C with classes"~\cite{cwithclasses}.
 Since then, the language has grown in popularity, and even surpassed C 
 itself~\cite{stackoverflowpopularity}.
@@ -125,35 +121,17 @@ Nevertheless, most reverse-engineering efforts have been focused towards C
 binaries, because analysis methods found this way are simpler and will often
 work on C++ binaries too.
 
-
-% Main challenge:
-% C++-specific ELF sections are not as well documented as they could be (?);
-% Debuggers do not work as well as they should on non-C binaries;
-
 This has meant reverse engineering tools like Ghidra~\cite{ghidra}, IDA 
 Pro~\cite{ida} or Binary Ninja~\cite{binja} have treated non-C binaries as 
 second-class citizen.
 These tools will often show C++ specific features as passing comments, failing 
 to show the real implications of a try/catch block or a polymorphic class.
 
-% Ghidra/IDA will show as pseudo-C code, but not C++
-%  see throw/catch or RTTI
-% C++ is quite a compilicated language.
-% C's abstractions work very well in assembler, but C++ adds a whole layer of 
-% complexity.
-% When translated to assembly, a lot of information is lost.
-
 The blame can mostly be put on the complexity of C++ when compared to C.
 Whereas C translates quite naturally to assembly, abstractions specific to C++ 
 require more work and complexity to be translated to asm.
 This also leads to important information being lost from C++ source code to 
 binary, but also certain information remaining.
-
-
-% Related work:
-% RetroWrite only does C;
-% debugging tools don't have nice support for C++ features;
-% DWARF will be explored more and more in the coming years;
 
 The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a 
 static rewriting tool for x86\_64 position-independent binaries.
@@ -163,43 +141,13 @@ Instrumentation is the process of adding instructions to a binary, to add
 additional security checks for example.
 The target can be a legacy project, a closed-source product or even malware.
 
-% Does anything else try to do retrowriting C++ ?
-% Does anything else try to extract classes ? (Marx / plugins)
-
-
-% Our approach:
-% Tool for static analysis of C++ binaries, to recover classes and display them 
-% in a helpful way;
-% Fixing RetroWrite to support C++ binaries;
-
 In this thesis we would like to present the 
 \emph{dis-cover}~\cite{discovergithub} static analysis tool,
 as well as improvements made to RetroWrite to support C++ binaries.
 
-
-% Why it is needed:
-% Non-obtrusive way of adding C++ support in debugging tools;
-% Nobody (?) (as far as we know / to the best of our knowledge) has been able 
-% to rewrite C++ binaries before, this could lead to very interesting 
-% discoveries;
-
 The dis-cover tool extracts information from a C++ binary, and re-inject it as
 debug information using the DWARF format into the binary.
 This enables other debugging tools to see and display this information.
-
-
-% Highlight results:
-% 53\% of packages on Debian that use C++ have extracteable classes;
-% [whatever we are able to do with C++ and RetroWrite];
-
-
-% It's a first symbolic representation of C++ code that can be recompiled
-
-
-% Core contribution:
-% dis-cover as an open-source tool;
-% [whatever we are able to add to RetroWrite];
-% Also the documentation of the process.
 
 [IF WE SUCCEEDED]
 In this thesis we would like to show how we brought C++ support to RetroWrite, 
@@ -219,6 +167,7 @@ and what remains to be done for the implementation to work.
 % that must be resolved to understand your design and implementation.
 
 % This section is usually 3-5 pages.
+
 
 \section{Executable and Linkable Format (ELF)}
 
@@ -242,6 +191,7 @@ Famous sections include
 and \texttt{.eh\_frame} (where exception unwinding information is stored for 
 C++ binaries).
 
+
 \section{Position-Independent Code (PIC) and Executable (PIE)}
 \label{picpie}
 
@@ -257,13 +207,12 @@ security measures like address space layout
 randomization~\cite{aslr}.
 We will talk more about PIE in \autoref{retrowritesection}.
 
+
 \section{C++ features}
 
 \subsection{Polymorphism}
 \label{polymorphism}
 
-% C++ polymorphism (what, how, but also research like Marx) (+ exceptions) 
-% also talk about how compilers will optimize this out in certain situtations
 The C++ programming language implements polymorphism.
 This feature enables complex code logic that can comply with external business 
 logic.
@@ -429,7 +378,6 @@ These are used at runtime to check the relationship between classes.
 See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer 
 to the Animal RTTI.
 
-
 \subsection{Exceptions}
 \label{exceptions}
 
@@ -578,10 +526,10 @@ In the initialization array, you will also find pointers to a global
 constructor for every compilation unit (usually, a compilation unit is a C++
 source file).
 
+
 \section{DWARF debugging standard}
 \label{dwarf}
 
-% DWARF DIEs
 \emph{DWARF} is the debugging standard used widely in conjunction with 
 executable ELF files.
 It is often included in these ELF files in the \texttt{.debug\_info} section 
@@ -603,9 +551,8 @@ The root of the tree is called the \emph{Compile Unit} (CU).
 It contains information about the source code file, the programming language
 used as well as the compiler.
 
-\section{RetroWrite} \label{retrowritesection}
 
-% How RetroWrite works
+\section{RetroWrite} \label{retrowritesection}
 
 The \emph{RetroWrite}\cite{dinesh20oakland} project is a project from the
 HexHive lab that aims to statically rewrite binaries and instrument them, to
@@ -645,6 +592,7 @@ becomes an unsolvable problem to differentiate between data and a pointer
 
 % This section is usually 5-10 pages.
 
+
 \section{Goals}
 
 The primary goal of this project was to extract some debug information from a
@@ -671,8 +619,6 @@ with around 90\% accuracy.
 
 \subsection{Finding Run-Time Type Information}
 
-% vtable => RTTI
-%   mention class data (Debian analysis)
 As we mentioned in the Background chapter, the RTTIs are available for a
 class hierarchy tree when there is at least one virtual method implemented
 by one of the classes.
@@ -710,12 +656,6 @@ inheritance}
 \subsection{DWARF}
 \label{dwarfdesign}
 
-% Why do we want DWARF data ?
-%   We want to make the info available to reversing tools
-%   => input from Dr. Sergey Bratus
-%        He would like to see DWARF used as a lingua franca for debugging
-% Also, exception's try/catch blocks & exception types
-% but dwarf is limited for this (=> future work)
 Once we have extracted class information from RTTI, next comes the question :
 what should we do with all of this class information ? What would be the most
 useful format to output the data in ?
@@ -790,7 +730,6 @@ attributes, in the order they were defined in the abbreviation.
 In this project, we use very minimalist DIE abbreviations, containing only
 what we could infer from the analysis.
 
-% Injecting debug section & symbols
 With dis-cover, we inject information in the debug and symbol sections of the
 binary, creating a new ELF file with all of this useful info included.
 We will go more into the implementation details in \autoref{dwarfdesign} and
@@ -798,7 +737,6 @@ We will go more into the implementation details in \autoref{dwarfdesign} and
 
 \subsection{Exceptions}
 
-% Also: exceptions (we felt this needed to be handled)
 Exceptions are often implemented as classes, and dis-cover will naturally 
 recover information about programmer-defined exceptions.
 Future extensions of this work might consider recovering more information about 
@@ -837,6 +775,7 @@ We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most
 widely used platform (though the same logic will most probably apply with a 
 little tweaking to ARM and other architectures).
 
+
 \section{RetroWrite}
 \label{retrowritedesign}
 
@@ -862,6 +801,7 @@ We had to rewrite the LSDA in our new assembly representation, with the
 appropriate labels and values, in order to make the exceptions work as they
 should.
 
+
 \section{Design for future integrations}
 
 As described in \autoref{dwarfdesign}, we use the DWARF format as an output
@@ -884,6 +824,7 @@ reliable.
 The fact that we used the DWARF format as an output is what we consider the
 most interesting part of the dis-cover tool.
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementation}
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -894,14 +835,13 @@ most interesting part of the dis-cover tool.
 
 % This section is usually 3-5 pages.
 
-% Python script (because RetroWrite; and good tools) (1 sentence)
 We decided to write a python module for this project, as the python ecosystem 
 has great reverse engineering packages, and for easy integration in RetroWrite, 
 which is also written in python.
 
+
 \section{Finding RTTIs}
 
-% RTTI and vtable
 The first thing dis-cover does is find ELF sections where the vtables and RTTIs 
 could be hiding.
 This is usually \texttt{.rodata} (read-only data) and \texttt{.data.rel.ro}, 
@@ -936,13 +876,12 @@ inheritance information to the extracted class.
 
 This algorithm is $O(n)$, as adding a class only adds one more value to parse.
 
+
 \section{Creating DWARF data}
 \label{dwarfimplementation}
 
-% Creating DIEs
 Next, we want to add that information to the debug sections of a new ELF file.
 
-% DIE Bytecode
 In order to write DWARF data, the first step is defining the types we will be 
 using, and their fields.
 This is done by writing bytes in the \texttt{.debug\_abbrev} section.
@@ -983,9 +922,9 @@ and one inheriting from the other.
 The strings themselves are stored in another section, \texttt{.debug\_str}, and 
 are referred to with their offset in that section.
 
+
 \section{Creating symbols}
 
-% symbols
 Symbols are mainly used for shared object loading. To use the \emph{printf}
 method from \emph{stdio.h} for example, the binary must be aware of a
 method named \emph{printf}. The same is true for
@@ -1002,6 +941,7 @@ original binary (if there was one) and append the aforementioned symbols.
 The two symbol sections are \texttt{.symtab}, which contains the information 
 (offset, size, type, ...) for each symbol, and \texttt{.strtab}, which contains 
 the strings related to these symbols.
+
 
 \section{Wrapping things together}
 \label{wrappingimplementation}
@@ -1073,6 +1013,7 @@ ELF files we have created into one.
 The newly created combined ELF file will contain all of the code and data from 
 the original file, as well as the debug and symbol sections we have created.
 
+
 \section{Visualizing and analyzing the output}
 
 The \emph{dis-cover} tool also comes with two options for the visualization
@@ -1089,13 +1030,9 @@ file~\cite{pickle}, that can later be opened by another python script for
 further analysis.
 This is how we conducted the research detailed in \autoref{debiansection}.
 
-% what it does and does not do
 
 \section{C++ capabilities in RetroWrite}
 \label{retrowriteimplementation}
-% RetroWrite implementation details
-% Refer to the other thesis
-% unwind tables etc
 
 The first modification we did to RetroWrite to add support for C++ binaries
 was to address the \emph{init\_array} errors described in
@@ -1124,9 +1061,9 @@ are used by C++ compilers to describe the logic of exception handling.
 
 % This section is usually 5-10 pages.
 
+
 \section{Small case studies}
 
-% Small examples
 In addition to the first version of dis-cover, we created three small programs 
 highlighting different features of C++.
 One was using simple inheritance,
@@ -1148,9 +1085,9 @@ These examples alone were not capable of letting us evaluate the full
 capabilities of dis-cover.
 We found a few big applications that could serve that purpose.
 
+
 \section{Real-world case studies}
 
-% Big applications examples
 The first and smallest of these case studies was the \emph{gold 
 linker}~\cite{gold}.
 We found 571 classes in version 1.16 of the program.
@@ -1210,10 +1147,10 @@ GHz dedicated vCPU}
 
 \end{table}
 
+
 \section{Analysis of Debian packages}
 \label{debiansection}
 
-% Debian test
 As we have shown before, out of the 5827 Debian packages that list C++ as a 
 dependency, we extracted classes from 3194 (54\%).
 The total number of classes we found is 960'188, with 39\% of them unique 
@@ -1221,7 +1158,7 @@ across all packages (unique name in unique tree).
 
 \lou{TODO write more stats here, maybe a graph}
 
-% RetroWrite test
+
 \section{Testing RetroWrite}
 
 \lou{TODO if we end up with a working version of C++ capabilities in RetroWrite}
@@ -1239,6 +1176,7 @@ across all packages (unique name in unique tree).
 % trade-offs. Stay positive!
 
 % This section is usually 3-5 pages.
+
 
 \section{MARX}
 \label{relatedworksmarx}
@@ -1261,6 +1199,7 @@ This project could be a great candidate for future integration into
 RetroWrite, if we extend the tool to add defenses around type integrity for
 example.
 
+
 \section{Plugins}
 
 There exists multiple plugins for reverse engineering frameworks that serve
@@ -1281,6 +1220,7 @@ Or have they less or more advanced features?}
 \lou{The key here is "integrate very well into the RE frameworks". They use
 these tools' built-in UI to represent the data however they want, which we
 cannot do.}
+
 
 \section{Type Integrity}
 
@@ -1313,6 +1253,7 @@ control of systems.
 
 Adding runtime checks during compilation allows for great coverage and low
 overhead.
+
 
 \section{Exploiting the hard-working DWARF}
 
