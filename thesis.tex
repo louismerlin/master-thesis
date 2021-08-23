@@ -514,9 +514,9 @@ We will have more to say about RTTIs in the following chapters.
 
 During the execution of an ELF file, some methods will be run before the main
 program starts. Pointers to these methods are stored in the
-\emph{init\_array}.
+\texttt{init\_array}.
 A simple C++ binary that uses exceptions will have an initialization array
-containing a pointer to the \emph{frame\_dummy}. This method is in charge of
+containing a pointer to the \texttt{frame\_dummy}. This method is in charge of
 setting up the stack frames to unwind the frame during exception handling
 later on.
 In the initialization array, you will also find pointers to a global
@@ -780,7 +780,8 @@ The first bug we encountered while trying to use RetroWrite on C++ binaries
 was due to the fact that the \emph{initialization array} (see
 \autoref{framedummy}) contained a pointer to the \emph{frame dummy} and this
 was not handled well during RetroWrite's symbolization process.
-By adding special treatment for that scenario, we resolved this failure.
+By adding special treatment for that scenario, we resolved this failure (see
+more details in \autoref{retrowriteimplementation}).
 
 Once that was fixed, we saw that using RetroWrite on binaries that had C++
 exception handling would cause crashes in the new binary, caused by the fact
@@ -1032,21 +1033,51 @@ This is how we conducted the research detailed in \autoref{debiansection}.
 \section{C++ capabilities in RetroWrite}
 \label{retrowriteimplementation}
 
+\subsection{Fixing the .init\_array}
+
 The first modification we did to RetroWrite to add support for C++ binaries
-was to address the \emph{init\_array} errors described in
+was to address the \texttt{init\_array} errors described in
 \autoref{retrowritedesign}.
-This meant treating the \emph{frame\_dummy} method differently, as it was
-ignored by the symbolizer.
+This meant treating the \texttt{frame\_dummy} method differently, as it was
+ignored by the symbolizer, but included in the \texttt{init\_array}.
+
+As described in \autoref{framedummy}, the \texttt{frame\_dummy} method is used
+to set up the stack frames for exception handling by the program.
+The compiler will automatically generate one during the compilation process.
+
+The fix to this bug was simply to remove the \texttt{frame\_dummy} pointer
+from the \texttt{init\_array} when it was present in the intermediate
+representation of the assembly code.
+We then let the compiler add a pointer to the \texttt{frame\_dummy} it just
+created to the \texttt{init\_array} at compile time.
+
+\subsection{Creating a Language Specific Data Area}
 
 The next modification was a larger one : the whole \emph{Language Specific
-Data Area} (LSDA) had to be symbolized and rewritten.
+Data Areas} (LSDAs) had to be symbolized and rewritten.
 See \autoref{retrowritedesign} and \autoref{exceptions} for more details.
-This table, contained in the \texttt{.gcc\_except\_table} section, has offsets
-to cleanup functions, as well as lengths of instructions (which we transform
-into label differences).
+These tables, contained in the \texttt{.gcc\_except\_table} section, have
+offset to cleanup functions, as well as lengths of instructions (which we
+transform into label differences).
+There is one LSDA for each code block in a program.
 
-The LSDA structure is quite complex, but in practice only a subset of actions
-are used by C++ compilers to describe the logic of exception handling.
+There are multiple tables in the LSDA : First the \emph{call-site table}.
+It contains information about what action to take if an exception is thrown in
+a certain location.
+
+The second table is the \emph{action table}. It contains offsets to next
+actions (similarly to a linked list), and an index to the types table.
+
+The third and final table is the \emph{types table}, which contains pointers
+to type information structures. For example, it might contain a pointer to
+type information for \texttt{std::invalid\_argument} and another pointer to
+type information for \texttt{MyCustomException}.
+
+We had to symbolize every table, which meant extracting the information we
+needed from the original binary's LSDAs, and rewriting our own for each code
+block, using the appropriate labels for each value (for example, an offset to
+another table is computed with a difference between two labels, to maintain the
+position-independence of the code).
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
@@ -1180,7 +1211,8 @@ packages.
   \centering
   {\small
   \begin{tabular}{r | l | r | r}
-    Number of packages & Sorting criteria & Percentage of packages & Mean number of classes \\
+    Number of packages & Sorting criteria & Percentage of packages & Mean 
+    number of classes \\
     & & with classes recovered & per package with classes \\
     \hline
     100 & usage & 71\% & 330 \\
