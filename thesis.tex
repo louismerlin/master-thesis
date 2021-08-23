@@ -67,14 +67,14 @@ engineering process.
 Fortunately, some of that information can be recovered from stripped binaries
 due to the way polymorphism is implemented in C++ compilers.
 
-With \emph{dis-cover}, the tool we developed, we \emph{extract class
-information} and the hierarchy tree from a stripped C++ binary, and write DWARF
-debug information and symbols for the later use of that knowledge by any
-existing debugging tool.
+With \emph{dis-cover}, the tool we developed, we extract \emph{class
+information} and the \emph{hierarchy tree} from a stripped C++ binary, and
+write DWARF debug information and symbols for the later use of that knowledge
+by any existing debugging tool.
 Through this method, we aim to demonstrate an open and collaborative way of
 writing static analysis tools.
 
-Through careful research of the way C++ exceptions are implemented, we augment
+By researching in details the way C++ exceptions are implemented, we augment
 the capabilities of the \emph{RetroWrite} static rewriting tool to support C++
 binaries.
 We also show how the class information extracted by dis-cover could be used to
