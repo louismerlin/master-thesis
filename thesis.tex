@@ -229,7 +229,7 @@ This Animal is sure to overwrite the \emph{speak} method and have whatever
 other properties and methods Animal has defined.
 This logic is verified by the compiler.
 
-\begin{figure}[h]
+\begin{figure}
 \begin{lstlisting}
 #include <iostream>
 #include <string.h>
@@ -267,10 +267,8 @@ int main (int argc, char *argv[]) {
     // Animal*.
     if (strcmp("cat", argv[1]) == 0) {
       my_animal = new Cat();
-
     } else if (strcmp("dog", argv[1]) == 0) {
       my_animal = new Dog();
-
     } else {
       return 1;
     }
@@ -280,7 +278,6 @@ int main (int argc, char *argv[]) {
     // We can dynamic_cast an Animal* into a Feline*, even though one does not
     // inherit from the other (but Cat inherits from both).
     Feline *my_feline = dynamic_cast<Feline*>(my_animal);
-
     if (my_feline) {
       my_feline->retract_claws();
       cout << "This feline could retract its claws" << endl;
@@ -341,7 +338,7 @@ well as dynamic cast between Animal and Feline we defined in \autoref{classes}.
 If you do not do one of these things, the class logic is likely to be abstracted
 away by the compiler for optimization reasons.
 
-\begin{figure}[h]
+\begin{figure}
 
 \includegraphics[width=16cm]{RTTI_graph.png}
 \caption{Overview of an example of vtables and RTTI in memory}
@@ -399,7 +396,7 @@ reached after an exception is caught.
 See \autoref{unwinding} for an example of code that will only guarantee safety
 if there is this mechanism in place.
 
-\begin{figure}[h]
+\begin{figure}
 \begin{lstlisting}
 #include <iostream>
 
@@ -435,7 +432,7 @@ unwinding}
 
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}
 \begin{lstlisting}
 	.section	.gcc_except_table,"a",@progbits
 	.p2align	2
@@ -469,7 +466,7 @@ GCC_except_table2:
                                         # >> Catch TypeInfos <<
 	.long	_ZTISt9exception        # TypeInfo 1 (what we are catching)
 \end{lstlisting}
-\caption{assembly representation of an except\_table for a simple program}
+\caption{Assembly representation of an except\_table for a simple program}
 \label{excepttable}
 \end{figure}
 
@@ -644,7 +641,7 @@ offset to the primary base virtual table. See
 \autoref{multipleinheritancegraph} for a visual example of RTTIs and vtables
 in a multiple inheritance scenario.
 
-\begin{figure}[h]
+\begin{figure}
 
 \includegraphics[width=16cm]{Feline.png}
 \caption{Overview of an example of vtables and RTTI in memory with multiple 
@@ -690,7 +687,7 @@ pointers and methods in a simple program. Lines beginning with \emph{DW\_TAG}
 describe the type of the debug information entry, and the following lines
 beginning with \emph{DW\_AT} describe the attributes of this entry.
 
-\begin{figure}[h]
+\begin{figure}
 \begin{lstlisting}
 < 1><0x00001d94>    DW_TAG_class_type
                       DW_AT_containing_type       <0x00001d94>
@@ -856,7 +853,7 @@ another part of the read-only data sections, and we have a potential RTTI
 pointer. See \autoref{hexdump} for a hexdump of vtables and RTTIs in an ELF
 file.
 
-\begin{figure}[h]
+\begin{figure}
 
 \includegraphics[width=16cm]{hexdump.png}
 \caption{Hexdump of the location of vtables and RTTIs in an ELF file}
@@ -900,7 +897,7 @@ These \emph{class\_type}s will themselves have as children
 \autoref{dwarfdump} shows a very simple example of this, with two class types 
 and one inheriting from the other.
 
-\begin{figure}[h]
+\begin{figure}
 \begin{lstlisting}
 < 1><0x0000001a>    DW_TAG_class_type
                       DW_AT_containing_type       <0x0000001a>
@@ -961,7 +958,7 @@ to "combine stripped files with separate symbols and debug information".
 \autoref{recovergraph} shows a diagram of the process we will explain in this
 section.
 
-\begin{figure}[h]
+\begin{figure}
 
 \includegraphics[width=16cm]{recover.png}
 \caption{Combining the ELF files}
@@ -1108,7 +1105,7 @@ some projects (but not more classes).
 Having access to the open-source LibreOffice code to check that we had found 
 the right inheritance links was extremely helpful.
 
-\begin{figure}[h]
+\begin{figure}
 
 \includegraphics[width=16cm]{libloglo_partial.png}
 \caption{Partial class tree of libloglo.so from LibreOffice}
@@ -1163,7 +1160,7 @@ in individual packages. We excluded the 20 projects with the most classes, as
 they made the graph much less readable (some packages had more then 10,000
 classes).
 
-\begin{figure}[h]
+\begin{figure}
 
 \includegraphics[width=16cm]{package_distribution.png}
 \caption{Class quantity distribution in Debian packages with C++ as a
