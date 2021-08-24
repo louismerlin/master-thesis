@@ -74,17 +74,16 @@ by any existing debugging tool.
 Through this method, we aim to demonstrate an open and collaborative way of
 writing static analysis tools.
 
-By researching in details the way C++ exceptions are implemented, we augment
-the capabilities of the \emph{RetroWrite} static rewriting tool to support C++
-binaries.
+By researching in detail the way C++ exceptions are implemented, we also
+augment the capabilities of the \emph{RetroWrite} static rewriting tool to
+support C++ binaries.
 We also show how the class information extracted by dis-cover could be used to
 improve the instrumentation done by RetroWrite.
 
-By utilizing these two tools, we successfully extract useful information from
-closed-source applications like Zoom, and instrument large and well-known
-closed-source projects like {TODO}.
+By utilizing \emph{dis-cover}, we successfully extract useful information from
+closed-source applications like Zoom.
 
-\lou{We will give a cool example here if we end up with one.}
+\lou{TODO add RetroWrite C++ example}
 
 \end{abstract}
 
@@ -116,7 +115,7 @@ Since then, the language has grown in popularity, and even surpassed C
 itself~\cite{stackoverflowpopularity}.
 Examples of well-known C++ projects include modern browsers like 
 Chrome~\cite{chrome} and Firefox~\cite{firefox}, the Qt Framework~\cite{qt}, or 
-the zoom~\cite{zoom} conferencing software.
+the Zoom~\cite{zoom} conferencing software.
 Nevertheless, most reverse-engineering efforts have been focused towards C
 binaries, because analysis methods found this way are simpler and will often
 work on C++ binaries too.
@@ -126,12 +125,25 @@ Pro~\cite{ida} or Binary Ninja~\cite{binja} have treated non-C binaries as
 second-class citizen.
 These tools will often show C++ specific features as passing comments, failing 
 to show the real implications of a try/catch block or a polymorphic class.
+The complexity of C++ has also lead binary rewriters like
+RetroWrite~\cite{dinesh20oakland} to focus on C binaries only, leaving a whole
+ecosystem of binaries unstudied.
 
 The blame can mostly be put on the complexity of C++ when compared to C.
 Whereas C translates quite naturally to assembly, abstractions specific to C++ 
 require more work and complexity to be translated to asm.
 This also leads to important information being lost from C++ source code to 
 binary, but also certain information remaining.
+
+In this thesis we would like to present the 
+\emph{dis-cover}~\cite{discovergithub} static analysis tool.
+This tool extracts class hierarchy information from a C++ binary, and
+re-injects it into the binary as debug information using the DWARF format.
+This enables other debugging tools to see and display this information.
+
+This class hierarchy information is included in the binary for functionality
+reasons, and is even kept after basic stripping of the program.
+Several large projects, like the Zoom conferencing software
 
 The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a 
 static rewriting tool for x86\_64 position-independent binaries.
@@ -140,23 +152,9 @@ source code.
 Instrumentation is the process of adding instructions to a binary, to add
 additional security checks for example.
 The target can be a legacy project, a closed-source product or even malware.
-
-In this thesis we would like to present the 
-\emph{dis-cover}~\cite{discovergithub} static analysis tool,
-as well as improvements made to RetroWrite to support C++ binaries.
-
-The dis-cover tool extracts information from a C++ binary, and re-inject it as
-debug information using the DWARF format into the binary.
-This enables other debugging tools to see and display this information.
-
-[IF WE SUCCEEDED]
-In this thesis we would like to show how we brought C++ support to RetroWrite, 
-and what research opportunities this will create.
-
-[IF WE FAILED]
-In this thesis we will detail how we tried to bring C++ support to RetroWrite, 
-and what remains to be done for the implementation to work.
-
+In this thesis we will also detail our improvements to RetroWrite to support
+C++ binaries, and the possibilities opened by this feature for future
+researchers.
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
