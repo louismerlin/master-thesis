@@ -1269,6 +1269,9 @@ packages.
 
 We were able to test the new C++ capabilities of RetroWrite on examples we had
 coded ourselves.
+These included complex examples with user-defined errors types, catching of
+multiple error types, and memory allocation in the code blocks that threw the
+exception.
 % TODO modify this if it changes
 The tool did not yet manage to rewrite larger projects.
 This will be fixed before we make the code public.
@@ -1281,8 +1284,6 @@ Zoom~\cite{zoom}, one could use a function identification tool such as the
 ones found in IDA Pro~\cite{ida} or radare2~\cite{radare}.
 These tools use heuristics to find the function boundaries, so they might not
 work for every project.
-
-\lou{TODO say we tried more complex code, not just simple examples}
 
 
 %%%%%%%%%%%%%%%%%%%%%%
