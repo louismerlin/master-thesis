@@ -57,6 +57,9 @@ instrumentation}
 % insufficient, what the high-level intuition of your work is, maybe a neat
 % design or implementation decision, and key results of your evaluation.
 
+\lou{TODO (not in the abstract) say that we could also find the custom 
+exception's RTTIs from the LSDA type pointers}
+
 The analysis of closed-source C++ programs is an arduous task.
 C++ adds several powerful functionalities to the C language, which leads to
 complex binaries.
@@ -79,7 +82,9 @@ support unstripped position-independent C++ binaries.
 We also show how the class information extracted by dis-cover could be used to
 improve the instrumentation done by RetroWrite.
 
-\dam{I am confused here: Your current addtions allow RetroWrite to work on \textbf{unstripped} C++ binaries? ...}
+\dam{I am confused here: Your current additions allow RetroWrite to work on 
+\textbf{unstripped} C++ binaries? ...}
+\lou{TODO take the "unstripped" out of the abstract for RetroWrite}
 
 By utilizing \emph{dis-cover}, we successfully extract useful information from
 closed-source applications like Zoom.
@@ -87,7 +92,10 @@ closed-source applications like Zoom.
 We also detail the improvements now needed for \emph{RetroWrite} to support
 rewriting \emph{stripped} position-independent C++ binaries.
 
-\dam{... and you detailed what will be needed to support \textbf{stripped} ones? Is my understanding correct? Maybe make this a bit more explicit.}
+\dam{... and you detailed what will be needed to support \textbf{stripped} 
+ones? Is my understanding correct? Maybe make this a bit more explicit.}
+\lou{TODO this sentence => we describe how this could be combined with 
+[whatever] to tackle closed-source binaries in the future}
 
 \end{abstract}
 
@@ -135,10 +143,12 @@ ecosystem of binaries unstudied.
 
 The blame can mostly be put on the complexity of C++ when compared to C.
 Whereas C translates quite naturally to assembly, abstractions specific to C++ 
-require more work and complexity to be translated to asm. \dam{What do you mean by "asm"? "assembly"?}
+require more work and complexity to be translated to assembly.
 This also leads to important information being lost from C++ source code to 
 binary, but also certain information remaining.
-\dam{Maybe you could add examples of what remains and what not. To give an intuition/outlook about what you are talking.}
+\dam{Maybe you could add examples of what remains and what not. To give an 
+intuition/outlook about what you are talking.}
+\lou{TODO talk about classes, which is a differentiation of C and C++}
 
 In this thesis we would like to present the 
 \emph{dis-cover}~\cite{discovergithub} static analysis tool.
@@ -148,7 +158,8 @@ This enables other debugging tools to see and display this information.
 
 This class hierarchy information is included in the binary for functionality
 reasons, and is even kept after basic stripping of the program.
-Several large projects, like the Zoom conferencing software \dam{Something seems to be missing here.}
+Several large projects, like the Zoom conferencing software \dam{Something 
+seems to be missing here.}
 
 The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a 
 static rewriting tool for unstripped x86\_64 position-independent binaries.
@@ -199,12 +210,16 @@ C++ binaries).
 \label{picpie}
 
 Position-independence for code is a property that guarantees that code will 
-execute correctly no matter the absolute address of the body of code.
+execute correctly no matter the base address of the body of code.
 This is made possible by computing \emph{relative positions} instead of
-using absolute addresses, as well as a feature called \emph{relocations}.
+using base addresses, as well as a feature called \emph{relocations}.
 
 PIC is most often found for shared libraries, so that they can be inserted into 
-an ELF file without worry. \dam{Maybe you want to be a bit more explicit here. PIC is used so that sharing of libraries by different processes works, right? Not really so that they can be inserted into ELF files.}
+an ELF file without worry. \dam{Maybe you want to be a bit more explicit here. 
+PIC is used so that sharing of libraries by different processes works, right? 
+Not really so that they can be inserted into ELF files.}
+\lou{TODO you can load the library into address space without breaking offsets 
+or thinking about them}
 PIE binaries are seen as more secure because they allow for easy inserting of 
 security measures like address space layout 
 randomization~\cite{aslr}.
@@ -477,6 +492,9 @@ This memory safety logic is defined in a table called the \emph{Language
 Specific Data Area}, in a section of the binary called the
 \texttt{.gcc\_except\_table}~\cite{airsexcepttable}.
 
+\lou{TODO say that this in theory is language-specific, but the C++ definition 
+is used in practice by many languages}
+
 In figure \autoref{excepttable} you can see a \texttt{.gcc\_except\_table} that 
 was generated from the code in \autoref{unwinding}. We will now go through line
 by line to explain the inner workings of this table.
@@ -597,6 +615,7 @@ which is why you would also need heuristics in that scenario.
 
 
 \section{Goals}
+\lou{TODO rename this to dis-cover ?}
 
 The primary goal of this project was to extract some debug information from a
 stripped C++ binary, make it available through DWARF in order to use that
@@ -735,7 +754,7 @@ what we could infer from the analysis.
 
 With dis-cover, we inject information in the debug and symbol sections of the
 binary, creating a new ELF file with all of this useful info included.
-We will go more into the implementation details in \autoref{dwarfdesign} and
+We will go more into the implementation details in 
 \autoref{wrappingimplementation}.
 
 \subsection{Exceptions}
@@ -775,6 +794,7 @@ that the exceptions thrown were never caught.
 Exception behavior is described in the \emph{Language Specific Data Area}
 (LSDA), which is found in the \texttt{.gcc\_except\_table} section of the ELF
 file.
+\lou{TODO say that it would point to nothing and crash}
 This LSDA describes, row by row, actions to take for specific instruction in
 the code we are hitting while dealing with a thrown exception. These actions
 could be : destructing an out-of-scope variable, or examining a catch clause
@@ -802,6 +822,8 @@ For example, dis-cover output could be used in RetroWrite in order to add
 instrumentation around \emph{Object Type Integrity}, as defined in the CFIXX
 paper~\cite{cfixx}, or reinforcing type checks as defined in the HexType
 paper~\cite{hextype} to avoid type confusion errors and vulnerabilities.
+
+\lou{TODO link to that}
 
 We also designed dis-cover in a heuristics-free way, which fits perfectly with
 RetroWrite's current goal to avoid heuristics.
@@ -845,6 +867,8 @@ We simply have to pattern-match for zeroes directly followed by a pointer to
 another part of the read-only data sections, and we have a potential RTTI 
 pointer. See \autoref{hexdump} for a hexdump of vtables and RTTIs in an ELF
 file.
+
+\lou{TODO label things as keys etc}
 
 \begin{figure}
 
@@ -1077,6 +1101,8 @@ block, using the appropriate labels for each value (for example, an offset to
 another table is computed with a difference between two labels, to maintain the
 position-independence of the code).
 
+\lou{TODO maybe explain the CFI stuff for a paragraph}
+
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
 %%%%%%%%%%%%%%%%%%%%
@@ -1242,6 +1268,8 @@ Zoom~\cite{zoom}, one could use a function identification tool such as the
 ones found in IDA Pro~\cite{ida} or radare2~\cite{radare}.
 These tools use heuristics to find the function boundaries, so they might not
 work for every project.
+
+\lou{TODO say we tried more complex code, not just simple examples}
 
 
 %%%%%%%%%%%%%%%%%%%%%%
