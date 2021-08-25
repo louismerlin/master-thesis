@@ -777,9 +777,16 @@ more details in \autoref{fixinginitarray}).
 Once that was fixed, we saw that using RetroWrite on binaries that had C++
 exception handling would cause crashes in the new binary, caused by the fact
 that the exceptions thrown were never caught.
-Exception behavior is described in the \emph{Language Specific Data Area}
-(LSDA), which is found in the \texttt{.gcc\_except\_table} section of the ELF
-file.
+
+To fix that, we had to fix the symbolization of two sections.
+First, we focused on the \texttt{eh\_frame} section that contains stack
+unwinding information.
+See \autoref{addingcfi} for the implementation details of this process.
+Second, we worked on the \texttt{.gcc\_except\_table} section that contains
+the \emph{Language Specific Data Area} (LSDA), which handles the correct
+handling of exception catching as well as the proper calling of variable
+destructors when leaving certain code blocks during a throw.
+
 This LSDA describes, row by row, actions to take for specific instruction in
 the code we are hitting while dealing with a thrown exception. These actions
 could be : destructing an out-of-scope variable, or examining a catch clause
@@ -852,8 +859,6 @@ We simply have to pattern-match for zeroes directly followed by a pointer to
 another part of the read-only data sections, and we have a potential RTTI 
 pointer. See \autoref{hexdump} for a hexdump of vtables and RTTIs in an ELF
 file.
-
-\lou{TODO label things as keys etc}
 
 \begin{figure}
 
@@ -1053,6 +1058,19 @@ representation of the assembly code.
 We then let the compiler add a pointer to the \texttt{frame\_dummy} it just
 created to the \texttt{init\_array} at compile time.
 
+\subsection{Adding CFI directives}
+\label{addingcfi}
+
+We then had to insert the relevant Call Frame Information (CFI) directives
+into the code blocks. These directives specify which code blocks should have
+an entry in the \texttt{.eh\_frame} section, and what these entries should
+contain, for stack unwinding during exception handling (see
+\autoref{exceptions}).
+
+We implemented this by recovering the original binary's \texttt{.eh\_frame}
+section, parsing each value, and adding the relevant directive at the right
+location for each one.
+
 \subsection{Creating a Language Specific Data Area}
 \label{creatinglsda}
 
@@ -1090,7 +1108,6 @@ the appropriate labels for each value (for example, an offset to another table
 is computed with a difference between two labels, to maintain the
 position-independence of the code).
 
-\lou{TODO maybe explain the CFI stuff for a paragraph}
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Evaluation}
