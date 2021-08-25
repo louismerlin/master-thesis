@@ -143,8 +143,11 @@ This enables other debugging tools to see and display this information.
 
 This class hierarchy information is included in the binary for functionality
 reasons, and is even kept after basic stripping of the program.
-Several large projects, like the Zoom conferencing software \dam{Something 
-seems to be missing here.}
+Several large closed-source projects, like the Zoom conferencing software,
+have several thousands of classes linked to each other in complex class
+hierarchy trees.
+Having that information easily accessible would help reverse engineering
+efforts.
 
 The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a 
 static rewriting tool for unstripped x86\_64 position-independent binaries.
@@ -199,12 +202,9 @@ execute correctly no matter the base address of the body of code.
 This is made possible by computing \emph{relative positions} instead of
 using base addresses, as well as a feature called \emph{relocations}.
 
-PIC is most often found for shared libraries, so that they can be inserted into 
-an ELF file without worry. \dam{Maybe you want to be a bit more explicit here. 
-PIC is used so that sharing of libraries by different processes works, right? 
-Not really so that they can be inserted into ELF files.}
-\lou{TODO you can load the library into address space without breaking offsets 
-or thinking about them}
+PIC is most often found for shared libraries, so that they can be loaded and
+shared by any number of processes without breaking offsets, or even thinking
+about them.
 PIE binaries are seen as more secure because they allow for easy inserting of 
 security measures like address space layout 
 randomization~\cite{aslr}.
@@ -478,9 +478,11 @@ GCC_except_table2:
 This memory safety logic is defined in a table called the \emph{Language
 Specific Data Area}, in a section of the binary called the
 \texttt{.gcc\_except\_table}~\cite{airsexcepttable}.
-
-\lou{TODO say that this in theory is language-specific, but the C++ definition 
-is used in practice by many languages}
+In theory this section should be language specific, but in practice the
+implementation is the same for every language when using the \emph{GNU
+Compiler Collection}~\cite{gcc} (GCC), that supports languages like
+Objective-C, Fortran or Go, and when using \emph{LLVM}~\cite{llvm}, that
+supports most well-known compiled languages.
 
 In \autoref{excepttable} you can see a \texttt{.gcc\_except\_table} that 
 was generated from the code in \autoref{unwinding}. We will now go through line
@@ -609,8 +611,7 @@ which is why you would also need heuristics in that scenario.
 % This section is usually 5-10 pages.
 
 
-\section{Goals}
-\lou{TODO rename this to dis-cover ?}
+\section{dis-cover}
 
 The primary goal of this project was to extract some debug information from a
 stripped C++ binary, make it available through DWARF in order to use that
@@ -789,7 +790,6 @@ that the exceptions thrown were never caught.
 Exception behavior is described in the \emph{Language Specific Data Area}
 (LSDA), which is found in the \texttt{.gcc\_except\_table} section of the ELF
 file.
-\lou{TODO say that it would point to nothing and crash}
 This LSDA describes, row by row, actions to take for specific instruction in
 the code we are hitting while dealing with a thrown exception. These actions
 could be : destructing an out-of-scope variable, or examining a catch clause
@@ -817,8 +817,8 @@ For example, dis-cover output could be used in RetroWrite in order to add
 instrumentation around \emph{Object Type Integrity}, as defined in the CFIXX
 paper~\cite{cfixx}, or reinforcing type checks as defined in the HexType
 paper~\cite{hextype} to avoid type confusion errors and vulnerabilities.
-
-\lou{TODO link to that}
+See more details about these projects in \autoref{cfixx} and
+\autoref{hextype}.
 
 We also designed dis-cover in a heuristics-free way, which fits perfectly with
 RetroWrite's current goal to avoid heuristics.
@@ -1256,6 +1256,7 @@ packages.
 
 We were able to test the new C++ capabilities of RetroWrite on examples we had
 coded ourselves.
+% TODO modify this if it changes
 The tool did not yet manage to rewrite larger projects.
 This will be fixed before we make the code public.
 
@@ -1332,6 +1333,7 @@ cannot do.}
 \section{Type Integrity}
 
 \subsection{CFIXX}
+\label{cfixx}
 
 \emph{CFIXX}~\cite{cfixx} introduces \emph{Object Type Integrity}, which
 is a dynamic (runtime) mechanism that keeps track of object types and prevents
@@ -1348,6 +1350,7 @@ rewriting capabilities of RetroWrite to implement object type integrity on
 closed-source binaries.
 
 \subsection{HexType}
+\label{hextype}
 
 \emph{HexType}~\cite{hextype} aims to remove \emph{type confusion errors}
 from programs, by adding explicit runtime checks during compilation.
