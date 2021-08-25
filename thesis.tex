@@ -143,8 +143,11 @@ This enables other debugging tools to see and display this information.
 
 This class hierarchy information is included in the binary for functionality
 reasons, and is even kept after basic stripping of the program.
-Several large projects, like the Zoom conferencing software \dam{Something 
-seems to be missing here.}
+Several large closed-source projects, like the Zoom conferencing software,
+have several thousands of classes linked to each other in complex class
+hierarchy trees.
+Having that information easily accessible would help reverse engineering
+efforts.
 
 The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a 
 static rewriting tool for unstripped x86\_64 position-independent binaries.
