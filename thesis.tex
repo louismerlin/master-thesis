@@ -354,7 +354,7 @@ All of this is defined in the Itanium C++ ABI~\cite{cppabi}.
 An instance of a virtual class Animal will contain the \emph{vtblptrAnimal}, 
 a pointer to the \emph{virtual table} (vtable) for the Animal class.
 This vtable will be shared by all instances of this class (even by instances
-of a class that inherits from Animal), and will contain pointers to the virtual
+of a class that inherit from Animal), and will contain pointers to the virtual
 methods of the class.
 The first value preceding the vtable is a pointer to the RTTI of the class. A
 program finds out the class inheritance of a class instance at runtime by
@@ -377,6 +377,8 @@ The next values of the RTTI are pointers to the RTTIs of the parent classes.
 These are used at runtime to check the relationship between classes.
 See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer 
 to the Animal RTTI.
+
+\dam{Great - I now like this section!}
 
 \subsection{Exceptions}
 \label{exceptions}
@@ -482,11 +484,11 @@ Compiler Collection}~\cite{gcc} (GCC), that supports languages like
 Objective-C, Fortran or Go, and when using \emph{LLVM}~\cite{llvm}, that
 supports most well-known compiled languages.
 
-In figure \autoref{excepttable} you can see a \texttt{.gcc\_except\_table} that 
+In \autoref{excepttable} you can see a \texttt{.gcc\_except\_table} that 
 was generated from the code in \autoref{unwinding}. We will now go through line
 by line to explain the inner workings of this table.
 This will help us explain why they are so important, and later why we had to
-rewrite them (see \autoref{retrowritedesign})
+rewrite them (see \autoref{retrowritedesign}).
 
 The first three lines define that "this is an except table starting".
 
@@ -517,6 +519,8 @@ Quite interestingly, the "TypeInfo" types are checked against the
 subsection.
 We will have more to say about RTTIs in the following chapters.
 
+\dam{Great again - Before your project I was never thinking about how exceptions are handled in binaries. I learned a lot... :)}
+
 \subsection{Global constructors and frame dummy}
 \label{framedummy}
 
@@ -534,6 +538,8 @@ source file).
 
 \section{DWARF debugging standard}
 \label{dwarf}
+
+\dam{I would maybe go for TitleCase styling ("DWARF Debugging Standard"). But that is up to what you prefer more. Just be consistent (e.g. "Related Work").}
 
 \emph{DWARF} is the debugging standard used widely in conjunction with 
 executable ELF files.
@@ -559,7 +565,7 @@ used as well as the compiler.
 
 \section{RetroWrite} \label{retrowritesection}
 
-The \emph{RetroWrite}\cite{dinesh20oakland} project is a project from the
+\emph{RetroWrite}\cite{dinesh20oakland} is a project from the
 HexHive lab that aims to statically rewrite binaries and instrument them, to
 improve fuzzing capabilities, or retrofit security measures.
 Static binary rewriting is the process of taking a binary file, and modifying
@@ -574,15 +580,19 @@ functions and data offsets for example.
 This way, we can add any instruction after and before existing instructions
 without breaking relative offsets.
 
+\dam{I would mention the term "reassembleable assembly" in the above section. Because that is what you describe and is the terminology used in the RetroWrite paper.}
+
 RetroWrite only works on \emph{x86\_64} unstripped position-independent
 executables (see \autoref{picpie}), compiled from C.
-This enables the RetroWrite to stay heuristics-free (meaning that it is
+This enables RetroWrite to stay heuristics-free (meaning that it is
 designed to work for every example without exceptions).
 
 If you try to rewrite a binary that is stripped, the code blocks that
 correspond to functions will not be identified as such.
 RetroWrite currently needs to know the function boundaries to rewrite a binary.
 Identifying the function boundaries would require heuristics.
+
+\dam{@Antony: Could be a future improvement for RetroWrite, though not being so straigh forward. Most use cases I currently have are actually stripped position-independent C binaries (and some compiled for ARMv7/32bit - could that theoretically be supported by RetroWrite?)}
 
 If you try to rewrite a binary that is not position-independent, the
 positions (pointers) in your binary are indistinguishable from data, and it
