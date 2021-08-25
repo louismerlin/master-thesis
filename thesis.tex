@@ -57,9 +57,6 @@ instrumentation}
 % insufficient, what the high-level intuition of your work is, maybe a neat
 % design or implementation decision, and key results of your evaluation.
 
-\lou{TODO (not in the abstract) say that we could also find the custom 
-exception's RTTIs from the LSDA type pointers}
-
 The analysis of closed-source C++ programs is an arduous task.
 C++ adds several powerful functionalities to the C language, which leads to
 complex binaries.
@@ -1083,10 +1080,14 @@ to type information structures. For example, it might contain a pointer to
 type information for \texttt{std::invalid\_argument} and another pointer to
 type information for \texttt{MyCustomException}.
 
-We had to symbolize every table, which meant extracting the information we
-needed from the original binary's LSDAs, and rewriting our own for each code
-block, using the appropriate labels for each value (for example, an offset to
-another table is computed with a difference between two labels, to maintain the
+As a side note : these pointers could also be found by an improved version of
+\emph{dis-cover} to find even more classes during the analysis.
+
+In order to successfully rewrite the binaries with exceptions, we had to
+symbolize every table, which meant extracting the information we needed from
+the original binary's LSDAs, and rewriting our own for each code block, using
+the appropriate labels for each value (for example, an offset to another table
+is computed with a difference between two labels, to maintain the
 position-independence of the code).
 
 \lou{TODO maybe explain the CFI stuff for a paragraph}
