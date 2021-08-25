@@ -807,8 +807,8 @@ For example, dis-cover output could be used in RetroWrite in order to add
 instrumentation around \emph{Object Type Integrity}, as defined in the CFIXX
 paper~\cite{cfixx}, or reinforcing type checks as defined in the HexType
 paper~\cite{hextype} to avoid type confusion errors and vulnerabilities.
-
-\lou{TODO link to that}
+See more details about these projects in \autoref{cfixx} and
+\autoref{hextype}.
 
 We also designed dis-cover in a heuristics-free way, which fits perfectly with
 RetroWrite's current goal to avoid heuristics.
@@ -1323,6 +1323,7 @@ cannot do.}
 \section{Type Integrity}
 
 \subsection{CFIXX}
+\label{cfixx}
 
 \emph{CFIXX}~\cite{cfixx} introduces \emph{Object Type Integrity}, which
 is a dynamic (runtime) mechanism that keeps track of object types and prevents
@@ -1339,6 +1340,7 @@ rewriting capabilities of RetroWrite to implement object type integrity on
 closed-source binaries.
 
 \subsection{HexType}
+\label{hextype}
 
 \emph{HexType}~\cite{hextype} aims to remove \emph{type confusion errors}
 from programs, by adding explicit runtime checks during compilation.
