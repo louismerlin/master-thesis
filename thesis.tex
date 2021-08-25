@@ -378,8 +378,6 @@ These are used at runtime to check the relationship between classes.
 See \autoref{rttigraph} for an example, with the Dog RTTI containing a pointer 
 to the Animal RTTI.
 
-\dam{Great - I now like this section!}
-
 \subsection{Exceptions}
 \label{exceptions}
 
@@ -519,8 +517,6 @@ Quite interestingly, the "TypeInfo" types are checked against the
 subsection.
 We will have more to say about RTTIs in the following chapters.
 
-\dam{Great again - Before your project I was never thinking about how exceptions are handled in binaries. I learned a lot... :)}
-
 \subsection{Global constructors and frame dummy}
 \label{framedummy}
 
@@ -536,10 +532,8 @@ constructor for every compilation unit (usually, a compilation unit is a C++
 source file).
 
 
-\section{DWARF debugging standard}
+\section{The DWARF Debugging Standard}
 \label{dwarf}
-
-\dam{I would maybe go for TitleCase styling ("DWARF Debugging Standard"). But that is up to what you prefer more. Just be consistent (e.g. "Related Work").}
 
 \emph{DWARF} is the debugging standard used widely in conjunction with 
 executable ELF files.
@@ -573,14 +567,13 @@ it such that there is a patch applied to it but the other functionalities
 remain the same.
 
 RetroWrite's core idea is to symbolize all of the addresses in the machine
-code. This means transforming an address offset (+8) into a symbol
-(.LD1234) and adding the appropriate label at that location.
+code, in order to generate reassembleable assembly.
+This means transforming an address offset (+8) into a symbol (.LD1234) and
+adding the appropriate label at that location.
 These labels will be used by the assembler to compute the addresses of
 functions and data offsets for example.
 This way, we can add any instruction after and before existing instructions
 without breaking relative offsets.
-
-\dam{I would mention the term "reassembleable assembly" in the above section. Because that is what you describe and is the terminology used in the RetroWrite paper.}
 
 RetroWrite only works on \emph{x86\_64} unstripped position-independent
 executables (see \autoref{picpie}), compiled from C.
@@ -592,7 +585,10 @@ correspond to functions will not be identified as such.
 RetroWrite currently needs to know the function boundaries to rewrite a binary.
 Identifying the function boundaries would require heuristics.
 
-\dam{@Antony: Could be a future improvement for RetroWrite, though not being so straigh forward. Most use cases I currently have are actually stripped position-independent C binaries (and some compiled for ARMv7/32bit - could that theoretically be supported by RetroWrite?)}
+\dam{@Antony: Could be a future improvement for RetroWrite, though not being so 
+straightforward. Most use cases I currently have are actually stripped 
+position-independent C binaries (and some compiled for ARMv7/32bit - could that 
+theoretically be supported by RetroWrite?)}
 
 If you try to rewrite a binary that is not position-independent, the
 positions (pointers) in your binary are indistinguishable from data, and it
