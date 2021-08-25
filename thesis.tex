@@ -601,8 +601,7 @@ which is why you would also need heuristics in that scenario.
 % This section is usually 5-10 pages.
 
 
-\section{Goals}
-\lou{TODO rename this to dis-cover ?}
+\section{dis-cover}
 
 The primary goal of this project was to extract some debug information from a
 stripped C++ binary, make it available through DWARF in order to use that
@@ -781,7 +780,6 @@ that the exceptions thrown were never caught.
 Exception behavior is described in the \emph{Language Specific Data Area}
 (LSDA), which is found in the \texttt{.gcc\_except\_table} section of the ELF
 file.
-\lou{TODO say that it would point to nothing and crash}
 This LSDA describes, row by row, actions to take for specific instruction in
 the code we are hitting while dealing with a thrown exception. These actions
 could be : destructing an out-of-scope variable, or examining a catch clause
@@ -1248,6 +1246,7 @@ packages.
 
 We were able to test the new C++ capabilities of RetroWrite on examples we had
 coded ourselves.
+% TODO modify this if it changes
 The tool did not yet manage to rewrite larger projects.
 This will be fixed before we make the code public.
 
