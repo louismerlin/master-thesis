@@ -79,11 +79,15 @@ support unstripped position-independent C++ binaries.
 We also show how the class information extracted by dis-cover could be used to
 improve the instrumentation done by RetroWrite.
 
+\dam{I am confused here: Your current addtions allow RetroWrite to work on \textbf{unstripped} C++ binaries? ...}
+
 By utilizing \emph{dis-cover}, we successfully extract useful information from
 closed-source applications like Zoom.
 
-We also details the improvements now needed for \emph{RetroWrite} to support
+We also detail the improvements now needed for \emph{RetroWrite} to support
 rewriting \emph{stripped} position-independent C++ binaries.
+
+\dam{... and you detailed what will be needed to support \textbf{stripped} ones? Is my understanding correct? Maybe make this a bit more explicit.}
 
 \end{abstract}
 
@@ -131,9 +135,10 @@ ecosystem of binaries unstudied.
 
 The blame can mostly be put on the complexity of C++ when compared to C.
 Whereas C translates quite naturally to assembly, abstractions specific to C++ 
-require more work and complexity to be translated to asm.
+require more work and complexity to be translated to asm. \dam{What do you mean by "asm"? "assembly"?}
 This also leads to important information being lost from C++ source code to 
 binary, but also certain information remaining.
+\dam{Maybe you could add examples of what remains and what not. To give an intuition/outlook about what you are talking.}
 
 In this thesis we would like to present the 
 \emph{dis-cover}~\cite{discovergithub} static analysis tool.
@@ -143,7 +148,7 @@ This enables other debugging tools to see and display this information.
 
 This class hierarchy information is included in the binary for functionality
 reasons, and is even kept after basic stripping of the program.
-Several large projects, like the Zoom conferencing software
+Several large projects, like the Zoom conferencing software \dam{Something seems to be missing here.}
 
 The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a 
 static rewriting tool for unstripped x86\_64 position-independent binaries.
