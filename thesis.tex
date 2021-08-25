@@ -76,14 +76,15 @@ writing static analysis tools.
 
 By researching in detail the way C++ exceptions are implemented, we also
 augment the capabilities of the \emph{RetroWrite} static rewriting tool to
-support C++ binaries.
+support unstripped position-independent C++ binaries.
 We also show how the class information extracted by dis-cover could be used to
 improve the instrumentation done by RetroWrite.
 
 By utilizing \emph{dis-cover}, we successfully extract useful information from
 closed-source applications like Zoom.
 
-\lou{TODO add RetroWrite C++ example}
+We also details the improvements now needed for \emph{RetroWrite} to support
+rewriting \emph{stripped} position-independent C++ binaries.
 
 \end{abstract}
 
@@ -121,8 +122,8 @@ binaries, because analysis methods found this way are simpler and will often
 work on C++ binaries too.
 
 This has meant reverse engineering tools like Ghidra~\cite{ghidra}, IDA 
-Pro~\cite{ida} or Binary Ninja~\cite{binja} have treated non-C binaries as 
-second-class citizen.
+Pro~\cite{ida}, radare2~\cite{radare} or Binary Ninja~\cite{binja} have
+treated non-C binaries as second-class citizen.
 These tools will often show C++ specific features as passing comments, failing 
 to show the real implications of a try/catch block or a polymorphic class.
 The complexity of C++ has also lead binary rewriters like
@@ -146,15 +147,15 @@ reasons, and is even kept after basic stripping of the program.
 Several large projects, like the Zoom conferencing software
 
 The recent RetroWrite~\cite{dinesh20oakland} project by the HexHive lab is a 
-static rewriting tool for x86\_64 position-independent binaries.
+static rewriting tool for unstripped x86\_64 position-independent binaries.
 It enables the instrumentation of projects when we do not have access to the 
 source code.
 Instrumentation is the process of adding instructions to a binary, to add
 additional security checks for example.
 The target can be a legacy project, a closed-source product or even malware.
 In this thesis we will also detail our improvements to RetroWrite to support
-C++ binaries, and the possibilities opened by this feature for future
-researchers.
+unstripped position-independent \emph{C++} binaries, and the possibilities
+opened by this feature for future researchers.
 
 %%%%%%%%%%%%%%%%%%%%
 \chapter{Background}
@@ -564,17 +565,20 @@ functions and data offsets for example.
 This way, we can add any instruction after and before existing instructions
 without breaking relative offsets.
 
-RetroWrite only works on \emph{x86\_64} position-independent executables
-(see \autoref{picpie}), compiled from C. This enables the RetroWrite to stay
-heuristics-free (meaning that it is designed to work for every example without
-exceptions).
+RetroWrite only works on \emph{x86\_64} unstripped position-independent
+executables (see \autoref{picpie}), compiled from C.
+This enables the RetroWrite to stay heuristics-free (meaning that it is
+designed to work for every example without exceptions).
+
+If you try to rewrite a binary that is stripped, the code blocks that
+correspond to functions will not be identified as such.
+RetroWrite currently needs to know the function boundaries to rewrite a binary.
+Identifying the function boundaries would require heuristics.
 
 If you try to rewrite a binary that is not position-independent, the
-positions (pointers) in you binary are indistinguishable from data, and it
-becomes an unsolvable problem to differentiate between data and a pointer
-(which is why you would need heuristics in that scenario).
-
-\lou{@antony could you please verify the formulation of this last paragraph ?}
+positions (pointers) in your binary are indistinguishable from data, and it
+becomes an unsolvable problem to differentiate between data and a pointer,
+which is why you would also need heuristics in that scenario.
 
 
 %%%%%%%%%%%%%%%%
@@ -739,47 +743,27 @@ exceptions.
 
 We had to study and work with exceptions and exception handling frames for 
 the augmentation of RetroWrite with C++ capabilities
-
-\ant{Did DWARF allow us to express exception information in its debug format? 
-I don't think it did. So perhaps we can also add something like: we initially 
-hoped to expose exception information to DWARF as well, but this would require
-an extension to the DWARF format. However, by adding 
-exception support to RetroWrite, instrumentation tools can still work with 
-exceptions.}
-\ant{This is the key point I think: our goal was to make this information 
-available to help add instrumentation to compile binaries. We discovered we 
-couldn't do this for DWARF as it stands, but we can make RetroWrite support it, 
-and by doing so you can use that information during the analysis}
-\ant{You can then cite the goal of making DWARF a lingua franca of binary 
-analysis again. We hoped to help with this, we failed, but we did the work to 
-parse exceptions that is a very important step on the way to that.}
-\lou{Yes, the exception try/catch blacks are declared as "blocks" in DWARF,
-but I do not recall them being tagged as "try" and "catch" blocks. It
-definitely was an awkward process, mostly because it was not displayed well in
-debuggers. IIRC, we decided not to get dis-cover to tag them because tagging
-them did not bring out any additional information compared to what the
-debuggers already had with the eh\_frame etc.}
-
 (see \autoref{retrowriteimplementation}, \autoref{retrowritedesign} and
 \autoref{exceptions} for more details).
-Today, RetroWrite supports the reversing of x86\_64 position-independent 
-binaries.
-There was also work to augment RetroWrite to support kernel 
-code~\cite{rwkernel} and arm\_64~\cite{rwarm}.
-We aimed to add C++ capabilities for x86\_64 binaries only, as it is the most 
-widely used platform (though the same logic will most probably apply with a 
-little tweaking to ARM and other architectures).
 
 
 \section{RetroWrite}
 \label{retrowritedesign}
+
+Today, RetroWrite supports the reversing of \emph{x86\_64}
+position-independent binaries.
+There was also work to augment RetroWrite to support kernel 
+code~\cite{rwkernel} and \emph{arm\_64}~\cite{rwarm}.
+We aimed to add C++ capabilities for \emph{x86\_64} binaries only, as it is
+the most widely used platform (though the same logic will most probably apply
+with a little tweaking to \emph{arm\_64} and other architectures).
 
 The first bug we encountered while trying to use RetroWrite on C++ binaries
 was due to the fact that the \emph{initialization array} (see
 \autoref{framedummy}) contained a pointer to the \emph{frame dummy} and this
 was not handled well during RetroWrite's symbolization process.
 By adding special treatment for that scenario, we resolved this failure (see
-more details in \autoref{retrowriteimplementation}).
+more details in \autoref{fixinginitarray}).
 
 Once that was fixed, we saw that using RetroWrite on binaries that had C++
 exception handling would cause crashes in the new binary, caused by the fact
@@ -795,7 +779,13 @@ for an example of this process.
 
 We had to rewrite the LSDA in our new assembly representation, with the
 appropriate labels and values, in order to make the exceptions work as they
-should.
+should (see how we achieved that in \autoref{creatinglsda})
+
+Once this was done, we were able to rewrite basic C++ binaries that used
+exceptions.
+% TODO modify this if it changes
+Bigger projects still caused some issues, that will be addressed
+before the code becomes public.
 
 
 \section{Design for future integrations}
@@ -1032,6 +1022,7 @@ This is how we conducted the research detailed in \autoref{debiansection}.
 \label{retrowriteimplementation}
 
 \subsection{Fixing the .init\_array}
+\label{fixinginitarray}
 
 The first modification we did to RetroWrite to add support for C++ binaries
 was to address the \texttt{init\_array} errors described in
@@ -1050,6 +1041,7 @@ We then let the compiler add a pointer to the \texttt{frame\_dummy} it just
 created to the \texttt{init\_array} at compile time.
 
 \subsection{Creating a Language Specific Data Area}
+\label{creatinglsda}
 
 The next modification was a larger one : the whole \emph{Language Specific
 Data Areas} (LSDAs) had to be symbolized and rewritten.
@@ -1059,12 +1051,16 @@ offset to cleanup functions, as well as lengths of instructions (which we
 transform into label differences).
 There is one LSDA for each code block in a program.
 
+The LSDA starts with some fields that describe some properties of itself, such
+as the encoding of its values, an offset for its pointers and its length.
+
 There are multiple tables in the LSDA : First the \emph{call-site table}.
-It contains information about what action to take if an exception is thrown in
-a certain location.
+It contains information about what method to call if an exception is thrown in
+a certain location, and what \emph{actions} it should catch (what type of
+error it should catch).
 
 The second table is the \emph{action table}. It contains offsets to next
-actions (similarly to a linked list), and an index to the types table.
+action (similarly to a linked list), and an index to the types table.
 
 The third and final table is the \emph{types table}, which contains pointers
 to type information structures. For example, it might contain a pointer to
@@ -1229,7 +1225,19 @@ packages.
 
 \section{Testing RetroWrite}
 
-\lou{TODO if we end up with a working version of C++ capabilities in RetroWrite}
+We were able to test the new C++ capabilities of RetroWrite on examples we had
+coded ourselves.
+The tool did not yet manage to rewrite larger projects.
+This will be fixed before we make the code public.
+
+Also, testing on well-known closed-source projects proved an issue, because
+the binaries were stripped, and thus the function boundaries were not known.
+RetroWrite does not yet support unstripped binaries because of this.
+In order to make RetroWrite work on projects such as Chrome~\cite{chrome} or
+Zoom~\cite{zoom}, one could use a function identification tool such as the
+ones found in IDA Pro~\cite{ida} or radare2~\cite{radare}.
+These tools use heuristics to find the function boundaries, so they might not
+work for every project.
 
 
 %%%%%%%%%%%%%%%%%%%%%%
