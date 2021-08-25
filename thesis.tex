@@ -205,7 +205,7 @@ This is made possible by computing \emph{relative positions} instead of
 using absolute addresses, as well as a feature called \emph{relocations}.
 
 PIC is most often found for shared libraries, so that they can be inserted into 
-an ELF file without worry.
+an ELF file without worry. \dam{Maybe you want to be a bit more explicit here. PIC is used so that sharing of libraries by different processes works, right? Not really so that they can be inserted into ELF files.}
 PIE binaries are seen as more secure because they allow for easy inserting of 
 security measures like address space layout 
 randomization~\cite{aslr}.
