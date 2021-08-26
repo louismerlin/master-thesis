@@ -584,11 +584,6 @@ correspond to functions will not be identified as such.
 RetroWrite currently needs to know the function boundaries to rewrite a binary.
 Identifying the function boundaries would require heuristics.
 
-\dam{@Antony: Could be a future improvement for RetroWrite, though not being so 
-straightforward. Most use cases I currently have are actually stripped 
-position-independent C binaries (and some compiled for ARMv7/32bit - could that 
-theoretically be supported by RetroWrite?)}
-
 If you try to rewrite a binary that is not position-independent, the
 positions (pointers) in your binary are indistinguishable from data, and it
 becomes an unsolvable problem to differentiate between data and a pointer,
@@ -872,7 +867,6 @@ file.
 \label{hexdump}
 
 \end{figure}
-\dam{Maybe the "VTable for Animal" and "VTable for Dog" could have different colors.}
 
 Next, we analyze the data at the pointer's value.
 We check that we have not already extracted a class at that address, and if
@@ -966,12 +960,11 @@ We now have to go through a few hoops to make the debug and symbol information
 available in one binary because these sections do not come alone : they have to
 be accompanied by machine code and data.
 We did not want to recreate a whole compiler to assemble all of this data.
-Luckily, the \emph{eu-unstrip} tool was created as an utility application
-to "combine stripped files with separate symbols and debug information".
+Luckily, the \emph{eu-unstrip}~\cite{euunstrip} tool was created as an utility
+application to "combine stripped files with separate symbols and debug
+information".
 \autoref{recovergraph} shows a diagram of the process we will explain in this
 section.
-
-\dam{Maybe add a reference to the \emph{eu-unstrip} tool.}
 
 \begin{figure}
 
@@ -1063,9 +1056,8 @@ The compiler will automatically generate one during the compilation process.
 The fix to this bug was simply to remove the \texttt{frame\_dummy} pointer
 from the \texttt{init\_array} when it was present in the intermediate
 representation of the assembly code.
-We then let the compiler add a pointer to the \texttt{frame\_dummy} it just
-created to the \texttt{init\_array} at compile time.
-\dam{Is it really the compiler re-adding the pointer, or rather the assembler?}
+We then let the assembler add a pointer to the \texttt{frame\_dummy} it just
+created to the \texttt{init\_array} at assembly time.
 
 \subsection{Adding CFI directives}
 \label{addingcfi}
@@ -1138,8 +1130,8 @@ One was using simple inheritance,
 one had a namespace (which we can and should recover as part of the analysis),
 and the last one was a use case of multiple inheritance (using the diamond 
 problem).
-
-\dam{You could mention that these examples can be find in dis-cover's Github repo.}
+These examples can be found in the code repository~\cite{discovergithub} for
+the dis-cover project.
 
 We also created a script that would compile these three programs using
 different levels of compiler optimization.
@@ -1420,8 +1412,6 @@ C++ support.
 To our knowledge, RetroWrite is the first static rewriter that can add
 instrumentation like AddressSanitizer to closed-source C++ binaries that make
 use of exceptions.
-
-\dam{Great work, well done!}
 
 \cleardoublepage
 \phantomsection
