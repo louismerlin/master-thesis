@@ -873,6 +873,7 @@ file.
 \label{hexdump}
 
 \end{figure}
+\dam{Maybe the "VTable for Animal" and "VTable for Dog" could have different colors.}
 
 Next, we analyze the data at the pointer's value.
 We check that we have not already extracted a class at that address, and if
@@ -971,6 +972,8 @@ to "combine stripped files with separate symbols and debug information".
 \autoref{recovergraph} shows a diagram of the process we will explain in this
 section.
 
+\dam{Maybe add a reference to the \emph{eu-unstrip} tool.}
+
 \begin{figure}
 
 \includegraphics[width=16cm]{recover.png}
@@ -1063,6 +1066,7 @@ from the \texttt{init\_array} when it was present in the intermediate
 representation of the assembly code.
 We then let the compiler add a pointer to the \texttt{frame\_dummy} it just
 created to the \texttt{init\_array} at compile time.
+\dam{Is it really the compiler re-adding the pointer, or rather the assembler?}
 
 \subsection{Adding CFI directives}
 \label{addingcfi}
