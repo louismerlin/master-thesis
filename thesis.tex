@@ -353,9 +353,8 @@ The structure of vtables and RTTIs is detailed in \autoref{rttigraph}.
 All of this is defined in the Itanium C++ ABI~\cite{cppabi}.
 An instance of a virtual class Animal will contain the \emph{vtblptrAnimal}, 
 a pointer to the \emph{virtual table} (vtable) for the Animal class.
-This vtable will be shared by all instances of this class (even by instances
-of a class that inherit from Animal), and will contain pointers to the virtual
-methods of the class.
+This vtable will be shared by all instances of this class, and will contain
+pointers to the virtual methods of the class.
 The first value preceding the vtable is a pointer to the RTTI of the class. A
 program finds out the class inheritance of a class instance at runtime by
 following this pointer.
