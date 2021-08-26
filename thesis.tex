@@ -16,16 +16,16 @@
 \usepackage{xspace}
 \usepackage{listings}
 % Enable all todo comments.
-\usepackage[]{todonotes}
+% \usepackage[]{todonotes}
 % Uncomment this to disable the comment blocks
 % \usepackage[disable]{todonotes} 
 % This is how we do comments for papers in the lab. This way you can see it 
 % both in TeX and when you compile the PDF. Make sure they're all removed for 
 % the final version by switching the lines above. I also don't mind if you 
 % delete them once resolved because I can see them changed in git :)
-\newcommand{\ant}[1]{\todo[inline,color=blue!40]{Antony: #1}}
-\newcommand{\dam}[1]{\todo[inline,color=red!40]{Damian: #1}}
-\newcommand{\lou}[1]{\todo[inline,color=green!40]{Louis: #1}}
+% \newcommand{\ant}[1]{\todo[inline,color=blue!40]{Antony: #1}}
+% \newcommand{\dam}[1]{\todo[inline,color=red!40]{Damian: #1}}
+% \newcommand{\lou}[1]{\todo[inline,color=green!40]{Louis: #1}}
 
 \lstset{ 
   basicstyle=\footnotesize,
@@ -799,7 +799,6 @@ should (see how we achieved that in \autoref{creatinglsda})
 
 Once this was done, we could rewrite basic C++ binaries that used
 exceptions.
-% TODO modify this if it changes
 Bigger projects still caused some issues, that will be addressed
 before the code becomes public.
 
@@ -1269,7 +1268,6 @@ ourselves.
 These included complex examples with user-defined errors types, catching of
 multiple error types, and memory allocation in the code blocks that threw the
 exception.
-% TODO modify this if it changes
 The tool did not yet manage to rewrite larger projects.
 This will be fixed before we make the code public.
 
