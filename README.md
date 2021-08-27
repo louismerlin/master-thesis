@@ -3,6 +3,8 @@
 ##### Spring 2021
 ##### Louis Merlin
 
+[Read it here](https://github.com/louismerlin/master-thesis/releases/download/submitted/thesis.pdf)
+
 
 # Acknowledgement
 
